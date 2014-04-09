@@ -47,7 +47,7 @@ module ApiHelper
 
     TRANSACTION_MAX_RETRIES = 3
     def retriable_transaction(options = {},&block)
-      options[:isolation] ||= :repeatable_read
+      options[:isolation] ||= :read_committed
       read_only = !!options.delete(:read_only)
       unless connection.open_transactions.zero?
         return yield
@@ -78,7 +78,7 @@ module ApiHelper
       unless connection.open_transactions.zero?
         raise "locked_transaction cannot be called from within another transaction!"
       end
-      retriable_transaction(isolation: :serializable) do
+      retriable_transaction do
         ActiveRecord::Base.connection.execute("LOCK TABLE #{table_name}")
         yield if block_given?
       end
