@@ -1,4 +1,4 @@
-# Copyright 2013, Dell
+# Copyright 2014, Dell
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,3 +14,10 @@
 #
 
 en:
+  common:
+    roles:
+      puppet-agent_sa: 'Puppet Agent'
+      puppet-test: 'Puppet Validate'
+      puppet-sa: 'Puppet Stand Alone'
+    attribs:
+      puppet-agent-sa-name: "Puppet Name"
