@@ -26,7 +26,7 @@ class BarclampProvisioner::DockerSetup < Role
   def on_node_delete(node)
     to_enqueue = []
     node_roles.each do |nr|
-      nr.with_lock do
+      nr.with_lock('FOR NO KEY UPDATE') do
         hosts = nr.sysdata["crowbar"]["docker"]["clients"]
         next unless hosts.delete(node.name)
         nr.update_column("sysdata",{"crowbar" => {"docker" => {"clients" => hosts}}})
@@ -43,7 +43,7 @@ class BarclampProvisioner::DockerSetup < Role
     }
     to_enqueue = []
     node_roles.each do |nr|
-      nr.with_lock do
+      nr.with_lock('FOR NO KEY UPDATE') do
         hosts = (nr.sysdata["crowbar"]["docker"]["clients"] rescue {})
         next if hosts[node.name] == host
         hosts[node.name] = host

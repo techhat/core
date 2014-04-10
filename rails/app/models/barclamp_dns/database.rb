@@ -28,7 +28,7 @@ class BarclampDns::Database < Role
   def on_node_delete(n)
     to_enqueue = []
     node_roles.each do |nr|
-      nr.with_lock do
+      nr.with_lock('FOR NO KEY UPDATE') do
         hosts = nr.sysdata["crowbar"]["dns"]["hosts"]
         unless hosts.delete(n.name + ".")
           Rails.logger.error("dns-database: #{n.name} not in DNS database!")
@@ -54,7 +54,7 @@ class BarclampDns::Database < Role
     host["alias"] = n.alias if n.alias && !canonical_name.index(n.alias)
     to_enqueue = []
     node_roles.each do |nr|
-      nr.with_lock do
+      nr.with_lock('FOR NO KEY UPDATE') do
         hosts = (nr.sysdata["crowbar"]["dns"]["hosts"] rescue {})
         Rails.logger.debug("dns-database: Old host info: #{hosts.inspect}")
         if hosts[canonical_name] == host

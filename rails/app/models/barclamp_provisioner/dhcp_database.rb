@@ -30,7 +30,7 @@ class BarclampProvisioner::DhcpDatabase < Role
   def on_node_delete(node)
     Rails.logger.info("provisioner-dhcp-database: Updating for deleted node #{node.name}")
     node_roles.each do |nr|
-      nr.with_lock do
+      nr.with_lock('FOR NO KEY UPDATE') do
         hosts = nr.sysdata["crowbar"]["dhcp"]["clients"]
         next unless hosts.delete(node.name)
         nr.update_column("sysdata",{"crowbar" => {"dhcp" => {"clients" => hosts}}})
@@ -66,7 +66,7 @@ class BarclampProvisioner::DhcpDatabase < Role
     return unless mac_list.length > 0
     to_enqueue = []
     node_roles.each do |nr|
-      nr.with_lock do
+      nr.with_lock('FOR NO KEY UPDATE') do
         hosts = (nr.sysdata["crowbar"]["dhcp"]["clients"] rescue {})
         next if hosts[node.name] == host
         hosts[node.name] = host
