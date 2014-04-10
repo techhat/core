@@ -63,7 +63,10 @@ module ApiHelper
         # and we expect that things will eventually serialize.
         # At least, postgres ensures that at least 1 out of n transactions
         # that can trigger a serialization failure will be committed.
-        retry if error.message =~ /PG::TRSerializationFailure/
+        if error.message =~ /PG::TRSerializationFailure/
+          Rails.logger.error("Immediately retrying serialization failure")
+          retry
+        end
         raise error unless (retries <= TRANSACTION_MAX_RETRIES) &&
           connection.open_transactions.zero? &&
           (error.message =~ /(deadlock detected)|(The transaction might succeed if retried)/)
