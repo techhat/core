@@ -28,18 +28,6 @@ class Run < ActiveRecord::Base
     [node_role.cohort, node_role_id, id]
   end
 
-  def self.locked_transaction(&block)
-    begin
-      Run.transaction(isolation: :serializable) do
-        ActiveRecord::Base.connection.execute("LOCK TABLE runs")
-        yield if block_given?
-      end
-    rescue ActiveRecord::StatementInvalid => e
-      Rails.logger.error("Run: Deadlock detected, retrying: #{e.message}")
-      retry
-    end
-  end
-
   def self.empty?
     Run.locked_transaction do
       Run.all.count == 0
