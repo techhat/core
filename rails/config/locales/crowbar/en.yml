@@ -283,6 +283,9 @@ en:
       nav_next: "next page"
       nav_up: "up"
       edit_this_page: "Edit this page on GitHub"
+    topic:
+      topic_error: "Error processing doc request!"
+      topic_missing: "Topic not found!"
   groups:
     index:
       title: "Node Groups"

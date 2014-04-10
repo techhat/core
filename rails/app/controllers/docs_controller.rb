@@ -45,10 +45,12 @@ class DocsController < ApplicationController
   end
 
   def show
+    id = params[:id]
+    @doc = Doc.find_key id rescue nil
+    @doc ||= Doc.find_key "/#{id}" rescue nil
+    @doc ||= Doc.find_key "/#{id}/README.md" rescue nil
+    @text = ""
     begin
-      id = params[:id]
-      @doc = Doc.find_key id
-      @doc ||= Doc.find_key "/#{id}"
       if @doc
         @nav_up = @doc.parent
         brothers = Doc.where(:parent_id=>@doc.parent_id).sort
@@ -62,7 +64,7 @@ class DocsController < ApplicationController
           elsif x.id == @doc.id
             reached = true
           else
-          @nav_prev = x
+            @nav_prev = x
           end
         end
         if not reached
