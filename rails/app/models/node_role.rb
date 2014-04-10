@@ -450,7 +450,7 @@ class NodeRole < ActiveRecord::Base
       Rails.logger.debug("NodeRole #{name}: Calling #{meth} hook.")
       role.send(meth,self)
     end
-    if todo? && runnable?
+    if todo? && runnable? && !Run.exists?(node_id: self.node_id, running: true)
       Rails.logger.info("NodeRole #{name} is runnable, kicking the annealer.")
       Run.run!
     end

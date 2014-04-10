@@ -164,28 +164,61 @@ class Jig < ActiveRecord::Base
   end
 
   def run_job(job)
-    nr = job.node_role
-    Rails.logger.info("Run: Running job #{job.id} for #{nr.name}")
-    begin
-      nr.transition!
-      run(nr,job.run_data["data"]) unless nr.role.destructive && (nr.run_count > 0)
-      Rails.logger.debug("Run: Finished job #{job.id} for #{nr.name}, no exceptions raised.")
-      nr.active!
-    rescue Exception => e
-      NodeRole.transaction do
-        nr.update!(runlog: "#{e.class.name}: #{e.message}\nBacktrace:\n#{e.backtrace.join("\n")}")
-        nr.error!
+    loop do
+      nr = job.node_role
+      begin
+        nr.transition!
+        unless nr.role.destructive && (nr.run_count > 0)
+          Rails.logger.info("Run: Running job #{job.id} for #{nr.name}")
+          nr.jig.run(nr,job.run_data["data"])
+          Rails.logger.debug("Run: Finished job #{job.id} for #{nr.name}, no exceptions raised.")
+        else
+          Rails.logger.info("Run: Skipping run for job #{job.id} for #{nr.name} due to destructiveness")
+        end
+        nr.active!
+      rescue Exception => e
+        NodeRole.transaction do
+          nr.update!(runlog: "#{e.class.name}: #{e.message}\nBacktrace:\n#{e.backtrace.join("\n")}")
+          nr.error!
+        end
+        Rails.logger.debug("Run: Finished job #{job.id} for #{nr.name}, exceptions raised.")
+        Rails.logger.error("#{e.class.name}: #{e.message}\nBacktrace:\n#{e.backtrace.join("\n")}")
+      ensure
+        finish_run(nr)
+        Run.locked_transaction do
+          Rails.logger.debug("Run: Deleting finished job #{job.id} for #{nr.name}")
+          job.delete
+          # Try to steal work for this node if we can.
+          job = nil
+          unless Run.exists?(node_id: nr.node_id, running: true)
+            # This will ensure that queued noderoles get processed
+            # in proper dependency order.
+            job = Run.where(node_id: nr.node_id).runnable.first
+            if job
+              # Pick the latest job with the same noderole as the job we just found, and
+              # delete the previous instances.  This ensures that we do not waste time running
+              # intermediate roles where we do not need to.
+              Rails.logger.info("Run: Stole preexisting run #{job.id}")
+              job.running = true
+              job.save!
+            else
+              # We did not find an already-enqueued run, so see if we can make
+              # one from a handy runnable NodeRole.
+              nr = NodeRole.where(node_id: nr.node_id).runnable.order("cohort ASC").first
+              if nr
+                Rails.logger.info("Run: Stealing #{nr.name}")
+                job = Run.create!(node_id: nr.node_id,
+                                  node_role_id: nr.id,
+                                  running: true,
+                                  run_data: {"data" => nr.jig.stage_run(nr)})
+              end
+            end
+          end
+        end
       end
-      Rails.logger.debug("Run: Finished job #{job.id} for #{nr.name}, exceptions raised.")
-      Rails.logger.error("#{e.class.name}: #{e.message}\nBacktrace:\n#{e.backtrace.join("\n")}")
-    ensure
-      finish_run(nr)
-      Run.locked_transaction do
-        Rails.logger.debug("Run: Deleting finished job #{job.id} for #{nr.name}")
-        job.delete
-      end
-      Run.run!
+      break unless job
     end
+    Run.run!
   end
 
   # Return all keys from hash A that do not exist in hash B, recursively
