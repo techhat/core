@@ -43,8 +43,8 @@
 
     %footer
       =t '.provided_by'
-      %a{:href=>"http://dell.com/cloud", :target=>"_new"}
-        %img{:src=>"/images/layout/dell.png", :alt=>"Dell, Inc.", :title=>"Dell, Inc.", :style=>"vertical-align:middle;padding-bottom:2px"}
-      %a{:href=>"http://dell.com/crowbar", :target=>"_new", :alt=>"Dell, Inc."}
-        CloudEdge Solutions team
+      %a{:href=>"http://opencrowbar.org", :target=>"_new"}
+        %img{:src=>"/images/layout/ocb_logo.png", :alt=>"Crowbar Project", :title=>"Crowbar Project", :style=>"vertical-align:middle;padding-bottom:2px"}
+      %a{:href=>"https://github.com/orgs/opencrowbar/members", :target=>"_new", :alt=>"Dell, Inc."}
+        OpenCrowbar Project team
       =t 'version', :version=>(Rails.env.development? ? "Development" : Barclamp.where( :name => "crowbar").first.commit)
