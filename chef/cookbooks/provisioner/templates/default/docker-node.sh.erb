@@ -38,6 +38,7 @@ if [[ ! -x /crowbar-init ]]; then
     docker run "${docker_args[@]}" "$image" /crowbar-init
     exit $?
 fi
+set -x
 export http_proxy='http://<%=@proxy%>'
 export https_proxy="$http_proxy"
 export CROWBAR_KEY="<%=node["crowbar"]["provisioner"]["machine_key"]%>"
@@ -48,7 +49,6 @@ ip addr add <%=addr%> dev eth0
 <% end -%>
 mkdir -p /root/.ssh
 printf '%s' '<%=@keys%>' >/root/.ssh/authorized_keys
-set -x
 # Figure out what we are running on.
 if [[ -f /etc/system-release ]]; then
     read DISTRIB_ID _t DISTRIB_RELEASE rest < /etc/system-release
@@ -106,7 +106,7 @@ pkill -9 sshd
 $(which sshd)
 
 which chef-solo &>/dev/null || curl -L https://www.opscode.com/chef/install.sh | bash
-curl -f -u "$CROWBAR_KEY" --digest -L -X PUT -d "alive=false" "<%=@admin_url%>/api/v2/nodes/<%=@name%>"
-curl -f -u "$CROWBAR_KEY" --digest -L -X PUT -d "alive=true" "<%=@admin_url%>/api/v2/nodes/<%=@name%>"
+curl -g -f -u "$CROWBAR_KEY" --digest -L -X PUT -d 'alive=false' '<%=@admin_url%>/api/v2/nodes/<%=@name%>'
+curl -g -f -u "$CROWBAR_KEY" --digest -L -X PUT -d 'alive=true' '<%=@admin_url%>/api/v2/nodes/<%=@name%>'
 
 /bin/bash -i
