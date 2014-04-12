@@ -44,7 +44,7 @@
     %footer
       =t '.provided_by'
       %a{:href=>"http://opencrowbar.org", :target=>"_new"}
-        %img{:src=>"/images/ocb_logo.png", :alt=>"Crowbar Project", :title=>"Crowbar Project", :style=>"vertical-align:middle;padding-bottom:2px"}
+        %img{:src=>"/images/ocb_logo.png", :alt=>"Crowbar Project", :title=>"Crowbar Project", :width=>'20px', :style=>"vertical-align:middle;padding-bottom:2px"}
       %a{:href=>"https://github.com/orgs/opencrowbar/members", :target=>"_new", :alt=>"Dell, Inc."}
         OpenCrowbar Project team
       =t 'version', :version=>(Rails.env.development? ? "Development" : Barclamp.where( :name => "crowbar").first.commit)
