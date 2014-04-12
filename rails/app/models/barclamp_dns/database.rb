@@ -18,52 +18,38 @@ class BarclampDns::Database < Role
 
   def on_node_create(n)
     Rails.logger.info("dns-database: Updating for new node #{n.name}")
-    rerun_my_noderoles(n)
+    rerun_my_noderoles
   end
 
   def on_node_change(n)
-    rerun_my_noderoles(n)
+    rerun_my_noderoles
   end
 
   def on_node_delete(n)
-    to_enqueue = []
-    node_roles.each do |nr|
-      nr.with_lock('FOR NO KEY UPDATE') do
-        hosts = nr.sysdata["crowbar"]["dns"]["hosts"]
-        unless hosts.delete(n.name + ".")
-          Rails.logger.error("dns-database: #{n.name} not in DNS database!")
-          next
-        end
-        nr.update_column("sysdata",{"crowbar" => {"dns" => {"hosts" => hosts}}})
-        to_enqueue << nr
-      end
-      Rails.logger.info("dns-database: Updating #{nr.name} sysdata for removed node #{n.name}")
-    end
-    to_enqueue.each {|nr| Run.enqueue(nr)}
+    rerun_my_noderoles
   end
 
   private
 
-  def rerun_my_noderoles(n)
-    # Record our host entry information first.
-    v4addrs,v6addrs = n.addresses.partition{|a|a.v4?}
-    canonical_name = n.name + "."
-    host = {}
-    host["ip6addr"] ||= v6addrs.sort.first.addr unless v6addrs.empty?
-    host["ip4addr"] ||= v4addrs.sort.first.addr unless v4addrs.empty?
-    host["alias"] = n.alias if n.alias && !canonical_name.index(n.alias)
+  def rerun_my_noderoles
+    hosts = {}
     to_enqueue = []
+    ActiveRecord::Base.connection.execute("select name, cname, address
+                                           from dns_database
+                                           where network = 'admin'").each do |row|
+      name, addr, cname = row["name"] + ".", IP.coerce(row["address"]), row["cname"]
+      hosts[name] ||= Hash.new
+      hosts[name][addr.v4? ? "ip4addr" : "ip6addr"] ||= addr.addr
+      hosts[name][cname] ||= cname if cname && !name.index(cname)
+    end
     node_roles.each do |nr|
       nr.with_lock('FOR NO KEY UPDATE') do
-        hosts = (nr.sysdata["crowbar"]["dns"]["hosts"] rescue {})
-        Rails.logger.debug("dns-database: Old host info: #{hosts.inspect}")
-        if hosts[canonical_name] == host
-          Rails.logger.info("dns-database: #{n.name} DNS information unchanged.")
+        old_hosts = (nr.sysdata["crowbar"]["dns"]["hosts"] rescue {})
+        if hosts == old_hosts
+          Rails.logger.info("dns-database: DNS information unchanged.")
           next
         end
-        Rails.logger.info("dns-database: Updating #{nr.name} for new node #{n.name}")
-        hosts[canonical_name] = host
-        Rails.logger.debug("dns-database: New host info: #{hosts.inspect}")
+        Rails.logger.info("dns-database: Updating #{nr.name}")
         nr.update_column("sysdata", {"crowbar" => {"dns" => {"hosts" => hosts}}})
         to_enqueue << nr
       end

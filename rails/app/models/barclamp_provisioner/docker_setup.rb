@@ -16,37 +16,31 @@
 class BarclampProvisioner::DockerSetup < Role
 
   def on_node_create(node)
-    rerun_my_noderoles(node)
+    rerun_my_noderoles
   end
 
   def on_node_change(node)
-    rerun_my_noderoles(node)
+    rerun_my_noderoles
   end
 
   def on_node_delete(node)
-    to_enqueue = []
-    node_roles.each do |nr|
-      nr.with_lock('FOR NO KEY UPDATE') do
-        hosts = nr.sysdata["crowbar"]["docker"]["clients"]
-        next unless hosts.delete(node.name)
-        nr.update_column("sysdata",{"crowbar" => {"docker" => {"clients" => hosts}}})
-        to_enqueue << nr
-      end
-    end
-    to_enqueue.each {|nr| Run.enqueue(nr)}
+    rerun_my_noderoles
   end
 
-  def rerun_my_noderoles(node)
-    host = {
-      "addresses" => node.addresses.map{|a|a.to_s},
-      "image" => "opencrowbar/ubuntu-slave"
-    }
+  def rerun_my_noderoles
     to_enqueue = []
+    hosts = {}
+    ActiveRecord::Base.connection.execute("select * from docker_database order by name asc, address asc").each do |row|
+      name,address = row["name"], row["address"]
+      hosts[name] ||= Hash.new
+      hosts[name]["addresses"] ||= Array.new
+      hosts[name]["addresses"] << address
+      hosts[name]["image"] ||= "opencrowbar/ubuntu-slave"
+    end
     node_roles.each do |nr|
       nr.with_lock('FOR NO KEY UPDATE') do
-        hosts = (nr.sysdata["crowbar"]["docker"]["clients"] rescue {})
-        next if hosts[node.name] == host
-        hosts[node.name] = host
+        old_hosts = (nr.sysdata["crowbar"]["docker"]["clients"] rescue {})
+        next if old_hosts  == hosts
         nr.update_column("sysdata",{"crowbar" => {"docker" => {"clients" => hosts}}})
         to_enqueue << nr
       end
