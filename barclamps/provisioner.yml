@@ -58,7 +58,7 @@ roles:
       - name: provisioner-package-repos
         description: 'The packages repositories that managed nodes should use to install packages.'
         map: 'crowbar/provisioner/server/repositories'
-        ui_renderer: 'barclamp_provisioner/attribs/package-repos'
+        ui_renderer: 'barclamp_provisioner/attribs/package_repos'
       - name: provisioner-available-oses
         description: 'The operating systems that the provisioner knows how to install'
         map: 'crowbar/provisioner/server/available_oses'
