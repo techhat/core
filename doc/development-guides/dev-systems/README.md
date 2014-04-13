@@ -19,6 +19,8 @@ Engineers value documentation that explains how to get a development workstation
     1. Setup a [Squid Proxy](proxy-cache.md)
     1. SAMBA share
       1. ubuntu: `sudo apt-get install samba`
+  1. Make sure you setup noproxy for your environment: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"
+    1. tip: add this to your login init
   1. Passwordless sudo: `sudo sed -ie "s/%sudo\tALL=(ALL:ALL) ALL/%sudo ALL=(ALL) NOPASSWD: ALL/g" /etc/sudoers`
     1. additional information, see http://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux
   1. if you are stuck behind a proxy, make sure your environment does not use it for local addresses: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
