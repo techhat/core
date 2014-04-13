@@ -6,4 +6,4 @@ while [[ ! -x $init ]]; do
     printf '%s' "."
     sleep 1
 done
-"$init"
+sudo "$init"
