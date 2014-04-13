@@ -55,5 +55,37 @@ class CreateNetworks < ActiveRecord::Migration
       t.string       :address,    null: false, index: { unique: true }
       t.timestamps
     end
+
+    create_view :dns_database, "select n.name as name,
+                                       n.alias as cname,
+                                       a.address as address,
+                                       net.name as network
+                                from nodes n
+                                inner join network_allocations a on n.id = a.node_id
+                                inner join networks net on net.id = a.network_id"
+
+    create_view :dhcp_database, "select n.name as name,
+                                        n.bootenv as bootenv,
+                                        a.address as address,
+                                        json_extract_path(n.discovery,'ohai','network','interfaces') as discovered_macs,
+                                        json_extract_path(n.hint,'admin_macs') as hinted_macs
+                                 from nodes n
+                                 inner join network_allocations a on a.node_id = n.id
+                                                                  and family(a.address::inet) = 4
+                                 inner join networks net on a.network_id = net.id and net.name = 'admin'
+                                 inner join node_roles nr on nr.node_id = n.id
+                                 inner join roles r on nr.role_id = r.id and r.name = 'crowbar-managed-node'
+                                 where json_extract_path(n.hint,'admin_macs') is not null
+                                 or json_extract_path(n.discovery,'ohai','network','interfaces') is not null"
+
+    create_view :docker_database, "select n.name as name,
+                                       a.address as address
+                                from nodes n
+                                inner join network_allocations a on n.id = a.node_id
+                                inner join networks net on net.id = a.network_id
+                                inner join node_roles nr on nr.node_id = n.id
+                                inner join roles r on nr.role_id = r.id
+                                where net.name = 'admin'
+                                and r.name = 'crowbar-docker-node'"
   end
 end
