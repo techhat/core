@@ -14,7 +14,7 @@
 #
 
 provisioner_web=node["crowbar"]["provisioner"]["server"]["webserver"]
-provisioner_addr=node["crowbar"]["provisioner"]["server"]["v4addr"]
+provisioner_addr=node["crowbar"]["provisioner"]["server"]["v6addr"]
 proxy=node["crowbar"]["provisioner"]["server"]["proxy"]
 tftproot = node["crowbar"]["provisioner"]["server"]["root"]
 node_dir="#{tftproot}/nodes"
@@ -37,7 +37,7 @@ node.normal["crowbar_wall"]["docker"]["clients"] ||= Mash.new
               :name => name,
               :proxy => node["crowbar"]["provisioner"]["server"]["proxy"],
               :keys => (node["crowbar"]["provisioner"]["server"]["access_keys"] rescue Hash.new).values.sort.join($/),
-              :admin_url => "http://#{provisioner_addr}:3000"
+              :admin_url => "http://[#{provisioner_addr}]:3000"
               )
   end
 end

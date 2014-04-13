@@ -1,5 +1,11 @@
 #!/bin/bash
 set -e
+# If we have an http_proxy variable, make sure we have a semi-cromulent
+# no_proxy variable as well.
+if [[ $http_proxy && !$no_proxy ]] ; then
+    export no_proxy="127.0.0.0/8,localhost,::1"
+fi
+
 # Figure out what we are running on.
 if [[ -f /etc/system-release ]]; then
     read DISTRIB_ID _t DISTRIB_RELEASE rest < /etc/system-release

@@ -25,7 +25,7 @@ export RAILS_ENV=production
     echo "Failed to bootstrap the Crowbar UI"
     exit 1
 }
-
+. /etc/profile
 export CROWBAR_KEY=$(cat /etc/crowbar.install.key)
 export PATH=$PATH:/opt/opencrowbar/core/bin
 FQDN=$1

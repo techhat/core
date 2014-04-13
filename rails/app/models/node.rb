@@ -14,7 +14,7 @@
 #
 
 require 'digest/md5'
-require 'open3'
+require 'open4'
 
 class Node < ActiveRecord::Base
 
@@ -105,18 +105,15 @@ class Node < ActiveRecord::Base
   end
 
   def ssh(cmd)
-    out,err,stat = Open3.capture3(". /etc/profile; ssh -l root #{address.addr} -- #{cmd}")
-    [out, err, stat]
+    run_on(". /etc/profile; exec ssh -l root #{address.addr} -- #{cmd}")
   end
 
   def scp_from(remote_src, local_dest, opts="")
-    out,err,stat = Open3.capture3("scp #{opts} root@[#{address.addr}]:#{remote_src} #{local_dest}")
-    [out,err,stat]
+    run_on("exec scp #{opts} root@[#{address.addr}]:#{remote_src} #{local_dest}")
   end
 
   def scp_to(local_src, remote_dest, opts="")
-    out,err,stat = Open3.capture3("scp #{opts} #{local_src} root@[#{address.addr}]:#{remote_dest}")
-    [out,err,stat]
+    run_on("exec scp #{opts} #{local_src} root@[#{address.addr}]:#{remote_dest}")
   end
 
   def self.name_hash
@@ -138,7 +135,6 @@ class Node < ActiveRecord::Base
     res = network_allocations.where(network_id: net.id).map do |a|
       a.address
     end
-    res << auto_v6_address(net) if net.v6prefix
     res.sort
   end
 
@@ -329,6 +325,19 @@ class Node < ActiveRecord::Base
   end
 
   private
+
+  def run_on(cmd)
+    Rails.logger.debug("Node: #{name}: Running #{cmd}")
+    out,err = '',''
+    status = Open4::popen4ext(true,cmd) do |pid,stdin,stdout,stderr|
+      stdin.close
+      out << stdout.read
+      err << stderr.read
+      stdout.close
+      stderr.close
+    end
+    [out,err,status]
+  end
 
   def after_commit_handler
     Rails.logger.debug("Node: after_commit hook called")

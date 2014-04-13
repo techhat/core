@@ -47,7 +47,7 @@ module ApiHelper
 
     TRANSACTION_MAX_RETRIES = 3
     def retriable_transaction(options = {},&block)
-      options[:isolation] ||= :repeatable_read
+      options[:isolation] ||= :read_committed
       read_only = !!options.delete(:read_only)
       unless connection.open_transactions.zero?
         return yield
@@ -63,7 +63,10 @@ module ApiHelper
         # and we expect that things will eventually serialize.
         # At least, postgres ensures that at least 1 out of n transactions
         # that can trigger a serialization failure will be committed.
-        retry if error.message =~ /PG::TRSerializationFailure/
+        if error.message =~ /PG::TRSerializationFailure/
+          Rails.logger.error("Immediately retrying serialization failure")
+          retry
+        end
         raise error unless (retries <= TRANSACTION_MAX_RETRIES) &&
           connection.open_transactions.zero? &&
           (error.message =~ /(deadlock detected)|(The transaction might succeed if retried)/)
@@ -78,7 +81,7 @@ module ApiHelper
       unless connection.open_transactions.zero?
         raise "locked_transaction cannot be called from within another transaction!"
       end
-      retriable_transaction(isolation: :serializable) do
+      retriable_transaction do
         ActiveRecord::Base.connection.execute("LOCK TABLE #{table_name}")
         yield if block_given?
       end

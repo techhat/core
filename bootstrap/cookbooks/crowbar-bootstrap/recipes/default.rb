@@ -124,7 +124,8 @@ when "debian","ubuntu"
 when "centos","redhat","suse","opensuse","fedora"
   # Docker images do not have this, but the postgresql init script insists on it being present.
   file "/etc/sysconfig/network" do
-    action :create_if_missing
+    action :create
+    content "NETWORKING=yes"
   end
 
   repos.each do |repo|

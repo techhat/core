@@ -17,7 +17,7 @@ class Network < ActiveRecord::Base
   ADMIN_NET = "admin"
 
   validate        :check_network_sanity
-  after_create    :add_role
+  after_commit    :add_role, on: :create
   after_save      :auto_prefix
   before_destroy  :remove_role
 
@@ -68,11 +68,7 @@ class Network < ActiveRecord::Base
   end
 
   def node_allocations(node)
-    res = allocations.node(node).map do |a|
-      a.address
-    end
-    res << node.auto_v6_address(self) if v6prefix
-    res.sort
+    allocations.node(node).map{|a|a.address}.sort
   end
 
   def make_node_role(node)
@@ -111,13 +107,17 @@ class Network < ActiveRecord::Base
     end
   end
 
-  # every network needs to have a matching role
+  # every network needs to have a matching role and auto v6 range
   def add_role
     role_name = "network-#{name}"
     unless Role.exists?(name: role_name)
       Rails.logger.info("Network: Adding role and attribs for #{role_name}")
       bc = Barclamp.find_key "network"
       Role.transaction do
+        NetworkRange.create!(name: "host-v6",
+                             first: "#{v6prefix}::1/64",
+                             last:  ((IP.coerce("#{v6prefix}::/64").broadcast) - 1).to_s,
+                             network_id: id) if v6prefix
         r = Role.find_or_create_by_name!(:name => role_name,
                                         :type => "BarclampNetwork::Role",   # force
                                         :jig_name => Rails.env.production? ? "chef-solo" : "test",

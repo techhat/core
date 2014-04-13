@@ -40,6 +40,7 @@ gem 'delayed_job_active_record'
 gem 'ledermann-rails-settings', :require => 'rails-settings'
 gem 'jquery-rails'
 gem 'chef', "11.6"
+gem 'open4'
 
 group :development, :test do
   gem 'coveralls', :platforms => [:ruby_19,:ruby_20]

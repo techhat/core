@@ -57,6 +57,7 @@ class BarclampNetwork::Role < Role
   def on_proposed(nr)
     node = nr.node(true)
     return if network.allocations.node(node).count != 0
+    # v4 automatic address allocation handling
     addr_range = if node.is_admin? && network.ranges.exists?(name: "admin")
                    network.ranges.find_by!(name: "admin")
                  else
@@ -64,6 +65,12 @@ class BarclampNetwork::Role < Role
                  end
     # get the suggested ip address (if any) - nil = automatically assign
     suggestion = node.attribs.find_by!(name: "hint-#{network.name}-v4addr").get(node)
+    addr_range.allocate(nr.node, suggestion)
+    # v6 automatic address handling
+    addr_range = network.ranges.find_by(name: "host-v6")
+    return unless addr_range
+    suggestion = node.attribs.find_by!(name: "hint-#{network.name}-v6addr").get(node) ||
+      node.auto_v6_address(network)
     addr_range.allocate(nr.node, suggestion)
   end
 
