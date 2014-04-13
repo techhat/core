@@ -43,7 +43,8 @@ class NetworkRange < ActiveRecord::Base
   end
 
   def === (other)
-    (first..last) === IP.coerce(other)
+    addr = IP.coerce(other)
+    (first <= addr) && (addr <= last) 
   end
 
   def allocate(node, suggestion = nil)
@@ -62,9 +63,19 @@ class NetworkRange < ActiveRecord::Base
                                             :address => suggestion)
           end
         end
-        (first..last).each do |addr|
-          break if res
-          next if NetworkAllocation.where(:address => addr.to_s).count > 0
+        unless res
+          addr = nil
+          allocated = network_allocations.all.map{|a|a.address}.sort{|a,b| b <=> a}
+          if allocated.empty?
+            addr = first
+          else
+            (first..last).each do |a|
+              next if a == allocated.pop
+              addr = a
+              break
+            end
+            raise RangeError.new("#{fullname} is out of addresses!") unless addr
+          end
           res = NetworkAllocation.create!(:network_range_id => self.id,
                                           :network_id => network_id,
                                           :node_id => node.id,

@@ -135,7 +135,6 @@ class Node < ActiveRecord::Base
     res = network_allocations.where(network_id: net.id).map do |a|
       a.address
     end
-    res << auto_v6_address(net) if net.v6prefix
     res.sort
   end
 
