@@ -403,6 +403,8 @@ rpms:
     # To extract ISO images without needing a loopback mount.
     - bsdtar
     - git
+    - gecode
+    - gecode-devel
   build_pkgs:
     - make
     - gcc

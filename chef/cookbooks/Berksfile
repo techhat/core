@@ -1,12 +1,16 @@
-site :opscode
-
-# automatically includes all cookbooks in the cookbooks folder
-# AND their dependencies.
-Dir[File.expand_path('*/')].each do |path|  
-  File.directory?(path) || next
-  cookbook(File.basename(path), path: path)
-  Dir.chdir(path) do
-    result = %x{unset GEM_HOME BUNDLE_BIN_PATH BUNDLE_GEMFILE RUBYOPT RUBYLIB GEM_PATH; berks -d 2>&1}
-  end
-end 
-
+source 'https://api.berkshelf.com'
+cookbook 'barclamp', path: './barclamp/'
+cookbook 'bind9', path: './bind9/'
+cookbook 'bmc-nat', path: './bmc-nat/'
+cookbook 'crowbar-hacks', path: './crowbar-hacks/'
+cookbook 'dhcp', path: './dhcp/'
+cookbook 'ipmi', path: './ipmi/'
+cookbook 'kernel-panic', path: './kernel-panic/'
+cookbook 'logging', path: './logging/'
+cookbook 'network', path: './network/'
+cookbook 'ntp', path: './ntp/'
+cookbook 'ohai', path: './ohai/'
+cookbook 'provisioner', path: './provisioner/'
+cookbook 'repos', path: './repos/'
+cookbook 'resolver', path: './resolver/'
+cookbook 'utils', path: './utils/'
