@@ -211,6 +211,7 @@ EOC
           action :create
           recursive true
         end
+
         bash "Delete #{destdir}/gen_meta" do
           code "rm -f #{destdir}/gen_meta"
           action :nothing
@@ -219,7 +220,7 @@ EOC
         bash "Update package metadata in #{destdir}" do
           cwd destdir
           action :nothing
-          notifies :run, "bash[Delete #{destdir}/gen_meta]"
+          notifies :run, "bash[Delete #{destdir}/gen_meta]", :immediately
           code case pkgtype
                when "debs" then "dpkg-scanpackages . |gzip -9 >Packages.gz"
                when "rpms" then "createrepo ."
@@ -229,14 +230,14 @@ EOC
 
         file "#{destdir}/gen_meta" do
           action :nothing
-          notifies :run, "bash[Update package metadata in #{destdir}]"
+          notifies :run, "bash[Update package metadata in #{destdir}]", :immediately
         end
 
         bc[pkgtype][os]["raw_pkgs"].each do |src|
           dest = "#{destdir}/#{src.split('/')[-1]}"
           bash "#{destdir}: Fetch #{src}" do
             code "curl -fgL -o '#{dest}' '#{src}'"
-            notifies :create, "file[#{destdir}/gen_meta]"
+            notifies :create, "file[#{destdir}/gen_meta]", :immediately
             not_if "test -f '#{dest}'"
           end
         end
