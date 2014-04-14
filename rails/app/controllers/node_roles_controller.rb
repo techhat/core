@@ -95,7 +95,8 @@ class NodeRolesController < ApplicationController
   end
 
   def retry
-    @node_role = NodeRole.find_key params[:node_role_id]
+    params[:id] ||= params[:node_role_id]
+    @node_role = NodeRole.find_key params[:id]
     @node_role.todo!
     respond_to do |format|
       format.html { render :action => :show }
