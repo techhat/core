@@ -115,7 +115,7 @@ worker() ->
   end.
 
 % global setup
-step(Global, {step_setup, {Scenario, _N}, Test}) -> 
+step(_Global, {step_setup, {_Scenario, _N}, Test}) -> 
   % setup the groups object override
   bdd_utils:log(debug, crowbar, step, "Global Setup alias: ~p",[get({scenario,alias_map})]),
   bdd_utils:alias(group, group_cb),

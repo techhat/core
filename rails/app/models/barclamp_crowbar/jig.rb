@@ -19,6 +19,7 @@
 require 'json'
 require 'fileutils'
 
+# Script Jig
 class BarclampCrowbar::Jig < Jig
   def stage_run(nr)
     super(nr)

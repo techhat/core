@@ -98,7 +98,12 @@ class Run < ActiveRecord::Base
     # what we can actually run.
     jobs.values.each do |j|
       Rails.logger.info("Run: Sending job #{j.id}: #{j.node_role.name} to delayed_jobs")
-      j.node_role.jig.delay(:queue => "NodeRoleRunner").run_job(j)
+      # dev mode not starting queued jobs, we need to skip queuing for now
+      if Rails.env.development?
+        j.node_role.jig.run_job(j)
+      else
+        j.node_role.jig.delay(:queue => "NodeRoleRunner").run_job(j)
+      end
     end
     Rails.logger.info("Run: #{jobs.length} handled this pass, #{Run.running.count} in delayed_jobs")
     begin
