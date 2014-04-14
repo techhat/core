@@ -19,6 +19,11 @@ roles:
     jig: test
     flags:
       - bootstrap
+    attribs:
+      - name: delay
+        map: 'test/delay'
+        description: 'UI Simulated Delay'
+        ui_renderer: 'barclamp_test/attribs/delay'
   - name: test-server
     jig: test
     requires:

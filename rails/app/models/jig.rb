@@ -278,7 +278,7 @@ end
 class NoopJig < Jig
 
   def stage_run(nr)
-    return nil
+    return nr.all_my_data
   end
 
   def run(nr,data)

@@ -1,4 +1,4 @@
-# Copyright 2013, Dell
+# Copyright 2014, Dell
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,21 +25,20 @@ class BarclampTest::Jig < Jig
 
     Node.transaction do
       # create tests data
-      disco = { :test=> { :random => Random.rand(1000000), :marker => data["marker"] }, data["marker"] => nr.id }
-      nr.node.discovery_merge(disco)
+      Attrib.set('random', nr.node, Random.rand(1000000)) rescue nil
+      marker = Attrib.get('marker', nr.node) rescue nr.name
+      delay = Attrib.get('delay', nr) rescue 0
       # running the actions from the node role
       Rails.logger.info("TestJig Running node-role: #{nr.to_s}")    
-      name = data["marker"] || nr.name
-      delay = data["delay"].to_i || 0
-      file = File.join "/tmp", "test-jig-noderole-#{name}.txt"
-      o = "TEST JIG >> Working #{nr.node.name} #{name} & pausing for #{delay}"
+      file = File.join "/tmp", "test-jig-noderole-#{marker}.txt"
+      o = "TEST JIG >> Working #{nr.node.name} #{marker} & pausing for #{delay}"
       puts o
       # %x[touch #{file}]
       puts "touch #{file}"  # use until we figure out which the touch is putting files in the wrong place!
       Rails.logger.info o
       nr.runlog = o
       # we want an easy way to turn off the delay setting
-      sleep delay if (data["test"] || true) or data["test"].eql? "true"
+      sleep delay if delay > 0
       raise "test-fails role always fails" if nr.role.name.eql? 'test-fails'
     end
   end
