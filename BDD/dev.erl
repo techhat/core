@@ -50,11 +50,11 @@ pop(ConfigRaw)  ->
   crowbar:step([], {step_given, {0, 0}, ["there are no pending Crowbar runs for",node,g(node_name)]}), 
 
   % turn on the delays in the test jig (the tests turn these off, simulator wants them on)
-  role:step([], {step_given, {0, 1}, ["I set the",role, "test-admin", "property", "test", "to", "true"]}), 
-  role:step([], {step_given, {0, 2}, ["I set the",role, "test-server", "property", "test", "to", "true"]}), 
-  role:step([], {step_given, {0, 3}, ["I set the",role, "test-client", "property", "test", "to", "true"]}), 
-  role:step([], {step_given, {0, 4}, ["I set the",role, "test-library", "property", "test", "to", "true"]}), 
-  role:step([], {step_given, {0, 5}, ["I set the",role, "test-discovery", "property", "test", "to", "true"]}), 
+  %role:step([], {step_given, {0, 1}, ["I set the",role, "test-admin", "property", "test", "to", "true"]}), 
+  %role:step([], {step_given, {0, 2}, ["I set the",role, "test-server", "property", "test", "to", "true"]}), 
+  %role:step([], {step_given, {0, 3}, ["I set the",role, "test-client", "property", "test", "to", "true"]}), 
+  %role:step([], {step_given, {0, 4}, ["I set the",role, "test-library", "property", "test", "to", "true"]}), 
+  %role:step([], {step_given, {0, 5}, ["I set the",role, "test-discovery", "property", "test", "to", "true"]}), 
 
   % rest of the nodes
   [ add_deployment(D) || D <- buildlist(Build, deployments) ],

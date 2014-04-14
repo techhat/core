@@ -39,7 +39,7 @@ class BarclampTest::Jig < Jig
       Rails.logger.info o
       nr.runlog = o
       # we want an easy way to turn off the delay setting
-      sleep delay if (data["test"] || true) or data["test"].eql? "true"
+      # TODO > sleep delay if (data["test"] || true) or data["test"].eql? "true"
       raise "test-fails role always fails" if nr.role.name.eql? 'test-fails'
     end
   end
