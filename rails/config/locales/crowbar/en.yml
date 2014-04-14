@@ -75,11 +75,10 @@ en:
     roles:
       crowbar-managed-node: 'Node Discovered'
       crowbar-installed-node: 'OS Installed'
+      crowbar-docker-node: "Docker Container"
       crowbar-admin-node: 'Crowbar Admin'
-      provisioner-os-install: "Install OS"
     attribs:
-      provisioner-target_os: "Target OS"
-
+      asset_tag: "Asset Tag"
   # Layout
   nav:
     nodes: "Nodes"

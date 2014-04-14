@@ -21,4 +21,7 @@ en:
       provisioner-dhcp-server: "DHCP Server"
       provisioner-repos: "O/S Repo Cache"
       provisioner-dhcp-database: "DHCP Boot Records"
+      provisioner-os-install: "Install OS"
+      provisioner-docker-setup: "Docker Provisioner"
     attribs:
+      provisioner-target_os: "Target OS"
