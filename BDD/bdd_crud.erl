@@ -102,6 +102,9 @@ update(URI, JSON) ->
 delete(Scenario, Key) when is_number(Scenario) -> delete(bdd_utils:scenario_retrieve(Scenario, Key, undefined));
 delete(Path, Key)                   -> delete(eurl:path([Path, Key])).
 delete(O) when is_record(O, obj)    -> delete(O#obj.url);
+delete(unknown) ->
+  % handle case where no URI is passed
+  bdd_utils:log(debug, bdd_crud, destroy, "Destroy was requested but Object URI was unknown (likely empty object)", []);
 delete(Marker) when is_atom(Marker) -> delete(bdd_utils:config(Marker));
 delete(URI) ->
   [R | _O] = read(URI),

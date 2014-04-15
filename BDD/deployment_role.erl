@@ -61,4 +61,4 @@ step(_Global, {step_setup, _N, _}) ->
 
 step(_Global, {step_teardown, _N, _}) -> 
   % find the node from setup and remove it
-  bdd_crud:delete(g(atom)).  
+  bdd_crud:delete(g(atom)).
