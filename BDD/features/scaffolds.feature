@@ -17,7 +17,6 @@ Feature: Scaffolds
       And I should see "Name"
       And I should see "Description"
       And I should see "Display"
-      And I should see "Layout"
       And I should see "Search"
       And I should see "Create New"
       And there should be no translation errors
@@ -50,7 +49,6 @@ Scenario: NodeRoles
     Then I should see heading "NodeRoles"
       And I should see "Node"
       And I should see "Role"
-      And I should see "Snapshot"
       And I should see "Created At"
       And I should see "Updated At"
       And I should see "Search"
