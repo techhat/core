@@ -98,7 +98,7 @@ class Barclamp < ActiveRecord::Base
           Rails.logger.info("Import: berks install: #{result}\n")
           if jig_type.end_with?("SoloJig")
             Rails.logger.info("Import: #{bc_name} is a chef-solo-type jig. Using Berkshelf packaging.")
-            result = berks(cookbook_path,"package -o /var/cache/crowbar/cookbooks")
+            result = berks(cookbook_path,"package /var/cache/crowbar/cookbooks/package.tar.gz")
             raise "Import: Unable to berks package #{berksfile}: #{result}" unless $?.exitstatus == 0
             Rails.logger.info("Import: berks package: #{result}\n")
           end

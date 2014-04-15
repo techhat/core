@@ -34,8 +34,24 @@ fi
 
 if [[ $OS = ubuntu || $OS = redhat || $OS = opensuse ]] && [[ ! -x /etc/init.d/chef-server ]]; then
     # Set up initial config
-    chef-server-ctl reconfigure
     mkdir -p /etc/chef-server
+    # If we are running in Docker, lie like a rug to make runit work
+    if [[ -f /.dockerenv ]]; then
+        cat >/opt/chef-server/embedded/cookbooks/runit/recipes/default.rb <<EOF
+bash "Launch runsvdir in the background for Docker" do
+  code "nohup /opt/chef-server/embedded/bin/runsvdir-start >//var/log/chef-server/runsvdir.log &"
+  not_if "pgrep runsvdir"
+end
+EOF
+    fi
+    # Set sane-ish defaults for chef-server.
+    cat /etc/chef-server/chef-server.rb <<EOF
+postgresql['port'] = 5439
+postgresql['effective_cache_size'] = '128MB'
+postgresql['shared_buffers'] = '128MB'
+postgresql['work_mem'] = '1MB'
+EOF
+    chef-server-ctl reconfigure
     chef-server-ctl test || {
         echo "Could not bring up valid chef server!"
         exit 1

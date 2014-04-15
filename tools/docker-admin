@@ -22,7 +22,7 @@ declare -A image_map
 #image_map["ubuntu"]="ubuntu:precise"
 image_map["ubuntu"]="opencrowbar/ubuntu:12.04-4"
 #image_map["centos"]="centos:6.4"
-image_map["centos"]="opencrowbar/centos:6.5-5"
+image_map["centos"]="opencrowbar/centos:6.5-6"
 image_map["opensuse"]="mmckeen/opensuse-13-1:latest"
 image_map["fedora"]="fedora:20"
 image_map["debian"]="debian:jessie"
@@ -116,6 +116,7 @@ if [[ $http_proxy ]]; then
     wanted_no_proxy['::1']=true
     wanted_no_proxy['172.16.0.0/12']=true
     wanted_no_proxy['192.168.0.0/16']=true
+    wanted_no_proxy['127.0.0.1']=true
     if [[ $no_proxy ]]; then
         IFS="," read -a no_proxy_parts <<<"$no_proxy"
         for no_proxy_part in "${no_proxy_parts[@]}"; do

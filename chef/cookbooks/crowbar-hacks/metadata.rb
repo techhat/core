@@ -1,3 +1,4 @@
+name              'crowbar-hacks'
 maintainer        "Dell, Inc"
 maintainer_email  "crowbar@dell.com"
 license           "Apache 2.0"
