@@ -25,7 +25,7 @@ class DashboardController < ApplicationController
       layer = taxmap[nr.role.name] || 'apps'
       @layers[layer] << nr 
       if nr.state == NodeRole::ERROR
-        @status[layer] = 'error'
+        @status[layer] = 'alert'
       elsif (nr.state == NodeRole::PROPOSED)
         @status[layer] = 'user'
       elsif nr.state != NodeRole::ACTIVE
