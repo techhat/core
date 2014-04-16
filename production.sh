@@ -151,7 +151,7 @@ if ! [[ $* = *--zombie* ]]; then
   # Converge the admin node.
   crowbar converge && date && exit 0
   echo "Could not converge all noderoles!"
-  exit 1
 else
   echo "To complete configuration, mark node alive using: crowbar nodes update 1 '{""alive"": true}'"
 fi
+/bin/bash -i
