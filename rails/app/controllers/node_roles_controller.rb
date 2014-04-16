@@ -17,7 +17,7 @@ class NodeRolesController < ApplicationController
 
   def index
     @list = (if params.key? :node_id
-              Node.find_key(params[:node_id]).node_roles.current
+              Node.find_key(params[:node_id]).node_roles
             elsif params.key? :deployment_id
               Deployment.find_key(params[:deployment_id]).node_roles
             else
