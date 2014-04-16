@@ -20,5 +20,4 @@ printf "%s\n" "$SSH_PUBKEY" >> /root/.ssh/authorized_keys
 [[ $1 ]] && "$@"
 . /etc/profile
 export PATH=$PATH:/opt/opencrowbar/core/bin
-/bin/bash -i
 rm -rf /tftpboot/nodes

@@ -1,3 +1,13 @@
+bash "Upgrade all the things" do
+  code case node["platform"]
+       when "ubuntu","debian" then "apt-get -y --force-yes dist-upgrade"
+       when "centos","redhat","fedora" then "yum -y upgrade"
+       when "suse","opensuse" then "zypper -n upgrade"
+       else raise "Don't know how to install required files for #{node["platform"]}'"
+       end
+  only_if do ::File.exists?("/tmp/install_pkgs") end
+end
+
 [
  "/root/.ssh",
  "/home/crowbar/.ssh",
