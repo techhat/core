@@ -183,9 +183,9 @@ end
 
 bash "Install required files" do
   code case node["platform"]
-       when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && apt-get dist-upgrade && rm /tmp/install_pkgs"
-       when "centos","redhat","fedora" then "yum -y install #{pkgs.join(" ")} && yum -y upgrade && rm /tmp/install_pkgs"
-       when "suse","opensuse" then "zypper -n install #{pkgs.join(" ")} && zypper upgrade && rm /tmp/install_pkgs"
+       when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "centos","redhat","fedora" then "yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "suse","opensuse" then "zypper -n install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
        else raise "Don't know how to install required files for #{node["platform"]}'"
        end
   only_if do ::File.exists?("/tmp/install_pkgs") end
@@ -306,7 +306,7 @@ end
 
 (prereqs["gems"]["required_pkgs"] rescue []).each do |g|
   gem_package g do
-    action :upgrade
+    action :install
     options "--http-proxy #{proxies["http_proxy"]} --no-ri --no-rdoc --bindir /usr/local/bin"
   end
 end
