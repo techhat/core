@@ -14,10 +14,10 @@ fi
 export OCBDIR="${OCBDIR%/core/tools/kvm-admin}"
 
 admin_server_loc="$HOME/.cache/opencrowbar/tftpboot/centos-6.5"
+admin_server_iso="$HOME/.cache/opencrowbar/tftpboot/isos/CentOS-6.5-x86_64-bin-DVD1.iso"
 
-if [[ ! -d $admin_server_loc/install ]]; then
-    echo "Cannot find extracted Centos 6.5 install tree!"
-    echo "kvm-admin requires that docker-admin have already created it!"
+if [[ ! -f $admin_server_iso ]]; then
+    echo "Cannot find $admin_server_iso"
     exit 1
 fi
 
@@ -33,31 +33,25 @@ fi
 . "$OCBDIR/core/tools/kvm_lib.sh"
 TMPDIR=$(mktemp -d /tmp/ocb-kvm-admin-XXXXXX)
 
-# Run a webserver pointing at our local repos
-ruby -rwebrick -e "WEBrick::HTTPServer.new(Port: 8091, DocumentRoot: '$admin_server_loc').start" &>/dev/null &
-webrick_pid="$!"
-
 myclean() {
     set +e
     rm -rf "$TMPDIR"
-    kill -9 $webrick_pid
     cleanup
     kill_ocb_bridge
 }
 trap 'myclean' 0 INT QUIT TERM
 
-# Inject our kickstart into the PXE install ISO.
+# Inject opencrowbar packages and kickstart into the PXE install ISO.
 mkdir -p "$TMPDIR/initrd"
+tar -C "$admin_server_loc" -czf "$TMPDIR/initrd/ocb.tar.gz" ocb-packages
 cat >"$TMPDIR/initrd/opencrowbar.ks" <<'EOF'
 # Opencrowbar Admin Development Kickstart
-
 install
-url --url http://192.168.124.1:8091/install
+cdrom
 key --skip
 lang en_US.UTF-8
 keyboard us
 text
-network --activate --bootproto=static --device=eth0 --ip=192.168.124.10 --netmask=255.255.252.0 --nodns --nodefroute
 # crowbar
 rootpw --iscrypted $1$H6F/NLec$Fps2Ut0zY4MjJtsa1O2yk0
 firewall --disabled
@@ -84,6 +78,16 @@ fipscheck
 device-mapper-multipath
 emacs-nox
 openssh
+createrepo
+
+%post --nochroot
+export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
+exec > /mnt/sysimage/root/post-install.log 2>&1
+set -x
+mkdir -p /mnt/sysimage/opt/opencrowbar
+tar -C /mnt/sysimage/opt/opencrowbar -xzf /ocb.tar.gz
+mkdir -p /mnt/sysimage/tftpboot/centos-6.5/install
+cp -a /mnt/source/. /mnt/sysimage/tftpboot/centos-6.5/install/.
 
 %post
 export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
@@ -106,9 +110,18 @@ done
 cat >/etc/yum.repos.d/local-ocb.repo <<EOR
 [ocb]
 name=Local Opencrowbar
-baseurl=http://192.168.124.1:8091/ocb-packages
+baseurl=file:///opt/opencrowbar/ocb-packages
 gpgcheck=0
 EOR
+
+cat <<EOQ >/etc/sysconfig/network-scripts/ifcfg-eth0
+DEVICE=eth0
+BOOTPROTO=none
+ONBOOT=yes
+NETMASK=255.255.252.0
+IPADDR=192.168.124.10
+TYPE=Ethernet
+EOQ
 
 EOF
 cp "$admin_server_loc/install/images/pxeboot/initrd.img" "$TMPDIR"
@@ -134,7 +147,8 @@ makenics
 # Kick off the installer
 run_kvm -kernel "$admin_server_loc/install/images/pxeboot/vmlinuz" \
     -initrd "$TMPDIR/initrd.img" \
-    -append "${install_params[*]}"
+    -append "${install_params[*]}" \
+    -cdrom "$admin_server_iso"
 
 # Once we get here, the OS should be installed.
 while [[ ! -f $VM_DIR/$VMID.killed ]]; do
