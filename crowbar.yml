@@ -216,13 +216,13 @@ rpms:
       # openssh stuff
       - openssh-clients
       - openssh-server
+      - openssl-devel
     pkgs:
       # openldap stuff
       - openldap
       - openldap-servers
       - openldap-clients
       - krb5-workstation
-      - openssl-devel
       - vim-enhanced
       # network
       - vconfig
@@ -264,13 +264,13 @@ rpms:
       # openssh stuff
       - openssh-clients
       - openssh-server
+      - openssl-devel
     pkgs:
       # openldap stuff
       - openldap
       - openldap-servers
       - openldap-clients
       - krb5-workstation
-      - openssl-devel
       - vim-enhanced
       # network
       - vconfig
@@ -303,13 +303,13 @@ rpms:
       - createrepo
       - libxml2-devel
       - zlib-devel
+      - openssl-devel
     pkgs:
       # openldap stuff
       - openldap
       - openldap-servers
       - openldap-clients
       - krb5-workstation
-      - openssl-devel
       - vim-enhanced
       # provisioner
       - rpcbind
@@ -363,7 +363,6 @@ rpms:
       - openldap2
       - openldap2-client
       - krb5-client
-      - libopenssl-devel
       - openssl
       - libssh-devel
       - vim
