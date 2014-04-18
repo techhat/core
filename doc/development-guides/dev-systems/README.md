@@ -54,5 +54,12 @@ If you want to **commit code or docs fixes**, please review [the Contributor gui
 ###Setup Docker Admin Node 
   1. follow steps in [docker-admin.md](docker-admin.md)
 
+###Deploy Nodes!  
+
+Now that you've got Crowbar installed, it's time to look in the [Deployment Guide](../../deployment-guide/README.md) for instructions about provisioning nodes.
+
 ###Change to Crowbar user
-  1. `su - crowbar` to gain ruby-2.0 and control Crowbar!
+  1. `su - crowbar` to gain ruby-2.0 and control Crowbar via the CLI!
+  1. we've provided a handle `tools/rails-console` command if you want to reach deep into the bowels of the bunny.
+
+
