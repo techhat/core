@@ -126,7 +126,7 @@ node["crowbar"]["provisioner"]["server"]["supported_oses"].each do |os,params|
 
   # Don't bother for OSes that are not actaully present on the provisioner node.
   next unless File.file?("#{iso_dir}/#{params["iso_file"]}") or
-    File.file?("#{os_install_dir}/.#{params["iso_file"]}.crowbar_canary")
+    File.directory?(os_install_dir)
   node.normal["crowbar"]["provisioner"]["server"]["available_oses"][os] = true
   node.normal["crowbar"]["provisioner"]["server"]["repositories"][os] = Mash.new
 
