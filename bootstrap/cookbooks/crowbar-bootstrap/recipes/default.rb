@@ -41,7 +41,7 @@ unless prereqs["os_support"].member?(os_token)
 end
 
 tftproot = "/tftpboot"
-sledgehammer_url="http://173.226.178.140/sledgehammer/#{sledgehammer_signature}"
+sledgehammer_url="http://rcbdrepo.opencrowbar.org/sledgehammer/#{sledgehammer_signature}"
 sledgehammer_dir="#{tftproot}/sledgehammer/#{sledgehammer_signature}"
 
 
@@ -331,6 +331,7 @@ end
 
 ["/var/run/crowbar",
  "/var/cache/crowbar",
+ "/var/cache/crowbar/cookbooks",
  "/var/cache/crowbar/gems",
  "/var/cache/crowbar/bin",
  "/var/log/crowbar"

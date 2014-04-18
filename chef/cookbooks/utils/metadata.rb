@@ -1,3 +1,4 @@
+name             'utils'
 maintainer       "Dell Crowbar Team"
 maintainer_email "openstack@dell.com"
 license          "Apache 2"

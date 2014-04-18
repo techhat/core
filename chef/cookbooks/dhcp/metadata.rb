@@ -1,3 +1,4 @@
+name             'dhcp'
 maintainer       "Dell Crowbar Team"
 maintainer_email "crowbar@dell.com"
 license          "Apache 2.0"

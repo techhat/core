@@ -74,7 +74,7 @@ class BarclampChef::SoloJig < Jig
     out,err,ok = nr.node.scp_to(cookbook_tarball,"/var/chef/")
     raise("Chef Solo jig run for #{nr.name} failed to scp pacakge.tar.gz.\nOut: #{out}\nErr:#{err}\n") unless ok.success?
     Rails.logger.debug("Chef Solo Jig: #{nr.name} tar time start: #{Time.now.to_s}")
-    out,err,ok = nr.node.ssh("/bin/tar xvzf /var/chef/package.tar.gz -C /var/chef/cookbooks/ 2>&1")
+    out,err,ok = nr.node.ssh("/bin/tar xvzf /var/chef/package.tar.gz -C /var/chef 2>&1")
     raise("Chef Solo jig run for #{nr.name} failed to untar package.tar.gz\nOut: #{out}\nErr:#{err}\n") unless ok.success?
     #Rails.logger.info("Chef Solo jig run for #{nr.name} cookbook tarball tar output: \nOut: #{out}\nClass: #{out.class}\n")
     Rails.logger.debug("Chef Solo Jig: #{nr.name} scp/tar time end: #{Time.now.to_s}")

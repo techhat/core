@@ -9,8 +9,8 @@ Engineers value documentation that explains how to get a development workstation
 ###Base OS Installed
   1. VirtualBox, THREE network interfaces
     1. (assumed to be eth0) bridge external 
-    1. (assumed to be eth1) on a host-only network 192.168.124.0/24.  Give it a reasonable unused IP. 192.168.124.7 is good.
-    1. (assumed to be eth2) on a host-only network 192.168.124.0/24.  *NO IP assignment* or OS interface configuration (`/etc/network/interfaces` or `/etc/sysconfig`). If using Docker, setup bridging as in [docker-admin.md](docker-admin.md)
+    1. (assumed to be eth1) on a host-only network - you need to setup to talk to the VM, we don't use it.
+    1. (assumed to be eth2) on a host-only network - *NO IP assignment* or OS interface configuration (`/etc/network/interfaces` or `/etc/sysconfig`). If using Docker, setup bridging as in [docker-admin.md](docker-admin.md)
   1. Setup an .ssh keypair using `rssh-keygen`
   1. Optional Items that we find handy if you are developing on Windows using VMs behind corporate firewalls
     1. CNTLM proxy: 
@@ -19,11 +19,10 @@ Engineers value documentation that explains how to get a development workstation
     1. Setup a [Squid Proxy](proxy-cache.md)
     1. SAMBA share
       1. ubuntu: `sudo apt-get install samba`
-  1. Make sure you setup noproxy for your environment: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"
-    1. tip: add this to your login init
   1. Passwordless sudo: `sudo sed -ie "s/%sudo\tALL=(ALL:ALL) ALL/%sudo ALL=(ALL) NOPASSWD: ALL/g" /etc/sudoers`
     1. additional information, see http://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux
-  1. if you are stuck behind a proxy, make sure your environment does not use it for local addresses: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
+  1. Make sure your environment does not use proxy for local addresses: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
+    1. tip: add this to your login init
   1. `apt-get install git`
 
 ###Position Boot Assets
