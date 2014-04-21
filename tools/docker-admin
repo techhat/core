@@ -73,61 +73,12 @@ bridge_addr_re='inet ([0-9.]+)/'
 [[ $(ip -o -4 addr show dev $bridge) =~ $bridge_addr_re ]] && \
     bridge_ip="${BASH_REMATCH[1]}"
 # Make sure the container knows about our proxies, if applicable.
-if [[ $http_proxy ]]; then
-    USE_PROXY=1
-    raw_proxy="${http_proxy#*://}"
-    raw_proxy="${raw_proxy%/}"
-    proxy_re='^(.+):([0-9]+)$'
-    hostsplit_re='(.*)@(.*)'
-    userpass_re='(.*):(.*)'
-    if [[ $raw_proxy =~ $proxy_re ]]; then
-        raw_proxy="${BASH_REMATCH[1]}"
-        proxy_port="${BASH_REMATCH[2]}"
-    fi
-    if [[ $raw_proxy =~ $hostsplit_re ]]; then
-        raw_proxy="${BASH_REMATCH[2]}"
-        proxy_user="${BASH_REMATCH[1]}"
-        if [[ ${BASH_REMATCH[1]} =~ $userpass_re ]]; then
-            proxy_password="${BASH_REMATCH[2]}"
-            proxy_user="${BASH_REMATCH[1]}"
-        fi
-    fi
-    # If we are running a local proxy, have Docker use it.
-    # This will fail badly if the proxy does not accept
-    # requests for addresses in Docker's range.'
-    case $raw_proxy in
-        127.0.0.1|[::]|localhost) raw_proxy="$bridge_ip";;
-    esac
-    docker_proxy="http://"
-    if [[ $proxy_user ]]; then
-        if [[ $proxy_password ]]; then
-            docker_proxy+="$proxy_user:$proxy_password@"
-        else
-            docker_proxy+="$proxy_user@"
-        fi
-    fi
-    docker_proxy+="$raw_proxy"
-    [[ $proxy_port ]] && docker_proxy+=":${proxy_port}"
-    docker_args+=(-e "http_proxy=$docker_proxy")
-    [[ $https_proxy ]] && docker_args+=(-e "https_proxy=$docker_proxy")
-    declare -A wanted_no_proxy
-    wanted_no_proxy['localhost']=true
-    wanted_no_proxy['127.0.0.0/8']=true
-    wanted_no_proxy['::1']=true
-    wanted_no_proxy['172.16.0.0/12']=true
-    wanted_no_proxy['192.168.0.0/16']=true
-    wanted_no_proxy['127.0.0.1']=true
-    if [[ $no_proxy ]]; then
-        IFS="," read -a no_proxy_parts <<<"$no_proxy"
-        for no_proxy_part in "${no_proxy_parts[@]}"; do
-            [[ ${wanted_no_proxy["$no_proxy_part"]} ]] && continue
-            wanted_no_proxy["$no_proxy_part"]=true
-        done
-    fi
-    no_proxy="$(printf '%s,' "${!wanted_no_proxy[@]}")"
-    no_proxy="${no_proxy%,}"
-    [[ $no_proxy ]] && docker_args+=(-e "no_proxy=${no_proxy}")
-fi
+. "$mountdir/core/tools/proxy_lib.sh"
+mangle_proxies "$bridge_ip"
+for proxy in "${!mangled_proxies[@]}"; do
+    docker_args+=(-e "$proxy=${mangled_proxies[$proxy]}")
+done
+
 # since 0.8.1 we need to run in privileged mode so we can change the networking
 docker_args+=("--privileged")
 # Run whatever we specified to run inside a container.
