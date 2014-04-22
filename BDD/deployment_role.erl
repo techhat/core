@@ -37,7 +37,7 @@ validate(JSON) when is_record(JSON, obj) ->
       bdd_utils:is_a(J, string, data),
       bdd_utils:is_a(J, string, wall),
       bdd_utils:is_a(J, dbid, role_id),
-      bdd_utils:is_a(J, dbid, snapshot_id),
+      bdd_utils:is_a(J, dbid, deployment_id),
       crowbar_rest:validate_core(J)],
   bdd_utils:assert(R).
 
@@ -61,4 +61,4 @@ step(_Global, {step_setup, _N, _}) ->
 
 step(_Global, {step_teardown, _N, _}) -> 
   % find the node from setup and remove it
-  bdd_crud:delete(g(atom)).  
+  bdd_crud:delete(g(atom)).
