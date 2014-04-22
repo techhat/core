@@ -46,7 +46,8 @@
               = ")"
           - @roles.each do |dr|
             - nr = node.node_roles.where(:role_id => dr.role_id, :deployment_id => dr.deployment_id).first
-            %td.noderole{:style=>"text-align:center", :id=>(nr ? nr.id : (dr.role.noop? and state == Deployment::PROPOSED ? -1 : 0)), :dr=>dr.id}
+            - id = (!nr.nil? ? nr.id : ((dr.role.noop? and state == Deployment::PROPOSED) ? -1 : 0))
+            %td.noderole{:style=>"text-align:center", :id=>id, :dr=>dr.id}
               - if nr
                 %span{:align=>'center'}
                   .led{:style=>"width:16px; margin:0px auto; text-align:center", :class => NodeRole::STATES[nr.state || NodeRole::ERROR], :title=>nr.role.name}
@@ -97,7 +98,9 @@
       function( ev ) {
         id = $(this).attr("id")
         dr = $(this).attr("dr");
-        if (id == -1 && dr > 0) {
+        console.debug(id);
+
+        if (id == 0 && dr > 0) {
           if (ev['type']=="mouseenter")
             { $(this).children().show();  
               // $("td.dr#"+dr).css("font-weight","italic"); 
