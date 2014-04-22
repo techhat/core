@@ -46,7 +46,8 @@
               = ")"
           - @roles.each do |dr|
             - nr = node.node_roles.where(:role_id => dr.role_id, :deployment_id => dr.deployment_id).first
-            %td.noderole{:style=>"text-align:center", :id=>(nr ? nr.id : (dr.role.noop? and state == Deployment::PROPOSED ? -1 : 0)), :dr=>dr.id}
+            - id = (!nr.nil? ? nr.id : ((dr.role.noop? and state == Deployment::PROPOSED) ? -1 : 0))
+            %td.noderole{:style=>"text-align:center", :id=>id, :dr=>dr.id}
               - if nr
                 %span{:align=>'center'}
                   .led{:style=>"width:16px; margin:0px auto; text-align:center", :class => NodeRole::STATES[nr.state || NodeRole::ERROR], :title=>nr.role.name}
@@ -54,7 +55,7 @@
               - elsif state == Deployment::PROPOSED
                 - display = (dr.role.noop? ? "inline" : "none" )
                 %span{:style=>"margin-left:30%; display:#{display}"}
-                  = link_to image_tag('/images/icons/add.png'), node_roles_path(:deployment_id=>@deployment.id, :node_id=>node.id, :role_id=>dr.role.id), :'data-remote'=>true, :method=>:post, :class=>'node_role_add'
+                  = link_to image_tag('/images/icons/add.png'), node_roles_path(:deployment_id=>@deployment.id, :format=>:json, :version=>'v2', :node_id=>node.id, :role_id=>dr.role.id), :'data-remote'=>true, :method=>:post, :class=>'node_role_add'
               - else
                 %span{:style=>"width:16px; margin:0px auto; text-align:center"}= "-"
   - else
@@ -79,17 +80,14 @@
     if (w > height) height = w;
   });
 
-  $('.node_role_add[id="-100"]')
+  // return message if error creating noderole
+  $('.node_role_add')
     .bind("ajax:error", function(evt, xhr, status, error){ 
       alert(JSON.parse(xhr.responseText)["message"]); 
-      $('.button').removeClass('pressed');
       })
     .bind("ajax:success", function(data, status, xhr){ 
       location.reload();
-      })
-    .bind('click', function() {
-      alert("foo");
-      $(this).button.addClass('pressed'); });
+      });
   
   // set hover showing
   $('td.noderole')
@@ -97,7 +95,7 @@
       function( ev ) {
         id = $(this).attr("id")
         dr = $(this).attr("dr");
-        if (id == -1 && dr > 0) {
+        if (id == 0 && dr > 0) {
           if (ev['type']=="mouseenter")
             { $(this).children().show();  
               // $("td.dr#"+dr).css("font-weight","italic"); 
