@@ -26,8 +26,8 @@ class BarclampTest::Jig < Jig
     Node.transaction do
       # create tests data
       Attrib.set('random', nr.node, Random.rand(1000000)) rescue nil
-      marker = Attrib.get('marker', nr.node) rescue nr.name
-      delay = Attrib.get('delay', nr) rescue 0
+      marker = Attrib.get('marker', nr.node) || nr.name rescue nr.name
+      delay = Attrib.get('delay', nr) || 0 rescue 0
       # running the actions from the node role
       Rails.logger.info("TestJig Running node-role: #{nr.to_s}")    
       file = File.join "/tmp", "test-jig-noderole-#{marker}.txt"
