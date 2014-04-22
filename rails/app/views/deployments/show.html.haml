@@ -55,7 +55,7 @@
               - elsif state == Deployment::PROPOSED
                 - display = (dr.role.noop? ? "inline" : "none" )
                 %span{:style=>"margin-left:30%; display:#{display}"}
-                  = link_to image_tag('/images/icons/add.png'), node_roles_path(:deployment_id=>@deployment.id, :node_id=>node.id, :role_id=>dr.role.id), :'data-remote'=>true, :method=>:post, :class=>'node_role_add'
+                  = link_to image_tag('/images/icons/add.png'), node_roles_path(:deployment_id=>@deployment.id, :format=>:json, :version=>'v2', :node_id=>node.id, :role_id=>dr.role.id), :'data-remote'=>true, :method=>:post, :class=>'node_role_add'
               - else
                 %span{:style=>"width:16px; margin:0px auto; text-align:center"}= "-"
   - else
@@ -80,17 +80,14 @@
     if (w > height) height = w;
   });
 
-  $('.node_role_add[id="-100"]')
+  // return message if error creating noderole
+  $('.node_role_add')
     .bind("ajax:error", function(evt, xhr, status, error){ 
       alert(JSON.parse(xhr.responseText)["message"]); 
-      $('.button').removeClass('pressed');
       })
     .bind("ajax:success", function(data, status, xhr){ 
       location.reload();
-      })
-    .bind('click', function() {
-      alert("foo");
-      $(this).button.addClass('pressed'); });
+      });
   
   // set hover showing
   $('td.noderole')
@@ -98,8 +95,6 @@
       function( ev ) {
         id = $(this).attr("id")
         dr = $(this).attr("dr");
-        console.debug(id);
-
         if (id == 0 && dr > 0) {
           if (ev['type']=="mouseenter")
             { $(this).children().show();  
