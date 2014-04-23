@@ -58,7 +58,7 @@ when "ubuntu","debian"
     source "apt-proxy.erb"
     variables(:proxy => proxy)
   end
-when "redhat","centos"
+when "redhat","centos","fedora"
   bash "add yum proxy" do
     code <<EOC
 grep -q -F 'proxy=http://#{proxy}' /etc/yum.conf && exit 0
@@ -110,7 +110,7 @@ when "ubuntu","debian"
     notifies :delete, "file[/tmp/.repo_update]", :immediately
     only_if { ::File.exists? "/tmp/.repo_update" }
   end
-when "redhat","centos"
+when "redhat","centos","fedora"
   bash "update software sources" do
     code "yum clean expire-cache"
     action :nothing

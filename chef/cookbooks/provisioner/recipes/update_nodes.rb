@@ -106,6 +106,14 @@ new_clients = {}
       target mnode_name
       action :add
     end
+  when "fedora-20-install"
+    provisioner_fedora mnode_name do
+      distro "fedora"
+      version "20"
+      address v4addr
+      target mnode_name
+      action :add
+    end
   else
     Chef::Log.info("Not messing with boot files for bootenv #{bootenv}")
   end

@@ -1,6 +1,8 @@
 #!/bin/bash
 
-[[ -x /etc/init.d/crowbar_join.sh || -x /etc/init.d/crowbar ]] && exit 0
+[[ -x /etc/init.d/crowbar_join.sh || \
+    -x /etc/init.d/crowbar || \
+    -x /usr/sbin/crowbar ]] && exit 0
 
 set -x
 webserver=$(read_attribute "crowbar/provisioner/server/webserver")

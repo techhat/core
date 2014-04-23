@@ -242,7 +242,7 @@ node["crowbar"]["network"].keys.sort{|a,b|
         p = package "vlan" do
           action :nothing
         end
-      when "centos","redhat"
+      when "centos","redhat","fedora"
         p = package "vconfig" do
           action :nothing
         end
@@ -323,7 +323,7 @@ old_ifs.each do |name,params|
   Chef::Log.info("#{name} is no longer being used, deconfiguring it.")
   Nic.new(name).destroy if Nic.exists?(name)
   case node["platform"]
-  when "centos","redhat"
+  when "centos","redhat","fedora"
     # Redhat and Centos have lots of small files definining interfaces.
     # Delete the ones we no longer care about here.
     if ::File.exists?("/etc/sysconfig/network-scripts/ifcfg-#{name}")
@@ -471,7 +471,7 @@ when "debian","ubuntu"
     group "root"
     variables({ :interfaces => ifs })
   end
-when "centos","redhat"
+when "centos","redhat","fedora"
   # add redhat-specific code here
   Nic.nics.each do |nic|
     next unless ifs[nic.name]
