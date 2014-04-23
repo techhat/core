@@ -1,9 +1,10 @@
-Objectives:
+# RHEL/CentOS 6.5 Deployment Guide
 
-Create a OpenCrowbar admin node on a VM or physical machine to begin the process of configuring or managing deployment of a cluster (openstack, hadoop, ceph, etc.).
+##Objectives
+
+Create an OpenCrowbar admin node on a VM or physical machine to begin the process of configuring or managing deployment of a cluster (openstack, hadoop, ceph, etc.).
 
 The following steps will be completed:
-
 
     Prepare a Virtual or Physical machine
     Installation of CentOS 6.5 x86_64
@@ -16,18 +17,21 @@ An outline is provided as a foundation for QA validation requirements for OpenCr
 Known limitations of the installation process, its sensitivities to updates and to upgrades is summarized.
 Installation process:
 
-Before commencing installation and configuration processing ensure that everything needed is available and that all remove resources that must be accessed are capable of being reached.
-Pre-Requisites:
-   CentOS 6.5 x86_64 - download site:  
-   You will need to know how to access the internet from your VM/Physical environment.  
-   Proxy Services
-      Windows - Fiddler 2 is a good one
-      Linux - potential proxy services include: cntlm and squid.
-      Direct Connection - Ensure you have appropriate security setup per security guidelines in effect within your organization.
+Before commencing installation and configuration processing ensure that everything needed is available and that all remote resources that must be accessed are capable of being reached.
 
-Machine preparation
+##Pre-Requisites:
+   
+   * CentOS 6.5 x86_64 - download site: http://www.centos.org/download/ 
+   * You will need to know how to access the internet from your VM/Physical environment.  
+   * Proxy Services
+       * Windows - Fiddler 2 is a good one
+       * Linux - potential proxy services include: cntlm and squid.
+       * Direct Connection - Ensure you have appropriate security setup per security guidelines in effect within your organization.
+
+## Machine preparation
 
 Machine requirements are:
+
     Memory: Min 4GB
     CPU Cores: 2 or more
     Network Interface Controllers: 2 preferred, 1 minimum (can use virtio if using a VM)
@@ -43,7 +47,7 @@ Machine requirements are:
     If using a virtual machine (VM), where VM motion (ability to migrated VMs across Hypervisor platforms) is required ensure that secure VM access is correctly configured and is operational.
     Where network-managed power switches are in use, ensure that network access is secure from unwanted access.
 
-CentOS 6.5 installation
+##CentOS 6.5 installation
     Boot CentOS 6.5 x86_64 from pristine ISO media
     At the boot screen select "Install or upgrade an existing system", hit Enter
     Screen: "Welcome to CentOS for x86_64", select [Skip], hit Enter
@@ -107,7 +111,9 @@ Follow the instructions at  https://www.centos.org/docs/5/html/yum/sn-yum-proxy-
     proxy_password=qwerty 
 
 ### END Proxy alternative ####
-OpenCrowbar installation
+
+##OpenCrowbar installation
+### Preparation
 
 NOTE: This is preliminary information.  The specific steps outlined here will change soon and will need to be updated.
 
@@ -137,15 +143,16 @@ Save the file and continue.
     Verify that you can access the RPM repository
         yum repolist   
 
-verify that you see dell-ocb in the list and its status is >0 (the number of packages that were found)
+Verify that you see dell-ocb in the list and its status is >0 (the number of packages that were found)
 
         yum -y install http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
         yum -y install http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
 
          
 If you are using VMs, now would be a good time to make a snapshot.
-Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.   
-    Installing OpenCrowbar
+Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.  
+ 
+###Installing OpenCrowbar
 
         yum clean all; yum makecache
         yum install -y opencrowbar-core
@@ -154,7 +161,7 @@ Another good reason to create a snapshot is the migration process doesn't at thi
             verify that you have one directory (core) and one file (prep.sh)
             if so, then proceed to the following section.
 
-Enable WebUI / Connect via browser
+###Enable WebUI / Connect via browser
 
     Execute the following commands:
 
@@ -177,9 +184,9 @@ Launch your web browser and connect to the IP address of the Admin node on port 
     Log in as user: crowbar
     Password: crowbar
 
-Known Issue:
+##Known Issues:
 
-  There is one known issue where the provisioner-server was unable to restart httpd and crashed.  The root cuase of the issue is being investigated.   If you see this issue, your best bet (assuming that you created the SnapShot advice) is to jump to the "Updating Crowbar" section below and follow those instructions.  
+  There is one known issue where the provisioner-server was unable to restart httpd and crashed.  The root cause of the issue is being investigated.   If you see this issue, your best bet (assuming that you created the SnapShot advice) is to jump to the "Updating Crowbar" section below and follow those instructions.  
 
  
 
@@ -195,7 +202,7 @@ As of March 28, the instructions below should not be used as there are still man
   ./production.sh <FQDN>
   Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
 
-Known Limitations:
+##Known Limitations:
 
 Please document all limitations that are discovered into this document.
 
