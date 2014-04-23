@@ -6,11 +6,11 @@ Create an OpenCrowbar admin node on a VM or physical machine to begin the proces
 
 The following steps will be completed:
 
-    Prepare a Virtual or Physical machine
-    Installation of CentOS 6.5 x86_64
-    Install OpenCrowbar
-    Start OpenCrowbar webUI
-    Connect to the webUI using a browser
+    * Prepare a Virtual or Physical machine
+    * Installation of CentOS 6.5 x86_64
+    * Install OpenCrowbar
+    * Start OpenCrowbar webUI
+    * Connect to the webUI using a browser
 
 An outline is provided as a foundation for QA validation requirements for OpenCrowbar RPM packages.
 
@@ -32,20 +32,20 @@ Before commencing installation and configuration processing ensure that everythi
 
 Machine requirements are:
 
-    Memory: Min 4GB
-    CPU Cores: 2 or more
-    Network Interface Controllers: 2 preferred, 1 minimum (can use virtio if using a VM)
-        The first NIC will be wired into a network that routes to the internet. Internet access is required for installation of CentOS/RHEL 6.5
-        The second NIC (may be named eth1, em1, or en1) must be wired into the private space (192.168.124.0/24)
-        Note: It is possible to use a single NIC. In that case the default network address will be 192.168.124.0/24, the admin node IP address will be 192.168.124.10
-        Where a single NIC is used, the private admin network (192.168.124.0/24) must be capable of download of files from the internet or from a local caching server
-    Storage: A disk capacity of at least 10 GB is preferred. * Make sure you configure RAID on the drives before installing.
-    Ensure that all physical network transports are correctly configured and are operational - at least check/verify that:
-        All network cabling is in place
-        Network switches are turned on and configured correctly (ask network admin if necessary)
-        Keyboard,Video, and Mouse (if required) devices are connected and ready for use.
-    If using a virtual machine (VM), where VM motion (ability to migrated VMs across Hypervisor platforms) is required ensure that secure VM access is correctly configured and is operational.
-    Where network-managed power switches are in use, ensure that network access is secure from unwanted access.
+    * Memory: Min 4GB
+    * CPU Cores: 2 or more
+    * Network Interface Controllers: 2 preferred, 1 minimum (can use virtio if using a VM)
+        * The first NIC will be wired into a network that routes to the internet. Internet access is required for installation of CentOS/RHEL 6.5
+        * The second NIC (may be named eth1, em1, or en1) must be wired into the private space (192.168.124.0/24)
+        * Note: It is possible to use a single NIC. In that case the default network address will be 192.168.124.0/24, the admin node IP address will be 192.168.124.10
+        * Where a single NIC is used, the private admin network (192.168.124.0/24) must be capable of download of files from the internet or from a local caching server
+    * Storage: A disk capacity of at least 10 GB is preferred. * Make sure you configure RAID on the drives before installing.
+    * Ensure that all physical network transports are correctly configured and are operational - at least check/verify that:
+        * All network cabling is in place
+        * Network switches are turned on and configured correctly (ask network admin if necessary)
+        * Keyboard,Video, and Mouse (if required) devices are connected and ready for use.
+    * If using a virtual machine (VM), where VM motion (ability to migrated VMs across Hypervisor platforms) is required ensure that secure VM access is correctly configured and is operational.
+    * Where network-managed power switches are in use, ensure that network access is secure from unwanted access.
 
 
 ##CentOS 6.5 installation
