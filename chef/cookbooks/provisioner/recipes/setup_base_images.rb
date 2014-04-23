@@ -159,13 +159,13 @@ createrepo -g ./comps.xml .
 touch "repodata/.#{params["iso_file"]}.crowbar_canary"
 EOC
     not_if do File.file?("#{os_install_dir}/repodata/.#{params["iso_file"]}.crowbar_canary") end
-    only_if do os =~ /^(redhat|centos)/ end
+    only_if do os =~ /^(redhat|centos|fedora)/ end
   end
   
   # Figure out what package type the OS takes.  This is relatively hardcoded.
   pkgtype = case
             when os =~ /^(ubuntu|debian)/ then "debs"
-            when os =~ /^(redhat|centos|suse)/ then "rpms"
+            when os =~ /^(redhat|centos|suse|fedora)/ then "rpms"
             else raise "Unknown OS type #{os}"
             end
   # If we are running in online mode, we need to do a few extra tasks.
@@ -260,7 +260,7 @@ EOC
               File.exists? "#{os_dir}/crowbar-extra/#{reponame}/Packages.gz"
             node.normal["crowbar"]["provisioner"]["server"]["repositories"][os][reponame][src] = true if
               File.exists? "#{os_dir}/crowbar-extra/#{reponame}/Sources.gz"
-          when os =~ /(redhat|centos|suse)/
+          when os =~ /(redhat|centos|suse|fedora)/
             bin="baseurl=#{provisioner_web}/#{os}/crowbar-extra/#{reponame}"
             node.normal["crowbar"]["provisioner"]["server"]["repositories"][os][reponame][bin] = true
           else
@@ -312,7 +312,7 @@ EOC
         node.normal["crowbar"]["provisioner"]["server"]["repositories"][os]["base"] = { "#{provisioner_web}/#{os}/install" => true }
       when /^(suse)/ =~ os
         node.normal["crowbar"]["provisioner"]["server"]["repositories"][os]["base"] = { "baseurl=#{provisioner_web}/#{os}/install" => true }
-      when /^(redhat|centos)/ =~ os
+      when /^(redhat|centos|fedora)/ =~ os
         # Add base OS install repo for redhat/centos
         if ::File.exists? "#{tftproot}/#{os}/install/repodata"
           node.normal["crowbar"]["provisioner"]["server"]["repositories"][os]["base"] = { "baseurl=#{provisioner_web}/#{os}/install" => true }

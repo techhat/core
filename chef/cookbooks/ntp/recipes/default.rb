@@ -46,7 +46,7 @@ file "/etc/network/if-up.d/ntpdate" do
 end if ::File.exists?("/etc/network/if-up.d/ntpdate")
 
 service "ntp" do
-  service_name "ntpd" if node[:platform] =~ /^(centos|redhat)$/
+  service_name "ntpd" if node[:platform] =~ /^(centos|redhat|fedora)$/
   supports :restart => true, :status => true, :reload => true
   running true
   enabled true
