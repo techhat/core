@@ -6,11 +6,11 @@ Create an OpenCrowbar admin node on a VM or physical machine to begin the proces
 
 The following steps will be completed:
 
-    * Prepare a Virtual or Physical machine
-    * Installation of CentOS 6.5 x86_64
-    * Install OpenCrowbar
-    * Start OpenCrowbar webUI
-    * Connect to the webUI using a browser
+    Prepare a Virtual or Physical machine
+    Installation of CentOS 6.5 x86_64
+    Install OpenCrowbar
+    Start OpenCrowbar webUI
+    Connect to the webUI using a browser
 
 An outline is provided as a foundation for QA validation requirements for OpenCrowbar RPM packages.
 
@@ -111,7 +111,9 @@ Follow the instructions at  https://www.centos.org/docs/5/html/yum/sn-yum-proxy-
     proxy_password=qwerty 
 
 ### END Proxy alternative ####
-OpenCrowbar installation
+
+##OpenCrowbar installation
+### Preparation
 
 NOTE: This is preliminary information.  The specific steps outlined here will change soon and will need to be updated.
 
@@ -148,8 +150,9 @@ verify that you see dell-ocb in the list and its status is >0 (the number of pac
 
          
 If you are using VMs, now would be a good time to make a snapshot.
-Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.   
-    Installing OpenCrowbar
+Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.  
+ 
+###Installing OpenCrowbar
 
         yum clean all; yum makecache
         yum install -y opencrowbar-core
@@ -158,7 +161,7 @@ Another good reason to create a snapshot is the migration process doesn't at thi
             verify that you have one directory (core) and one file (prep.sh)
             if so, then proceed to the following section.
 
-Enable WebUI / Connect via browser
+###Enable WebUI / Connect via browser
 
     Execute the following commands:
 
@@ -181,9 +184,9 @@ Launch your web browser and connect to the IP address of the Admin node on port 
     Log in as user: crowbar
     Password: crowbar
 
-Known Issue:
+##Known Issues:
 
-  There is one known issue where the provisioner-server was unable to restart httpd and crashed.  The root cuase of the issue is being investigated.   If you see this issue, your best bet (assuming that you created the SnapShot advice) is to jump to the "Updating Crowbar" section below and follow those instructions.  
+  There is one known issue where the provisioner-server was unable to restart httpd and crashed.  The root cause of the issue is being investigated.   If you see this issue, your best bet (assuming that you created the SnapShot advice) is to jump to the "Updating Crowbar" section below and follow those instructions.  
 
  
 
@@ -199,7 +202,7 @@ As of March 28, the instructions below should not be used as there are still man
   ./production.sh <FQDN>
   Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
 
-Known Limitations:
+##Known Limitations:
 
 Please document all limitations that are discovered into this document.
 
