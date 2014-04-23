@@ -33,6 +33,13 @@ BOOTPROTO=none
 IPADDR<%=(i == 0)?'':(i+1).to_s%>=<%=v4addrs[i].to_s.split('/')[0]%>
 PREFIX<%=(i == 0)?'':(i+1).to_s%>=<%=v4addrs[i].subnet%>
 <% end -%>
+<% unless v6addrs.empty? -%>
+IPV6ADDR=<%=v6addrs.pop.to_s%>
+<% end -%>
+<% unless v6addrs.empty? -%>
+IPV6ADDR_SECONDARIES="<%=v6addrs.map{|a|a.to_s}.join(" ")%>"
+<% end -%>
+
 <% if iface["gateway"] -%>
 GATEWAY=<%=iface["gateway"]%>
 <% end -%>
