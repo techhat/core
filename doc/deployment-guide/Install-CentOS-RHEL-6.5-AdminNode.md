@@ -6,11 +6,11 @@ Create an OpenCrowbar admin node on a VM or physical machine to begin the proces
 
 The following steps will be completed:
 
-    * Prepare a Virtual or Physical machine
-    * Installation of CentOS 6.5 x86_64
-    * Install OpenCrowbar
-    * Start OpenCrowbar webUI
-    * Connect to the webUI using a browser
+    Prepare a Virtual or Physical machine
+    Installation of CentOS 6.5 x86_64
+    Install OpenCrowbar
+    Start OpenCrowbar webUI
+    Connect to the webUI using a browser
 
 An outline is provided as a foundation for QA validation requirements for OpenCrowbar RPM packages.
 
