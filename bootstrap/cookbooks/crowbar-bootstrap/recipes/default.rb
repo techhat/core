@@ -226,6 +226,20 @@ directory "/root/.ssh" do
   mode 0755
 end
 
+user "crowbar" do
+  home "/home/crowbar"
+  action :create
+  password '$6$afAL.34B$T2WR6zycEe2q3DktVtbH2orOroblhR6uCdo5n3jxLsm47PBm9lwygTbv3AjcmGDnvlh0y83u2yprET8g9/mve.'
+  shell "/bin/bash"
+  supports :manage_home => true
+end
+
+group "crowbar" do
+  action :create
+  append true
+  members "crowbar"
+end
+
 directory "/home/crowbar/.ssh" do
   action :create
   owner "crowbar"
@@ -320,13 +334,6 @@ bash "Create skeleton local gemsite" do
   cwd "#{tftproot}/gemsite"
   code "gem generate_index"
   not_if "test -d '#{tftproot}/gemsite/quick'"
-end
-
-user "crowbar" do
-  home "/home/crowbar"
-  password '$6$afAL.34B$T2WR6zycEe2q3DktVtbH2orOroblhR6uCdo5n3jxLsm47PBm9lwygTbv3AjcmGDnvlh0y83u2yprET8g9/mve.'
-  shell "/bin/bash"
-  supports :manage_home => true
 end
 
 ["/var/run/crowbar",
