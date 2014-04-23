@@ -73,10 +73,10 @@ Feature: Nodes
       And the {object:node} is properly formatted
     Finally REST removes the {object:node} "bdd-alive-set.example.com"
 
-  Scenario: Node Available Settable Default True
+  Scenario: Node Available Settable Default False
     Given there is a {object:node} "bdd-available-false.example.com"
     When REST gets the {object:node} "bdd-available-false.example.com"
-    Then key "available" should be "true"
+    Then key "available" should be "false"
       And the {object:node} is properly formatted
     Finally REST removes the {object:node} "bdd-available-false.example.com"
 
