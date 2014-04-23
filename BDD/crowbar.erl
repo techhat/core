@@ -97,6 +97,14 @@ json_build([Head | Tail])                    -> [ Head | json_build(Tail)].
 wait_for(URL, Match, 0, _) -> 
   bdd_utils:log(error, crowbar,wait_for, "Did not get ~p from ~p after repeats", [Match, URL]),
   throw("Did not get result from URL after requested # of attempts");
+wait_for(URL, Match, Times, Sleep) when is_number(Match) ->
+  R = eurl:get_http(URL),
+  case R#http.code of
+    Match ->  true;
+    X     ->  bdd_utils:log(debug, crowbar, wait_for, "Waiting on ~p to return ~p was ~p",[URL, Match, X]), 
+              timer:sleep(Sleep), 
+              wait_for(URL, Match, Times-1, Sleep)
+  end;
 wait_for(URL, Match, Times, Sleep) ->
   R = eurl:get_http(URL),
   case R#http.data of
@@ -238,9 +246,9 @@ step(Result, {step_then, _N, ["I should not see", Text, "in the body"]}) ->
 % ============================  CLEANUP =============================================
 
 step(_, {_, {_Scenario, _N}, ["there are no pending Crowbar runs for",node,Node]}) -> 
-  timer:sleep(100),   % we want a little pause to allow for settling
+  timer:sleep(250),   % we want a little pause to allow for settling
   URL = eurl:path(run:g(path),Node),
-  wait_for(URL, "[]", 20, 500);  % 20 times for .5 secs
+  wait_for(URL, 404, 20, 500);  % 20 times for .5 secs
 
 % ============================  LAST RESORT =========================================
 step(_Given, {step_when, _N, ["I have a test that is not in WebRat"]}) -> true;
