@@ -39,10 +39,11 @@ validate(JSON) when is_record(JSON, obj) ->
       bdd_utils:is_a(J, dbid, barclamp_id), 
       bdd_utils:is_a(J, boolean, writable), 
       bdd_utils:is_a(J, string, schema), 
-      bdd_utils:is_a(J, length, 11),
+      bdd_utils:is_a(J, string, ui_renderer), 
+      bdd_utils:is_a(J, length, 12),
       crowbar_rest:validate(J)],
   bdd_utils:assert(R).
-  
+ 
 % Common Routine
 % Creates JSON used for POST/PUT requests
 json(Name, Description, Order) -> 
@@ -67,6 +68,10 @@ set_attrib(Type, Name, Attrib, Value) ->
 
 step(_Global, {step_given, {Scenario, _N}, ["REST creates the", attrib, Name, "with map",Map]}) -> 
   JSON = crowbar:json([{name, Name}, {description, g(description)}, {barclamp, 'test'}, {order, g(order)}, {writable, true}, {map, Map}]),
+  bdd_restrat:create(g(path), JSON, attrib, Scenario);
+
+step(_Global, {step_given, {Scenario, _N}, ["REST creates the", attrib, Name, "with barclamp",Barclamp]}) -> 
+  JSON = crowbar:json([{name, Name}, {description, g(description)}, {barclamp, Barclamp}, {order, g(order)}, {writable, true}]),
   bdd_restrat:create(g(path), JSON, attrib, Scenario);
 
 step(_Given, {step_when, {_Scenario, _N}, ["REST sets the node", Attrib, "on", Node, "to", Value]}) -> 
