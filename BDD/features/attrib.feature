@@ -26,7 +26,7 @@ Feature: Attrib(utes)
     Then the {object:attrib} is properly formatted
 
   Scenario: REST Can Delete
-    Given REST creates the {object:attrib} "bdd_foo"
+    Given REST creates the {object:attrib} "bdd_foo" with barclamp "test"
     When REST deletes the {object:attrib} "bdd_foo"
     Then I get a {integer:200} result
       And there is not a {object:attrib} "bdd_foo"
