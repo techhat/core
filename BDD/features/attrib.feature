@@ -72,9 +72,10 @@ Feature: Attrib(utes)
     Given there is a {object:node} "bdd-attrib1.data.edu"
       Given test loads the "node_discovery" data into {object:node} "bdd-attrib1.data.edu"
     When I go to the "nodes/bdd-attrib1.data.edu/attribs/os" page
-    Then I should see "bddsimulator"
+    Then I should see "crowbar"
       And I should see a link to "bdd-attrib1.data.edu"
       And I should see "os"
+      And I should see "ohai/platform"
     Finally REST removes the {object:node} "bdd-attrib1.data.edu"
 
   Scenario: Node checks calculated attrib

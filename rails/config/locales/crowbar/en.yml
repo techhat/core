@@ -197,6 +197,7 @@ en:
       <<: *form_common
       map: "Map"
       ui_renderer: "UI Renderer"
+      barclamp: "Barclamp"
   barclamps:
     index:
       title: "Installed Barclamps"
