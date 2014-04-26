@@ -41,15 +41,6 @@ Feature: Attrib(utes)
     Then key "map" should be "bdd/value"
     Finally REST removes the {object:attrib} "bdd_data_map"
 
-  Scenario: Test attrib value is detectable on node using discovery
-    Given REST creates the {object:node} "bdd-test-attrib.cr0wbar.com"
-      And REST creates the {object:attrib} "bdd_data_here" with map "bdd/value"
-      And REST sets the discovery on "bdd-test-attrib.cr0wbar.com" to "{ \"bdd\": { \"value\": 123 }}"
-    When REST gets the {object:node} "bdd-test-attrib.cr0wbar.com"
-    Then key "discovery:bdd:value" should be "123"
-    Finally REST removes the {object:attrib} "bdd_data_here"
-      And REST removes the {object:node} "bdd-test-attrib.cr0wbar.com"
-
   Scenario: Test attrib value is detectable on node using map
     Given REST creates the {object:node} "bdd-test-attribs.cr0wbar.com"
       And REST creates the {object:attrib} "bdd_data_there" with map "bdd/easyway"

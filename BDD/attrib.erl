@@ -84,17 +84,6 @@ step(_Given, {step_when, {_Scenario, _N}, ["REST sets the", Attrib, "on", Node, 
   bdd_utils:depricate({2014, 7, 1}, attrib, step, attrib, step, 
     [_Given, {step_when, {_Scenario, _N}, ["REST sets the node", Attrib, "on", Node, "to", Value]}]);
 
-
-step(_Global, {step_given, {_Scenario, _N}, ["REST sets the discovery on",Node, "to", JSON]}) -> 
-  Path = eurl:path([node:g(path), Node]),
-  % this ASSUMES that the Value is valid JSON
-  J = crowbar:json([{discovery, json:parse(JSON)}]),
-  bdd_utils:log(debug, attrib, step, "~p PUT ~p", [Path, J]),
-  % now update 
-  Result = eurl:put_post(Path, J, put),
-  O = bdd_restrat:get_object(Result),
-  [Result, O];
-
 step(_Global, {step_setup, _N, _}) -> true;
 
 step(_Global, {step_teardown, _N, _}) -> true.
