@@ -67,7 +67,7 @@ peek(Match, Input) ->
     		nomatch ->      bdd_utils:log(debug, "eurl:peek did NOT find match for ~p", [Match]), false;
     		R2 ->           bdd_utils:log(debug, "eurl:peek RegEx unexpected run result of ~p shows peek did NOT match ~p", [R2, Match]), false
     	catch
-    	  E2 -> bdd_utils:log(error, "eurl:peek RegEx error (~p) Could not parse regex ~p for ~p",[E2, Match]), 
+    	  E2 -> bdd_utils:log(warn, "eurl:peek RegEx error (~p) Could not parse regex ~p for ~p",[E2, Match]), 
     	        false
     	end;
     X -> bdd_utils:log(error, "eurl:peek RegEx compile returned ~p. Could not compile regex ~p",[X, Match]), 
@@ -84,7 +84,7 @@ find_button(Match, Input) ->
 	{ok, RegEx} = re:compile("type='submit'"),
 	case re:run(Button, RegEx) of
 	  {match, _} -> Button;
-	  _ -> bdd_utils:log(error, "eurl:find_button Could not find button with value  '~p'.  HTML could have other components encoded in a tag.", [Match]), "BUTTON NOT FOUND"
+	  _ -> bdd_utils:log(debug, "eurl:find_button Could not find button with value  '~p'.  HTML could have other components encoded in a tag.", [Match]), "BUTTON NOT FOUND"
 	end.
 	
 % return the HREF part of an anchor tag given the content of the link
@@ -104,9 +104,9 @@ find_link(Match, Input) ->
 	AnchorTag = try re:run(Input, RE) of
 	  {match, [{AStart, ALength} | _]} -> 
 	               string:substr(Input, AStart+1,AStart+ALength);
-	  nomatch   -> bdd_utils:log(error, "eurl:find_link AnchorTag Could not find ~p in request  (you may need to escape characters).", [Match]), 
+	  nomatch   -> bdd_utils:log(debug, "eurl:find_link AnchorTag Could not find ~p in request  (you may need to escape characters).", [Match]), 
 	               "ERROR: Could not find link";
-	  REX       -> bdd_utils:log(error, "eurl:find_link AnchorTag Could not find Anchor tags enclosing '~p'.  HTML could have other components encoded in a tag with RegEx ~p", [Match, REX]), 
+	  REX       -> bdd_utils:log(debug, "eurl:find_link AnchorTag Could not find Anchor tags enclosing '~p'.  HTML could have other components encoded in a tag with RegEx ~p", [Match, REX]), 
 	               "ERROR: Unexpected RegEx pattern while finding link"
 	catch
 	   E1       -> bdd_utils:log(error, "eurl:find_link AnchorTag error (~p) Could not parse regex ~p for ~p inside of ~p",[E1, RE, RegEx, Input]), 
@@ -123,10 +123,10 @@ find_link_part2(AnchorTag, HrefREX, Match)     ->
 	             Href = string:substr(AnchorTag, HStart+1,HLength),
 	  	         bdd_utils:log(trace, "eurl:find_link found anchor ~p in path ~p", [AnchorTag, Href]),
 	  	         Href;
-	  nomatch -> bdd_utils:log(error, "eurl:find_link Href Could not find ~s in request (you may need to escape characters)", [Match]), 
+	  nomatch -> bdd_utils:log(debug, "eurl:find_link Href Could not find ~s in request (you may need to escape characters)", [Match]), 
                % return something that's URL like instead of an error so the test fails more gracefully becaue issue is likely in the test, not code
 	             "404.html";
-	  RE      -> bdd_utils:log(error, "eurl:find_link Href Could not find href= information in substring '~p' with result ~p", [AnchorTag, RE]), 
+	  RE      -> bdd_utils:log(debug, "eurl:find_link Href Could not find href= information in substring '~p' with result ~p", [AnchorTag, RE]), 
 	             {error, "ERROR: No URL Found", AnchorTag}
 	catch
 	  E2 ->      bdd_utils:log(error, "eurl:find_link Href error (~p) Could not parse regex ~p for ~p inside of ~p",[E2, HrefREX, Match, AnchorTag]), 
