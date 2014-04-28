@@ -33,7 +33,7 @@ class RolesController < ApplicationController
     @role = Role.find_key params[:id]
     respond_to do |format|
       format.html {  }
-      format.json { render api_show @role }
+      format.json { render api_show @role, "role" }
     end
   end
 

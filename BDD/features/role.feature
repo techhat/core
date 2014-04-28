@@ -45,11 +45,6 @@ Feature: Role
     Then I should see "test-admin"
       And there are no localization errors
 
-  Scenario: BDD can turn off test delays
-    Given I set the {object:role} "test-admin" property "test" to "false"
-    When REST gets the {object:role} "test-admin"
-    Then key "template:test" should be "false"
-
   Scenario: Role class override specific works
     When I go to the "/roles/test-admin" page
     Then I should see "[BarclampTest::Admin]"

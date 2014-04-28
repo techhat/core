@@ -77,8 +77,9 @@ class ApplicationController < ActionController::Base
   end
 
   # creates the content type for a consistent API
-  def cb_content_type(type, form="list")
-    "application/vnd.crowbar.#{type2name(type)}.#{form}+json; version=2.0"
+  def cb_content_type(type, form="list", type_override=nil)
+    type = type_override || type2name(type)
+    "application/vnd.crowbar.#{type}.#{form}+json; version=2.0"
   end
 
   def api_not_found(e)
@@ -121,9 +122,9 @@ class ApplicationController < ActionController::Base
 
   # formats API json for output
   # using this makes it easier to update the API format for all models
-  def api_show(o)
+  def api_show(o, type_override=nil)
     ret = o.as_json
-    return {:json=>ret, :content_type=>cb_content_type(o, "obj") }
+    return {:json=>ret, :content_type=>cb_content_type(o, "obj", type_override) }
   end
 
   # formats API for delete
