@@ -217,12 +217,8 @@ step(_Global, {step_given, {_Scenario, _N}, ["test loads the",File,"data into",n
 
 % ============================  WHEN STEPS =========================================
 
-step(_Given, {step_when, {Scenario, _N}, ["I add",node, Node,"to",deployment, Deployment,"in",role,Role]}) -> 
-  Path = node_role:g(path), 
-  JSON = crowbar:json([{node, Node}, {role, Role}, {deployment, Deployment}]),
-  bdd_utils:log(debug, annealer, step, "Add node_role ~p POST ~p",[Path, JSON]),
-  bdd_restrat:create(Path, JSON, role, Scenario);
-
+step(_Given, {step_when, {_Scenario, _N}, ["I add",node, Node,"to",deployment, Deployment,"in",role,Role]}) -> 
+  node_role:bind(Node, Role, Deployment);
 
 step(_Given, {step_when, _N, ["REST gets the",network,Network,range,"list"]})  -> 
   % This relies on the pattern objects providing a g(path) value mapping to their root information
