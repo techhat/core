@@ -77,6 +77,7 @@ step(_Global, {step_given, {Scenario, _N}, ["REST creates the", attrib, Name, "w
 
 step(_Given, {step_given, {_Scenario, _N}, ["REST sets the node", Attrib, "on", Node, "to", Value]}) -> 
   step(_Given, {step_when, {_Scenario, _N}, ["REST sets the node", Attrib, "on", Node, "to", Value]});
+
 step(_Given, {step_when, {_Scenario, _N}, ["REST sets the node", Attrib, "on", Node, "to", Value]}) -> 
   set_attrib(node, Node, Attrib, Value);
 
