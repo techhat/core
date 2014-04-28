@@ -28,7 +28,7 @@ class UsersController < ApplicationController
   
  # RESTful DELETE of the node resource
   def destroy
-    @user = User.find_key(params[:id])
+    @user = User.find_by_id_or_username params[:id]
     @user.destroy
     render api_delete @user
   end
@@ -45,14 +45,14 @@ class UsersController < ApplicationController
   end
 
   def update
-    @user = User.find_key(params[:id])
+    @user = User.find_by_id_or_username params[:id]
     @user.update_attributes!(user_params)
     render api_show @user
   end
 
   add_help(:show,[:id],[:get])
   def show
-    @user = User.find_key(params[:id])
+    @user = User.find_by_id_or_username params[:id]
     respond_to do |format|
       format.html { } # show.html.erb
       format.json { render api_show @user }
