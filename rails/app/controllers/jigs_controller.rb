@@ -26,7 +26,7 @@ class JigsController < ApplicationController
     respond_to do |format|
       @jig = Jig.find_key params[:id]
       format.html {  }
-      format.json { render api_show @jig }
+      format.json { render api_show @jig, "jig" }
     end
   end
 
