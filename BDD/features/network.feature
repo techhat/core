@@ -58,7 +58,7 @@ Feature: Networks
     Then Array matches "192\.168\.124\.(10|11)/24" 
 
   Scenario: Network List
-    Given I use the Network API to create "bdd_network" with range "bdd1" from "10.10.11.100/24" to "10.10.11.200/24"
+    Given I use the Network API to create "bdd_network" with range "bdd11" from "10.10.11.100/24" to "10.10.11.200/24"
     When I go to the "networks" page
     Then I should see {bdd:crowbar.i18n.networks.index.title}
       And I should see "admin" in section "main_body"
@@ -67,12 +67,12 @@ Feature: Networks
     Finally REST removes the {object:network} "bdd_network"
 
  Scenario: Network List to Item
-    Given I use the Network API to create "bdd_test" with range "bdd1" from "10.10.12.100/24" to "10.10.12.200/24"
+    Given I use the Network API to create "bdd_test12" with range "bdd12" from "10.10.12.100/24" to "10.10.12.200/24"
       And I am on the "networks" page
-    When I click on the "bdd_test" link
-    Then I should see "bdd_test"
+    When I click on the "bdd_test12" link
+    Then I should see "bdd_test12"
       And there should be no translation errors
-    Finally REST removes the {object:network} "bdd_test"
+    Finally REST removes the {object:network} "bdd_test12"
 
   Scenario: REST Get 404
     When REST gets the {object:network} "thisdoesnotexist"
