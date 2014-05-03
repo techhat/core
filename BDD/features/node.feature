@@ -73,10 +73,10 @@ Feature: Nodes
       And the {object:node} is properly formatted
     Finally REST removes the {object:node} "bdd-alive-set.example.com"
 
-  Scenario: Node Available Settable Default True
+  Scenario: Node Available Settable Default False
     Given there is a {object:node} "bdd-available-false.example.com"
     When REST gets the {object:node} "bdd-available-false.example.com"
-    Then key "available" should be "true"
+    Then key "available" should be "false"
       And the {object:node} is properly formatted
     Finally REST removes the {object:node} "bdd-available-false.example.com"
 
@@ -129,7 +129,7 @@ Feature: Nodes
   Scenario: Node special API for deployment change
     Given there is a {object:node} "bdd-deployment-change.example.com"
       And there is a {object:deployment} "bdd_test1"
-    When REST updates an object at "/api/v2/nodes/bdd-deployment-change.example.com" with "{\"node\":{\"deployment\":\"bdd_test1\"}}"
+    When REST updates an object at "/api/v2/nodes/bdd-deployment-change.example.com" with "{\"deployment\":\"bdd_test1\"}"
     Then key "deployment_id" should not be "1"
       And key "deployment_id" should match id for {object:deployment}
     Finally REST removes the {object:node} "bdd-deployment-change.example.com"

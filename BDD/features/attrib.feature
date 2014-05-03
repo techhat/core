@@ -26,7 +26,7 @@ Feature: Attrib(utes)
     Then the {object:attrib} is properly formatted
 
   Scenario: REST Can Delete
-    Given REST creates the {object:attrib} "bdd_foo"
+    Given REST creates the {object:attrib} "bdd_foo" with barclamp "test"
     When REST deletes the {object:attrib} "bdd_foo"
     Then I get a {integer:200} result
       And there is not a {object:attrib} "bdd_foo"
@@ -41,39 +41,28 @@ Feature: Attrib(utes)
     Then key "map" should be "bdd/value"
     Finally REST removes the {object:attrib} "bdd_data_map"
 
-  Scenario: Test attrib value is detectable on node using discovery
-    Given REST creates the {object:node} "bdd-test-attrib.cr0wbar.com"
-      And REST creates the {object:attrib} "bdd_data_here" with map "bdd/value"
-      And REST sets the discovery on "bdd-test-attrib.cr0wbar.com" to "{ \"bdd\": { \"value\": 123 }}"
-    When REST gets the {object:node} "bdd-test-attrib.cr0wbar.com"
-    Then key "discovery:bdd:value" should be "123"
-    Finally REST removes the {object:attrib} "bdd_data_here"
-      And REST removes the {object:node} "bdd-test-attrib.cr0wbar.com"
-
   Scenario: Test attrib value is detectable on node using map
     Given REST creates the {object:node} "bdd-test-attribs.cr0wbar.com"
       And REST creates the {object:attrib} "bdd_data_there" with map "bdd/easyway"
-    When REST sets the "bdd_data_there" on "bdd-test-attribs.cr0wbar.com" to "456"
-    Then key "discovery:bdd:easyway" should be "456"
+    When REST sets the node "bdd_data_there" on "bdd-test-attribs.cr0wbar.com" to "456"
+    Then key "value" should be "456"
     Finally REST removes the {object:attrib} "bdd_data_there"
       And REST removes the {object:node} "bdd-test-attribs.cr0wbar.com"
 
   Scenario: attrib_ method missing works in UI pass without data
     Given REST creates the {object:node} "bdd-attrib-missing.cr0wbar.com"
     When I go to the "nodes/bdd-attrib-missing.cr0wbar.com" page
-    Then I should see {bdd:crowbar.i18n.nodes.show.bdd_marker}
-      And I should not see "foofoofoo"
-      And I should see {bdd:crowbar.i18n.ignore}
+    Then I should see {bdd:crowbar.i18n.nodes.show.bdd_marker} in section "column_50 last"
+      And I should not see "foofoofoo" in section "column_50 last"
+      And I should see {bdd:crowbar.i18n.ignore} in section "column_50 last"
     Finally REST removes the {object:node} "bdd-attrib-missing.cr0wbar.com"
 
   Scenario: attrib_ method missing works in UI
     Given REST creates the {object:node} "bdd-attrib-methodmissing.cr0wbar.com"
       And REST creates the {object:attrib} "bdd_marker" with map "bdd/marker"
-      And REST sets the discovery on "bdd-attrib-methodmissing.cr0wbar.com" to "{ \"bdd\": { \"marker\": \"foofoofoo\" }}"
+      And REST sets the node "bdd_marker" on "bdd-attrib-methodmissing.cr0wbar.com" to "foofoofoo"
     When I go to the "nodes/bdd-attrib-methodmissing.cr0wbar.com" page
-    Then I should see {bdd:crowbar.i18n.nodes.show.bdd_marker}
-      And I should see "foofoofoo"
-      And I should not see {bdd:crowbar.i18n.ignore}
+    Then I should see "foofoofoo" in section "column_50 last"
     Finally REST removes the {object:attrib} "bdd_marker"
       And REST removes the {object:node} "bdd-attrib-methodmissing.cr0wbar.com"
 
@@ -81,9 +70,10 @@ Feature: Attrib(utes)
     Given there is a {object:node} "bdd-attrib1.data.edu"
       Given test loads the "node_discovery" data into {object:node} "bdd-attrib1.data.edu"
     When I go to the "nodes/bdd-attrib1.data.edu/attribs/os" page
-    Then I should see "bddsimulator"
+    Then I should see "crowbar"
       And I should see a link to "bdd-attrib1.data.edu"
       And I should see "os"
+      And I should see "ohai/platform"
     Finally REST removes the {object:node} "bdd-attrib1.data.edu"
 
   Scenario: Node checks calculated attrib

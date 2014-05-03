@@ -35,7 +35,10 @@ class AttribsController < ApplicationController
     else
       ret = @attrib.as_json
       ret["value"] = @attrib.get(target)
-      render json: ret, content_type: cb_content_type(@attrib, "obj")
+      respond_to do |format|
+        format.html { }
+        format.json { render json: ret, content_type: cb_content_type(@attrib, "obj") }
+      end
     end
   end
 

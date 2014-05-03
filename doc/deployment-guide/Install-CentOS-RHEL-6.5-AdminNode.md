@@ -47,6 +47,7 @@ Machine requirements are:
     If using a virtual machine (VM), where VM motion (ability to migrated VMs across Hypervisor platforms) is required ensure that secure VM access is correctly configured and is operational.
     Where network-managed power switches are in use, ensure that network access is secure from unwanted access.
 
+
 ##CentOS 6.5 installation
     Boot CentOS 6.5 x86_64 from pristine ISO media
     At the boot screen select "Install or upgrade an existing system", hit Enter

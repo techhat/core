@@ -16,6 +16,7 @@
 -export([test/0, test/1, features/0, feature/1, feature/2, scenario/2, scenario/3, scenario/4]).
 -export([debug/1, debug/2, debug/3, debug/4, failed/0, failed/1, getconfig/1, start/1, stop/1, steps/0, steps/1]).  
 -export([step_run/3, step_run/4, inspect/1, is_clean/1, log/3, log/1]).
+-include("bdd.hrl").
 
 test()                   -> test("default").
 test(ConfigName)         -> 
@@ -289,7 +290,18 @@ step_run(Config, Input, Step, [Feature | Features]) ->
 		  log(trace, "^^ ~p,~p Result -> ~p",[Scenario, StepNum, Result]),
 		  Result
 	catch
-		error: undef -> step_run(Config, Input, Step, Features);
+		error: undef -> 
+      % if this is a given step then we should try it as a when before we give up
+      Retry = if is_record(Step, stepgiven) ->
+                RWhen = #stepwhen{scenario=Step#stepgiven.scenario, step=Step#stepgiven.step},
+                step_run(Config, Input, RWhen, Feature);
+              true -> error
+              end,
+      % if we did not pass (or have) an alternate then run in the other feature list
+      case Retry of
+        error -> step_run(Config, Input, Step, Features);
+        _     -> Retry
+      end;
 		error: function_clause -> step_run(Config, Input, Step, Features);
 		exit: {noproc, {gen_server, call, Details}} -> 
 		  log(info,  "exit Did not find step: ~p", [Alias]),

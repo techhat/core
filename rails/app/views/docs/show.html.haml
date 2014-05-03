@@ -15,7 +15,7 @@
 
   %p.topic= @text.html_safe
 
-  - if current_user.settings(:ui).debug
+  - if @doc and current_user.settings(:ui).debug
     %hr
       %h3= t 'debug'
       %ul

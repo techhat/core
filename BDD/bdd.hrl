@@ -28,3 +28,11 @@
 
 % return generic data from a call
 -record(grep, {data = "error"}).
+
+% step definitions!
+-record(stepgiven,    {scenario = {not_set,not_set}, step = []}).
+-record(stepwhen,     {scenario = {not_set,not_set}, step = []}).
+-record(stepthen,     {scenario = {not_set,not_set}, step = []}).
+-record(stepfinally,  {scenario = {not_set,not_set}, step = []}).
+-record(stepsetup,    {scenario = {not_set,not_set}, step = []}).
+-record(stepteardown, {scenario = {not_set,not_set}, step = []}).

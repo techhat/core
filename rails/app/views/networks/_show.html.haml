@@ -1,7 +1,10 @@
 = form_for :network, :'data-remote' => true, :url => network_path(network.id), :html => { :method=>:put, :'data-type' => 'html',  :class => "formtastic" } do |f|
   %dl
     %dt= t '.name'
-    %dd= link_to network.name, role_path(network.role.id)
+    - if network.role
+      %dd= link_to network.name, role_path(network.role.id)
+    - else
+      %dd= network.name
     %dt= t '.description'
     %dd= text_field_tag :description, network.description, :size=>30
     %dt= t '.deployment'

@@ -94,16 +94,29 @@ json_build({Key, Value})                     -> {Key, Value};
 json_build([Head | Tail])                    -> [ Head | json_build(Tail)].
 
 % wait for URL to return item, loop until we get the desire result
-wait_for(URL, Match, 0, _) -> 
-  bdd_utils:log(error, crowbar,wait_for, "Did not get ~p from ~p after repeats", [Match, URL]),
-  throw("Did not get result from URL after requested # of attempts");
-wait_for(URL, Match, Times, Sleep) ->
-  R = eurl:get_http(URL),
+wait_for(R, Match) when is_number(Match) ->
+  case R#http.code of
+    Match ->  true;
+    X     ->  bdd_utils:log(debug, crowbar, wait_for, "Waiting on ~p to return ~p was ~p",[R#http.url, Match, X]), 
+              false
+  end;
+wait_for(R, Match) ->
   case R#http.data of
     Match ->  true;
-    X     ->  bdd_utils:log(debug, crowbar, wait_for, "Waiting on ~p.  Result is ~p long",[URL, length(X)]), 
-              timer:sleep(Sleep), 
-              wait_for(URL, Match, Times-1, Sleep)
+    X     ->  bdd_utils:log(debug, crowbar, wait_for, "Waiting on ~p.  Result is ~p long",[R#http.url, length(X)]), 
+              false
+  end.
+
+wait_for(URL, MatchCode, MatchData, 0, _) -> 
+  bdd_utils:log(error, crowbar,wait_for, "Did not get ~p/~p from ~p after repeats", [MatchCode, MatchData, URL]),
+  throw("Did not get result from URL after requested # of attempts");
+wait_for(URL, MatchCode, MatchData, Times, Sleep) ->
+  R = eurl:get_http(URL),
+  case {wait_for(R, MatchCode), wait_for(R, MatchData)} of
+     {_, true} -> true;
+     {true, _} -> true;
+     _         -> timer:sleep(Sleep), 
+                  wait_for(URL, MatchCode, MatchData, Times-1, Sleep)
   end.
 
 worker() ->
@@ -138,8 +151,7 @@ step(_Global, {step_setup, {_Scenario, _N}, Test}) ->
   end,
   % create node for testing
   bdd_utils:log(debug, crowbar, step, "Global Setup running (creating node ~p)",[g(node_name)]),
-  Node = json([{name, g(node_name)}, {description, Test ++ g(description)}, {order, 100}, {alive, "true"}, {bootenv, node:g(bootenv)}, {admin, "true"}]),
-  bdd_crud:create(node:g(path), Node, g(node_atom)),
+  node:add_node(g(node_name), "crowbar-admin-node", [{description, Test ++ g(description)}, {order, 100}, {admin, "true"}], g(node_atom)),
   true;
 
 % find the node from setup and remove it
@@ -205,12 +217,8 @@ step(_Global, {step_given, {_Scenario, _N}, ["test loads the",File,"data into",n
 
 % ============================  WHEN STEPS =========================================
 
-step(_Given, {step_when, {Scenario, _N}, ["I add",node, Node,"to",deployment, Deployment,"in",role,Role]}) -> 
-  Path = node_role:g(path), 
-  JSON = crowbar:json([{node, Node}, {role, Role}, {deployment, Deployment}]),
-  bdd_utils:log(debug, annealer, step, "Add node_role ~p POST ~p",[Path, JSON]),
-  bdd_restrat:create(Path, JSON, role, Scenario);
-
+step(_Given, {step_when, {_Scenario, _N}, ["I add",node, Node,"to",deployment, Deployment,"in",role,Role]}) -> 
+  node_role:bind(Node, Role, Deployment);
 
 step(_Given, {step_when, _N, ["REST gets the",network,Network,range,"list"]})  -> 
   % This relies on the pattern objects providing a g(path) value mapping to their root information
@@ -239,9 +247,9 @@ step(Result, {step_then, _N, ["I should not see", Text, "in the body"]}) ->
 % ============================  CLEANUP =============================================
 
 step(_, {_, {_Scenario, _N}, ["there are no pending Crowbar runs for",node,Node]}) -> 
-  timer:sleep(100),   % we want a little pause to allow for settling
+  timer:sleep(250),   % we want a little pause to allow for settling
   URL = eurl:path(run:g(path),Node),
-  wait_for(URL, "[]", 20, 500);  % 20 times for .5 secs
+  wait_for(URL, 404, "[]", 20, 500);  % 20 times for .5 secs
 
 % ============================  LAST RESORT =========================================
 step(_Given, {step_when, _N, ["I have a test that is not in WebRat"]}) -> true;

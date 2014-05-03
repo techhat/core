@@ -18,12 +18,6 @@ Feature: Deployments
       And I should see {apply:crowbar.i18n.deployments.index.parent}
       And there are no localization errors
 
-  Scenario: Deployment UI click to Snapshot
-    Skip rob needs to update
-    Given I am on the "deployments" page
-    When I click on the {lookup:deployment.d_name} link
-    Then I should see "bravo_delta Proposed"
-
   Scenario: The system deployment has the system flag true
     When REST gets the {object:deployment} "system"
     Then key "system" should be "true"
@@ -35,14 +29,6 @@ Feature: Deployments
     When REST creates the {object:deployment} "bdd_deploy_test"
     Then there is a {object:deployment} "bdd_deploy_test"
     Finally REST removes the {object:deployment} "bdd_deploy_test"
-
-  Scenario: New Deployment has a default snapshot
-    Skip UI refactoring, please update
-    Given there is a {object:deployment} "bdd_deploy_has_snap"
-    When I go to the "snapshots/bdd_deploy_has_snap" page
-    Then I should see "bdd_deploy_has_snap Proposed"
-      And I should see a link to "bdd_deploy_has_snap"
-    Finally REST removes the {object:deployment} "bdd_deploy_has_snap"
 
   Scenario: New Deployment renders in UI
     Given there is a {object:deployment} "bdd_deploy_showme"
@@ -61,7 +47,6 @@ Feature: Deployments
   Scenario: Parent Deployment shown on UI
     Given there is a {object:deployment} "bdd_deploy_child_ui"
     When I go to the "deployments/bdd_deploy_child_ui" page
-    Then I should see "Child of"
-      And I should see a link to "system"
+    Then I should see a link to "system"
     Finally REST removes the {object:deployment} "bdd_deploy_child_ui"
   

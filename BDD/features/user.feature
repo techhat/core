@@ -97,10 +97,10 @@ Feature: User
       And the list should have an object with key "username" value "developer"
      
   Scenario: REST user
-    Given there is not a {object:user} "test_user_1"
-    When REST creates the {object:user} "test_user_1"
+    Given there is not a {object:user} "test_user_12"
+    When REST creates the {object:user} "test_user_12"
     Then the {object:user} is properly formatted
-    Finally REST removes the {object:user} "test_user_1"
+    Finally REST removes the {object:user} "test_user_12"
     
   Scenario: REST Updates a user email
     Skip ZEHICLE refactoring

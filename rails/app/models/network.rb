@@ -203,7 +203,7 @@ class Network < ActiveRecord::Base
     Attrib.destroy_all :role_id => rid
     # Also destroy the hints
     ["v4addr","v6addr"].each do |n|
-      Attrib.destroy_all(name: "hint-#{name}-#{v4addr}")
+      Attrib.destroy_all(name: "hint-#{name}-v4addr")
     end
   end
 

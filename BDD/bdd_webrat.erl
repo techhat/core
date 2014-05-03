@@ -100,11 +100,9 @@ step(Result, {step_then, _N, ["I should not see", Text]}) ->
 	bdd_utils:log(trace, "step_then result ~p should NOT have ~p on the page", [Result, Text]),
 	eurl:search(Text,Result, false);
 
-step(Result, {step_then, _N, ["I should not see", Text, "in section", Id]}) -> 
+step(Result, {step_then, {_Scenario, _N}, ["I should not see", Text, "in section", Id]}) -> 
 	bdd_utils:log(trace, "step_then result ~p should NOT have ~p on the page", [Result, Text]),
-	Body = eurl:get_result(Result, http, "text/html"), 
-	Section = [eurl:find_div(B, Id) || B <- Body],
-	eurl:search(Text,Section, false);
+  step(Result, {step_then, {_Scenario, _N}, ["I should see", Text, "in section", Id]}) =:= false;
 
 step(Result, {step_then, {_Scenario, _N}, ["I should see an input box with",Input]}) ->
   R = eurl:get_result(Result, http, "text/html"), 
@@ -144,6 +142,7 @@ step(Result, {step_then, _N, ["I should see", Text]}) ->
 	eurl:search(Text,R);
 
 step(Result, {step_then, _N, ["I should see", Text, "in section", Id]}) -> 
+  bdd_utils:log(debug, bdd_restrat, step, "~p should be in ~p", [Text, Id]),  
   R = eurl:get_result(Result, http, "text/html"),
   bdd_utils:log(trace, bdd_restrat, step, "~p should have ~p on the page", [R#http.url, Text]),
 	Body = R#http.data,
@@ -158,6 +157,7 @@ step(Result, {step_then, _N, ["there should be no translation errors"]}) ->
   TransError = bdd_utils:config(translation_error),
   R = eurl:get_result(Result, http, "text/html"),
   eurl:search(TransError,R, false);
+
 
 step(Result, {step_then, _N, ["I should see a link to", Link]}) ->
   bdd_utils:assert([ 
