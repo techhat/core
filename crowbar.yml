@@ -217,6 +217,8 @@ rpms:
       - openssh-clients
       - openssh-server
       - openssl-devel
+      - gecode
+      - gecode-devel
     pkgs:
       # openldap stuff
       - openldap
@@ -265,6 +267,8 @@ rpms:
       - openssh-clients
       - openssh-server
       - openssl-devel
+      - gecode
+      - gecode-devel
     pkgs:
       # openldap stuff
       - openldap
@@ -349,11 +353,11 @@ rpms:
       - postgresql93-server
       - ruby20
       - ruby20-devel
+      - autoconf
       - sudo
       - zlib-devel
       # openssh stuff
-      - openssh-clients
-      - openssh-server
+      - openssh
     build_pkgs:
       - libcurl-devel
       - libxml2-devel
@@ -392,8 +396,6 @@ rpms:
     - postgresql93-server
     - libxml2-devel
     - libpq5
-    - libpqxx
-    - libpqxx-devel
     - libossp-uuid16
     - libecpg6
     - sudo
@@ -403,8 +405,6 @@ rpms:
     # To extract ISO images without needing a loopback mount.
     - bsdtar
     - git
-    - gecode
-    - gecode-devel
   build_pkgs:
     - make
     - gcc

@@ -108,6 +108,11 @@ file "/tmp/install_pkgs" do
   action :nothing
 end
 
+template "/etc/gemrc" do
+  source "gemrc.erb"
+  variables(:proxy => ENV["http_proxy"])
+end
+
 template "/tmp/required_pkgs" do
   source "required_pkgs.erb"
   variables( :pkgs => pkgs )
@@ -126,7 +131,7 @@ when "centos","redhat","suse","opensuse","fedora"
   file "/etc/sysconfig/network" do
     action :create
     content "NETWORKING=yes"
-  end
+  end if File.file?("/etc/sysconfig/network")
 
   repos.each do |repo|
     repofile_path = case node["platform"]
@@ -305,6 +310,22 @@ when "centos","redhat"
     code "ln -sf /usr/pgsql-9.3/bin/pg_config /usr/local/bin/pg_config"
     not_if "which pg_config"
   end
+when "opensuse", "suse"
+  bash "Init the postgresql database" do
+    code <<EOC
+su -l -c 'initdb --locale=en_US.UTF-8 -D #{pg_conf_dir}' postgres
+sed -i -e '/POSTGRES_DATADIR/ s@=.*$@="#{pg_conf_dir}"@' /etc/sysconfig/postgresql
+EOC
+    not_if do File.exists?("#{pg_conf_dir}/pg_hba.conf") end
+  end
+  service "postgresql" do
+    action [:enable, :start]
+  end
+
+  # Why does opensuse consider ping to be a security risk?
+  bash "Allow everyone to ping" do
+    code "chmod u+s /usr/bin/ping /usr/bin/ping6"
+  end
 end
 
 
@@ -327,7 +348,6 @@ end
 (prereqs["gems"]["required_pkgs"] rescue []).each do |g|
   gem_package g do
     action :install
-    options "--http-proxy #{proxies["http_proxy"]} --no-ri --no-rdoc --bindir /usr/local/bin"
   end
 end
 
