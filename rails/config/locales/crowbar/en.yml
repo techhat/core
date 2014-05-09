@@ -267,7 +267,7 @@ en:
       value: "Value"
       save: "Update"
   docs:
-    missing: "%{topic} Topics"
+    missing: "Topics"
     index:
       title: "Documentation"
       framework_display: "Crowbar Framework"

@@ -1,4 +1,4 @@
-OPENCROWBAR LICENSE:
+# OpenCrowbar License:
 
 Is available from multiple authors under the Apache 2 license.
 
@@ -12,10 +12,10 @@ Is available from multiple authors under the Apache 2 license.
     See the License for the specific language governing permissions and
     limitations under the License.
 
-COMPONENT LICENSES:
+## Component Licenses 
 
-Please see /doc/licenses for component license information
+Please see subdirectories under /doc/licenses for component license information
 
-ADDITIONAL COMPONENTS:
+## Additional Components
 
-Workloads using the Crowbar framework may be offered under different licenses.  These licenses should be documented under the components relevenat "/doc/licenses" directory.
+Workloads using the Crowbar framework may be offered under different licenses.  These licenses should be documented under the components' "/doc/licenses" directory.
