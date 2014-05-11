@@ -307,7 +307,13 @@ when "centos","redhat"
   end
 end
 
+
 # This will configure us to only listen on a local UNIX socket
+template "#{pg_conf_dir}/postgresql.conf" do
+  source "postgresql.conf.erb"
+  notifies :restart, "service[postgresql]", :immediately
+end
+
 template  "#{pg_conf_dir}/pg_hba.conf" do
   source "pg_hba.conf.erb"
   notifies :restart, "service[postgresql]",:immediately
