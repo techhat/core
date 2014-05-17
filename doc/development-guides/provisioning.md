@@ -1,7 +1,4 @@
-> NOTE: should be moved to the Prov. Barclamp dir
-
-
-See all, [[Barclamp list]]
+## Provising Process
 
 **Overview**
 

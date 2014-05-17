@@ -21,3 +21,5 @@
       %ul
         %li= "Name: #{@doc.name}"
         %li= "Parent: #{(@doc.parent_id ? @doc.parent.name : t('not_set'))}"
+        %li= "Description: #{@doc.description}"
+        %li= "Barclamp: #{@doc.barclamp.name}"

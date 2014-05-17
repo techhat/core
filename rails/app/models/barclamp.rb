@@ -39,7 +39,7 @@ class Barclamp < ActiveRecord::Base
     (1..size).collect{|a| chars[rand(chars.size)] }.join
   end
 
-  def self.import(bc_name="core", bc=nil, source_path=nil)
+  def self.import(bc_name="core", bc=nil, source_path=nil, parent_id=nil)
     Barclamp.transaction do
       barclamp = Barclamp.find_or_create_by!(name: bc_name)
       source_path ||= File.expand_path(File.join(Rails.root, '..'))
@@ -65,7 +65,7 @@ class Barclamp < ActiveRecord::Base
                                   :source_path => source_path,
                                   :source_url  => source_url,
                                   :build_on    => gitdate,
-                                  :barclamp_id => barclamp.id,
+                                  :barclamp_id => parent_id || barclamp.id,
                                   :commit      => gitcommit)
 
       # load the jig information.
@@ -115,11 +115,11 @@ class Barclamp < ActiveRecord::Base
                                 :source_path => source_path,
                                 :source_url  => source_url,
                                 :build_on    => gitdate,
-                                :barclamp_id => barclamp.id,
+                                :barclamp_id => parent_id || barclamp.id,
                                 :commit      => gitcommit)
         subm_file = File.join(source_path,"barclamps","#{name}.yml")
         next unless File.exists?(subm_file)
-        Barclamp.import name, YAML.load_file(subm_file), source_path
+        Barclamp.import name, YAML.load_file(subm_file), source_path, barclamp.id
 
       end if bc["barclamps"]
 

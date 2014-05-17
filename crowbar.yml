@@ -24,8 +24,8 @@ os_support:
   - fedora-20
 
 barclamps:
-  - name: crowbar
-    description: "Self-referential barclamp enabling other barclamps"
+  - name: core
+    description: "Foundational Roles"
   - name: test
     description: "Test Barclamp Integrations"
   - name: network
