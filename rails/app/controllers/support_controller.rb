@@ -93,11 +93,12 @@ class SupportController < ApplicationController
   end
 
   def bootstrap
-    @roles = []
-    @roles << Role.find_key("dns-server")
-    @roles << Role.find_key("ntp-server")
-    @roles << Role.find_key("network-server")
-    @roles << Role.find_key("network-#{Network::ADMIN_NET}") || :create_network_admin
+    @attribs = []
+    @attribs << [Role.find_key("dns-server"), Attrib.find_key("dns_servers")]
+    @attribs << [Role.find_key("dns-server"), Attrib.find_key("dns-forwarders")]
+    @attribs << [Role.find_key("ntp-server"), Attrib.find_key("ntp_servers")]
+    @node = Node.admin.first
+    @net = Network.find_key("admin")
   end
 
   def bootstrap_post
