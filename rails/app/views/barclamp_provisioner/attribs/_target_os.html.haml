@@ -1,6 +1,6 @@
 - value = Attrib.get(attrib.name, obj)
 - admin = Node.admin.where(:available => true).first
-- available_os = Attrib.get("provisioner-available-oses", admin).map{ |k,v| k }
+- available_os = Attrib.get("provisioner-available-oses", admin).map{ |k,v| k } rescue []
 - raw_options = 
 = form_for :attrib, :remote => true, :url => attribs_api_path(:id=>attrib.id, obj_type=>obj.id, :version=>'v2'), :html => { :method=>:put, :'data-type' => 'html',  :class => "formtastic" } do |f|
   %tr

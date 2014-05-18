@@ -54,7 +54,7 @@ class NodeRolesController < ApplicationController
       depl = Deployment.find_key(params[:deployment])
     end
     node = Node.find_key(params[:node] || params[:node_id])
-    role = Role.find_key(params[:role] || params[:role_id])
+    role = Role.find_key(params[:role] || params[:role_id] || params[:node_roles][:role_id])
     depl ||= node.deployment
     @node_role = NodeRole.create!(role_id: role.id,
                                   node_id: node.id,
