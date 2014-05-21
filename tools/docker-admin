@@ -18,6 +18,25 @@
 # $@ = Command to run, if nothing then /bin/bash -i
 
 # If we are not running inside of Docker, put ourselves in a container.
+if ! which docker &>/dev/null; then
+    echo "Please install Docker!"
+    exit 1
+fi
+
+if [[ $0 = /* ]]; then
+    mountdir="$0"
+elif [[ $0 = .*  || $0 = */* ]]; then
+    mountdir="$(readlink -f "$PWD/$0")"
+else
+    echo "Cannot figure out where core is!"
+    exit 1
+fi
+# This gets us to core
+mountdir="${mountdir%/tools/docker-admin}"
+# This gets us to the parent directory of core, where presumably the rest of our repos are checked out
+mountdir="${mountdir%/*}"
+. "$mountdir/core/tools/tmux_lib.sh"
+
 declare -A image_map
 #image_map["ubuntu"]="ubuntu:precise"
 image_map["ubuntu"]="opencrowbar/ubuntu:12.04-4"
@@ -36,23 +55,7 @@ if [[ ! $image ]]; then
     exit 1
 fi
 shift
-if ! which docker &>/dev/null; then
-    echo "Please install Docker!"
-    exit 1
-fi
 
-if [[ $0 = /* ]]; then
-    mountdir="$0"
-elif [[ $0 = .*  || $0 = */* ]]; then
-    mountdir="$(readlink -f "$PWD/$0")"
-else
-    echo "Cannot figure out where core is!"
-    exit 1
-fi
-# This gets us to core
-mountdir="${mountdir%/tools/docker-admin}"
-# This gets us to the parent directory of core, where presumably the rest of our repos are checked out
-mountdir="${mountdir%/*}"
 echo "We will mount $mountdir at /opt/opencrowbar"
 mkdir -p "$HOME/.cache/opencrowbar/tftpboot"
 
