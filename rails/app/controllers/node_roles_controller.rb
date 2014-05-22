@@ -53,8 +53,12 @@ class NodeRolesController < ApplicationController
     elsif params.key? :deployment
       depl = Deployment.find_key(params[:deployment])
     end
+    # alternate formatting of input from bootstrap
+    if params.key? :node_roles
+      nr_roles = params[:node_roles][:role_id]
+    end
     node = Node.find_key(params[:node] || params[:node_id])
-    role = Role.find_key(params[:role] || params[:role_id])
+    role = Role.find_key(params[:role] || params[:role_id] || nr_roles)
     depl ||= node.deployment
     @node_role = NodeRole.create!(role_id: role.id,
                                   node_id: node.id,
