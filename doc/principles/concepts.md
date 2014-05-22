@@ -4,7 +4,7 @@
 
 A deployment framework is key to solving the problems of deploying, configuring, and scaling open source clusters for cloud computing.
 
-Deploying an open source cloud can be a complex undertaking. Manual processes, can take days or even weeks working to get a cloud fully operational. Eeven then, a cloud is never static, in the real world cloud solutions are constantly on an upgrade or improvement path. There is continuous need tp deploy new servers, add management capabilities, and track the upstream releases, while keeping the cloud running, and providing reliable services to end users. Service continuity requirements dictate a need for automation and orchestation.  There is no other way to reduce the cost while improving the uptime reliability of a cloud.
+Deploying an open source cloud can be a complex undertaking. Manual processes, can take days or even weeks working to get a cloud fully operational. Even then, a cloud is never static, in the real world cloud solutions are constantly on an upgrade or improvement path. There is continuous need to deploy new servers, add management capabilities, and track the upstream releases, while keeping the cloud running, and providing reliable services to end users. Service continuity requirements dictate a need for automation and orchestration.  There is no other way to reduce the cost while improving the uptime reliability of a cloud.
 
 These were among the challenges that drove the development of the OpenCrowbar software framework from it's roots as an [OpenStack](http://OpenStack.org) installer into a much broader orchestration tool.  Because of this evolution, OpenCrowbar has a number of architectural features to address these challenges:
 
@@ -26,17 +26,17 @@ These were among the challenges that drove the development of the OpenCrowbar so
     It supports discovery and provisioning from a bare metal state,
     including hardware configuration, updating and configuring BIOS and
     BMC boards, and operating system installation. Multiple operating
-    systems and heterogenous operating systems are supported. OpenCrowbar
+    systems and heterogeneous operating systems are supported. OpenCrowbar
     enables use of time-honored tools, industry standard tools, and any
     form of scriptable facility to perform its state transition operations.
 
 * Modular Architecture
 
-    OpenCrowbar is designed around modular plugins called BarClamps. 
+    OpenCrowbar is designed around modular plug-ins called Barclamps. 
     Barclamps allow for extensibility and customization while encapsulating
     layers of deployment in manageable units.
 
-* State Tansition Management Engine
+* State Transition Management Engine
 
     The core of OpenCrowbar is based on a state machine that tracks nodes,
     roles, and their relationships in groups called deployments. The
@@ -55,8 +55,8 @@ These were among the challenges that drove the development of the OpenCrowbar so
 * Network Abstraction
 
     OpenCrowbar is designed to support a flexible network abstraction,
-    where pyhsical interfaces, BMC's, VLANS, binding, teaming,and other low level
+    where physical interfaces, BMC's, VLANS, binding, teaming, and other low level
     features are mapped to logical conduits, which can be referenced by other
     components.  Networking configurations can be created dynamically to adapt
     to changing infrastructure.
-"concepts.md" 67L, 3174C                        
+                     
