@@ -1,6 +1,6 @@
 ## Emergent services
 
-We see data center operations as a duel between conflicting priorities.  On one hand, the environment is constantly changing and systems must adapt quickly to these changes.  On the other hand, users of the infrastructure expect it to provide stable and consistent services for consumption.  In previous white papers, we’ve described that as “always ready, never finished.”
+We see data center operations as a duel between conflicting priorities.  On one hand, the environment is constantly changing and systems must adapt quickly to these changes.  On the other hand, users of the infrastructure expect it to provide stable and consistent services for consumption.  We’ve described that as “always ready, never finished.”
 
 Our solution to this duality to expect that the infrastructure Crowbar builds is decomposed into well-defined service layers that can be (re)assembled dynamically.  Rather than require any component of the system to be in a ready state, Crowbar design principles assume that we can automate the construction of every level of the infrastructure from bios to network and application.  Consequently, we can hold off (re)making decisions at the bottom levels until we’ve figured out that we’re doing at the top.  
 
@@ -9,6 +9,6 @@ Effectively, we allow the overall infrastructure services configuration to evolv
 Emergent (aka iterative or evolutionary) design challenges the traditional assumption that all factors must be known before starting 
 
   * Dependency graph – multidimensional relationship
-  * High degree of reuse via abstraction and isolation of service boundries.
+  * High degree of reuse via abstraction and isolation of service boundaries.
   * Increasing complexity of deployments means more dependencies
   * Increasing revision rates of dependencies but with higher stability of APIs
