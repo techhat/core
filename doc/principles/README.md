@@ -1,6 +1,6 @@
 # Functional DevOps “FuncOps”
 
-The operational model behind Crowbar is entering its third generation and it’s important to understand the principles behind that model.  The model is critical because it shapes how Crowbar approaches the infrastructure at a fundamental level so it makes it easier to interact with the platform if you see how we are approaching operations.  Crowbar’s goal is to create emergent services.
+The operational model behind Crowbar is entering its third generation and its important to understand the principles behind that model.  The model is critical because it shapes how Crowbar approaches the infrastructure at a fundamental level so it makes it easier to interact with the platform if you see how we are approaching operations.  Crowbar’s goal is to create emergent services.
 
 The topics in this guide help explain Crowbar's core architectural principles.
 
@@ -12,7 +12,7 @@ Crowbar’s objective is to help operators become more efficient, stable and res
 
 ## Background
 
-When Greg Althaus (GAlhtaus on Github) and Rob "zehicle" Hirschfeld (CloudEdge on Github) started the project, we had some very specific targets in mind.  We’d been working towards using organic emergent swarming (think ants) to model continuous application deployment.  We had also been struggling with the most routine foundational tasks (bios, raid, o/s install, networking, ops infrastructure) when bringing up early scale cloud & data applications.  This background heavily influenced how we approached Crowbar.
+When Greg Althaus (github @GAlhtaus) and Rob "zehicle" Hirschfeld (github @CloudEdge) started the project, we had some very specific targets in mind.  We’d been working towards using organic emergent swarming (think ants) to model continuous application deployment.  We had also been struggling with the most routine foundational tasks (bios, raid, o/s install, networking, ops infrastructure) when bringing up early scale cloud & data applications.  Another key contributor, Victor Lowther (github @VictorLowther) has critical experience in Linux operations, networking and dependency resolution that lead to made significant contributions around the [Annealing](simulated_annealing.md) and networking model.  These backgrounds heavily influenced how we approached Crowbar.
 
 First, we started with best of field DevOps infrastructure: Opscode Chef.  There was already a remarkable open source community around this tool and an enthusiastic following for cloud and scale operators .  Using Chef to do the majority of the installation left the Crowbar team to focus on 
 
