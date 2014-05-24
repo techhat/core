@@ -13,13 +13,22 @@
   - if current_user.settings(:docs).sources
     = link_to t('.edit_this_page'), @doc.git_url, :class=>"button", :style=>"float:right" rescue ""
 
-  %p.topic= @text.html_safe
+%p.topic= @text.html_safe
 
-  - if @doc and current_user.settings(:ui).debug
-    %hr
-      %h3= t 'debug'
-      %ul
-        %li= "Name: #{@doc.name}"
-        %li= "Parent: #{(@doc.parent_id ? @doc.parent.name : t('not_set'))}"
-        %li= "Description: #{@doc.description}"
-        %li= "Barclamp: #{@doc.barclamp.name}"
+- if @doc and @doc.children.count > 0
+  %hr
+    %h3= t '.children'
+    %ol
+      - @doc.children.sort.each do |c|
+        %li= link_to c.description, doc_path(c.id)
+
+
+- if @doc and current_user and current_user.settings(:ui).debug
+  %hr
+    %h3= t 'debug'
+    %ul
+      %li= "Name: #{@doc.name}"
+      %li= "Parent: #{(@doc.parent_id ? @doc.parent.name : t('not_set'))}"
+      %li= "Description: #{@doc.description}"
+      %li= "Barclamp: #{@doc.barclamp.name}"
+      %li= "Last Doc: #{session['last_doc']}"

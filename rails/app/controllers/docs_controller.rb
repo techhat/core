@@ -23,6 +23,14 @@ class DocsController < ApplicationController
         Doc.delete_all 
         Doc.gen_doc_index
     end
+    @top_index = []
+    # change order
+    @top_index << Doc.find_key('/user-guide/README.md')
+    @top_index << Doc.find_key('/deployment-guide/README.md')
+    @top_index << Doc.find_key('/faq/README.md')
+    @top_index << Doc.find_key('/principles/README.md')
+    # make sure we have them all
+    Doc.roots.sort.each { |d| @top_index << d unless @top_index.include? d }
     respond_to do |format|
       format.html # index.html.haml
       format.json { render :json => Doc.all }
@@ -49,9 +57,21 @@ class DocsController < ApplicationController
     @doc = Doc.find_key id rescue nil
     @doc ||= Doc.find_key "/#{id}" rescue nil
     @doc ||= Doc.find_key "/#{id}/README.md" rescue nil
+    # we may be looking for a relative link
+    if @doc.nil? and session['last_doc']
+      children = Doc.where(:parent_id=>session['last_doc'])
+      children.each do |c|
+        if c.name.ends_with? id
+          @doc = c 
+        elsif c.name.ends_with? "#{id}/README.md"
+          @doc = c 
+        end
+      end
+    end
     @text = ""
     begin
       if @doc
+        session['last_doc'] = @doc.id
         @nav_up = @doc.parent
         brothers = Doc.where(:parent_id=>@doc.parent_id).sort
         @nav_prev = nil
@@ -70,7 +90,7 @@ class DocsController < ApplicationController
         if not reached
           @nav_prev = nil
         end
-        @file = File.join Doc.root_directory, @doc.name
+        @file = @doc.file_name
       else
         raise "doc not found: #{id}"
         # @file = File.join Doc.root_directory, id

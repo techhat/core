@@ -283,6 +283,7 @@ en:
       nav_next: "next page"
       nav_up: "up"
       edit_this_page: "Edit this page on GitHub"
+      children: "Child Topics"
     topic:
       topic_error: "Error processing doc request!"
       topic_missing: "Topic not found!"
