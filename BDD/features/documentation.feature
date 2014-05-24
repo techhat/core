@@ -9,22 +9,15 @@ Feature: Documentation
       And there should be no translation errors
 
   Scenario: Doc Topic
-    Skip Fix Render Error!
-    Given parameter "rebuild" is "false"
-    Given I am on the "docs" page with parameter "rebuild"
-    When I click on the "Crowbar User Guide" link in section "docindex"
-    Then I should see "Crowbar User Guide"
+    Given I am on the "docs" page
+    When I click on the "User Guide" link
+    Then I should see heading "User Guide"
       And there should be no translation errors
 
   Scenario: Doc Topic Navigation
-    Skip TODO ZEHICLE disable during refactoring
-    Given parameter "rebuild" is "false"
-    Given I am on the "docs/topic/framework/userguide" page with parameter "rebuild"
-    When I click on the "Introduction" link
-    Then I should see heading "Introduction"
-      And I should see heading "Navigation"
-      And I should see "Master Index"
-      And I should see a link to "Crowbar User Guide"
+    When I go to the "docs/development-guides" page
+    Then I should see heading "Development Guide"
+      And I should see heading {bdd:crowbar.i18n.docs.show.children}
       And there should be no translation errors
 
   Scenario: Doc Sub Topic return to Main
