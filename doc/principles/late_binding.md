@@ -6,9 +6,9 @@ Ops is fluid and situational.
 
 Many DevOps tooling leverages eventual consistency to create stable deployments.  This interative approach assumes that repeated attempts of executing the same idemnepotent scripts do deliver this result; however, they are do not deliver predictable upgrades in situations where there are circular dependencies to resolve.
 
-It’s not realistic to predict the exact configuration of a system in advance – 
+Its not realistic to predict the exact configuration of a system in advance – 
 
-  * the operational requirements recursively impact how the infratructre is configured
+  * the operational requirements recursively impact how the infrastructure is configured
   * ops environments must be highly dynamic
   * resilience requires configurations to be change tolerant
 
