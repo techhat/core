@@ -11,7 +11,9 @@ Engineers value documentation that explains how to get a development workstation
     1. (assumed to be eth0) bridge external 
     1. (assumed to be eth1) on a host-only network - you need to setup to talk to the VM, we don't use it.
     1. (assumed to be eth2) on a host-only network - *NO IP assignment* or OS interface configuration (`/etc/network/interfaces` or `/etc/sysconfig`). If using Docker, setup bridging as in [docker-admin.md](docker-admin.md)
-  1. Setup an .ssh keypair using `rssh-keygen`
+  1. Setup an .ssh keypair
+    1. use `ssh-keygen -t rsa`
+    2. Alternativly use `rssh-keygen`
   1. Optional Items that we find handy if you are developing on Windows using VMs behind corporate firewalls
     1. CNTLM proxy: 
       1. ubuntu: `sudo apt-get install cntlm`
