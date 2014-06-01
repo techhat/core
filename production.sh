@@ -127,9 +127,7 @@ crowbar roles bind crowbar-admin-node to "$FQDN"
 crowbar nodes commit "$FQDN"
 
 # Figure out what IP addresses we should have, and add them.
-netline=$(curl -f --digest -u $CROWBAR_KEY \
-    -X GET "http://localhost:3000/api/v2/networks/admin/allocations" \
-    -d "node=$FQDN")
+netline=$(crowbar nodes addresses "$FQDN" on admin)
 nets=(${netline//,/ })
 for net in "${nets[@]}"; do
     [[ $net =~ $ip_re ]] || continue
