@@ -169,6 +169,9 @@ shell inside the container.
 
 ### Booting slave VMs from the admin node
 
+Prereq : `sudo apt-get install bridge-utils`
+
+
 #### Bare Metal (the easy way)
 If your development environment is running on bare metal (as opposed
 to running inside a VM), you can use `tools/kvm-slave &` to spawn a
