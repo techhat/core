@@ -46,9 +46,12 @@ Examples:
 
 If you want to **commit code or docs fixes**, please review [the Contributor guide](../contributing.md)
 
-###Build Sledgehammer (Optional - setup will now download golden sledgehammers.)
+###Build Sledgehammer
+
+_ OPTIONAL_ setup will now download golden sledgehammers.
+
   1. prep for sledgehammer requirements: 
-    1. ubuntu: `sudo apt-get install rpm rpm2cpio`
+    1. ubuntu: `sudo apt-get install curl rpm rpm2cpio`
   1. from core, `tools/build_sledgehammer.sh`
     1. warning: this may take multiple attempts to complete to downloads.  Keep trying.
     2. warning: might need a better literal mirror in sledgehammer/sledgehammer.ks - see [Details]((../../workflow/dev-build-sledgehammer.md))
