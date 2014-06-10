@@ -47,16 +47,19 @@ sledgehammer_dir="#{tftproot}/sledgehammer/#{sledgehammer_signature}"
 
 repos = []
 pkgs = []
+raw_pkgs = []
 
 # Find all the upstream repos and packages we will need.
 if prereqs[os_pkg_type] && prereqs[os_pkg_type][os_token]
   repos << prereqs[os_pkg_type][os_token]["repos"]
   pkgs << prereqs[os_pkg_type][os_token]["build_pkgs"]
   pkgs << prereqs[os_pkg_type][os_token]["required_pkgs"]
+  raw_pkgs << prereqs[os_pkg_type][os_token]["raw_pkgs"]
 end
 repos << prereqs[os_pkg_type]["repos"]
 pkgs << prereqs[os_pkg_type]["build_pkgs"]
 pkgs << prereqs[os_pkg_type]["required_pkgs"]
+raw_pkgs << prereqs[os_pkg_type]["raw_pkgs"]
 
 Chef::Log.debug(repos)
 Chef::Log.debug(pkgs)
@@ -68,6 +71,10 @@ pkgs.flatten!
 pkgs.compact!
 pkgs.uniq!
 pkgs.sort!
+raw_pkgs.flatten!
+raw_pkgs.compact!
+raw_pkgs.uniq!
+raw_pkgs.sort!
 
 Chef::Log.debug(repos)
 
@@ -119,6 +126,17 @@ template "/tmp/required_pkgs" do
   notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
 end
 
+unless raw_pkgs.empty?
+  dest = "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+  FileUtils.mkdir_p(dest)
+  raw_pkgs.each do |pkg|
+    bash "Fetch #{pkg}" do
+      code "curl -fgL -o '#{dest}/#{pkg.split('/')[-1]}' '#{pkg}'"
+      not_if do File.file?("#{dest}/#{pkg.split('/')[-1]}") end
+    end
+  end
+end
+
 case node["platform"]
 when "debian","ubuntu"
   template "/etc/apt/sources.list.d/crowbar.list" do
@@ -132,13 +150,12 @@ when "centos","redhat","suse","opensuse","fedora"
     action :create
     content "NETWORKING=yes"
   end if File.file?("/etc/sysconfig/network")
-
+  repofile_path = case node["platform"]
+                  when "centos","redhat" then "/etc/yum.repos.d"
+                  when "suse","opensuse" then "/etc/zypp/repos.d"
+                  else raise "Don't know where to put repo files for #{node["platform"]}'"
+                  end
   repos.each do |repo|
-    repofile_path = case node["platform"]
-                    when "centos","redhat" then "/etc/yum.repos.d"
-                    when "suse","opensuse" then "/etc/zypp/repos.d"
-                    else raise "Don't know where to put repo files for #{node["platform"]}'"
-                    end
     rtype,rdest = repo.split(" ",2)
     case rtype
     when "rpm"
@@ -180,6 +197,20 @@ when "centos","redhat","suse","opensuse","fedora"
       end
     else
       raise "#{node["platform"]}: Unknown repo type #{rtype}"
+    end
+  end
+  unless raw_pkgs.empty?
+    bash "Create repodata for raw_pkgs" do
+      code "createrepo ."
+      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+    end
+    template "#{repofile_path}/crowbar-raw_pkgs.repo" do
+      source "crowbar.repo.erb"
+      variables(
+                :repo_name => "raw_pkgs",
+                :repo_prio => 20,
+                :repo_url => "file:///tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+                )
     end
   end
 else
