@@ -21,7 +21,14 @@ else
   v6addr=IP.coerce("::1/128")
 end
 node.normal["crowbar"]["provisioner"]["server"]["proxy"]="#{v4addr.addr}:8123"
-localnets = ["127.0.0.1","::1","fe80::/10"] + node.all_addresses.map{|a|a.network.to_s}.sort
+
+localnets = ["127.0.0.1","localhost","::1"]
+`ip -o addr show`.lines.each do |line|
+  next unless /inet6? ([^ ]+)/ =~ line
+  localnets << IP.coerce($1).network.to_s
+end
+localnets.sort!
+
 upstream_proxy = ( node["crowbar"]["provisioner"]["server"]["upstream_proxy"] rescue nil) ||
   ENV["http_proxy"]
 upstream_proxy_address = nil

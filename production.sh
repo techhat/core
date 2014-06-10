@@ -147,6 +147,16 @@ for net in "${nets[@]}"; do
     echo "${net%/*} $FQDN" >> /etc/hosts || :
 done
 
+# Now that we have shiny new IP addresses, make sure that Squid has the right
+# addresses in place for always_direct exceptions, and pick up the new proxy
+# environment variables.
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o 'recipe[barclamp],recipe[ohai],recipe[utils],recipe[crowbar-squid]'
+. /etc/profile
+
+# Make sure that Crowbar is running with the proper environment variables
+service crowbar stop
+service crowbar start
+
 # flag allows you to stop before final step
 if ! [[ $* = *--zombie* ]]; then
 
