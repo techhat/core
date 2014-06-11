@@ -104,8 +104,8 @@ class BarclampChef::SoloJig < Jig
     out,err,ok = nr.node.scp_from("/var/chef/node-out.json",local_tmpdir)
     raise("Chef Solo jig run for #{nr.name} did not copy attributes back\nOut: #{out}\nErr:#{err}") unless ok.success?
     from_node = JSON.parse(IO.read(node_out_json))
-    nr.node.discovery_merge({"ohai" => from_node["automatic"]})
     nr.update!(wall: from_node["normal"])
+    nr.node.discovery_merge({"ohai" => from_node["automatic"]})
   end
 end
     
