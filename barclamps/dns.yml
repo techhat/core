@@ -15,7 +15,7 @@
 
 roles:
   - name: dns-server
-    jig: chef-solo
+    jig: chef
     requires:
       - network-admin
     attribs:
@@ -31,12 +31,12 @@ roles:
             - type: str
               pattern: /[0-9a-f:.]*/
   - name: dns-database
-    jig: chef-solo
+    jig: chef
     flags:
     requires:
       - dns-server
   - name: dns-client
-    jig: chef-solo
+    jig: chef
     flags:
       - implicit
     requires:

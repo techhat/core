@@ -7,7 +7,7 @@ if ! which chef-client; then
     elif [[ -d /etc/apt ]]; then
         apt-get -y update
         # Our chef package does not need ruby, but it does need the cstruct gem.
-        apt-get -y --force-yes install ruby1.9.1 ruby1.9.1-dev chef
+        apt-get -y --force-yes install chef
         gem install cstruct
         service chef-client stop
     elif [[ -f /etc/SuSE-release ]]; then

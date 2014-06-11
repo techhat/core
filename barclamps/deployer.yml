@@ -15,11 +15,11 @@
 
 roles:
   - name: bmc-nat-client
-    jig: chef-solo
+    jig: chef
   - name: bmc-nat-router
-    jig: chef-solo
+    jig: chef
   - name: deployer-client
-    jig: chef-solo
+    jig: chef
     requires:
       - provisioner-repos
     flags:
