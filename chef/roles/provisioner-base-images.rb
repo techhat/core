@@ -1,5 +1,5 @@
 
-name "provisioner-server"
+name "provisioner-base-images"
 description "Provisioner Server role - Apt and Networking"
 run_list(
          "recipe[utils]",
