@@ -20,7 +20,7 @@
 
 crowbar_yml = "/opt/opencrowbar/core/crowbar.yml"
 sledgehammer_signature = "0f61af2f6be9288d5529e15aa223e036730a8387"
-
+ 
 unless File.exists?(crowbar_yml)
   raise "No crowbar checkout to bootstrap!"
 end

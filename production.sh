@@ -13,25 +13,46 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+set -e
+
 date
 export RAILS_ENV=production
 [[ $1 ]] || {
     echo "Must pass the FQDN you want the admin node to have as the first argument!"
     exit 1
 }
-./bootstrap.sh && \
-    ./setup/01-crowbar-rake-tasks.install && \
+
+if [[ $http_proxy ]] && ! pidof squid; then
+    export upstream_proxy=$http_proxy
+fi
+
+. ./bootstrap.sh
+# At the end of this we have a running proxy server.  Use it.
+. /etc/profile
+./setup/01-crowbar-rake-tasks.install && \
     ./setup/02-make-machine-key.install || {
     echo "Failed to bootstrap the Crowbar UI"
     exit 1
 }
-. /etc/profile
+
 export CROWBAR_KEY=$(cat /etc/crowbar.install.key)
 export PATH=$PATH:/opt/opencrowbar/core/bin
 FQDN=$1
 
+# Update the provisioner server template to use whatever
+# proxy the admin node should be using.
+if [[ $upstream_proxy ]]; then
+    crowbar roles set provisioner-server \
+        attrib provisioner-upstream_proxy \
+        to "{\"value\": \"${upstream_proxy}\"}"
+fi
+
+crowbar roles set provisioner-os-install \
+    attrib provisioner-target_os \
+    to '{"value": "centos-6.5"}'
+
 DOMAINNAME=${FQDN#*.}
-if [[ $container != lxc ]]; then
+if [[ ! -f /.dockerenv ]]; then
     HOSTNAME=${FQDN%%.*}
     # Fix up the localhost address mapping.
     sed -i -e "s/\(127\.0\.0\.1.*\)/127.0.0.1 $FQDN $HOSTNAME localhost.localdomain localhost/" /etc/hosts
@@ -91,17 +112,6 @@ admin_node="
 # This should vanish once we have a real bootstrapping story.
 ###
 ip_re='([0-9a-f.:]+/[0-9]+)'
-
-# Update the provisioner server template to use whatever
-# proxy the admin node should be using.
-if [[ $http_proxy ]]; then
-    crowbar roles set provisioner-server \
-        attrib provisioner-upstream_proxy \
-        to "{\"value\": \"${http_proxy}\"}"
-fi
-crowbar roles set provisioner-os-install \
-    attrib provisioner-target_os \
-    to '{"value": "centos-6.5"}'
 
 # Create a stupid default admin network
 crowbar networks create "$admin_net"

@@ -147,6 +147,10 @@ class BarclampChef::Jig < Jig
 
   def prep_chef_auth
     reload if server.nil? || server.empty?
+    # Avoid using an http proxy
+    Chef::Config[:http_proxy] = nil
+    Chef::Config[:https_proxy] = nil
+    
     Chef::Config[:client_key] = key
     Chef::Config[:chef_server_url] = server
     Chef::Config[:node_name] = client_name
