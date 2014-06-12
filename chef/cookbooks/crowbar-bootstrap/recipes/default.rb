@@ -206,7 +206,7 @@ end
 bash "Install required files" do
   code case node["platform"]
        when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "centos","redhat","fedora" then "yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
        when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm /tmp/install_pkgs"
        else raise "Don't know how to install required files for #{node["platform"]}'"
        end
