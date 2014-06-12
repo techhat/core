@@ -6,7 +6,10 @@ if [[ $http_proxy && !$no_proxy ]] ; then
     export no_proxy="127.0.0.1,localhost,::1"
 fi
 
-recipes='recipe[barclamp],recipe[ohai],recipe[utils],recipe[crowbar-bootstrap],recipe[crowbar-squid]'
+prefix_recipes='recipe[barclamp],recipe[ohai],recipe[utils]'
+boot_recipes="$prefix_recipes,recipe[crowbar-bootstrap]"
+database_recipes="$prefix_recipes,recipe[crowbar-bootstrap::postgresql]"
+proxy_recipes="$prefix_recipes,recipe[crowbar-squid]"
 
 # Figure out what we are running on.
 if [[ -f /etc/system-release ]]; then
@@ -37,7 +40,7 @@ which curl &>/dev/null || \
     install_prereqs
 which chef-solo &>/dev/null || \
     curl -L https://www.opscode.com/chef/install.sh | bash
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${recipes}" || {
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${boot_recipes}" || {
     echo "Chef-solo bootstrap run failed"
     exit 1
 }

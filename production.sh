@@ -28,6 +28,8 @@ fi
 
 . ./bootstrap.sh
 # At the end of this we have a running proxy server.  Use it.
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${proxy_recipes}"
 . /etc/profile
 ./setup/01-crowbar-rake-tasks.install && \
     ./setup/02-make-machine-key.install || {

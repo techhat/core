@@ -250,6 +250,10 @@ bash "Regenerate Host SSH keys" do
   not_if "test -f /etc/ssh/ssh_host_rsa_key"
 end
 
+bash "Unlock the root account" do
+  code "while grep -q '^root:!' /etc/shadow; do usermod -U root; done"
+end
+
 # We need Special Hackery to run sshd in docker.
 if File.file?("/.dockerenv")
   service "ssh" do
@@ -327,65 +331,15 @@ template "/etc/sudoers.d/crowbar" do
   mode 0440
 end
 
-pg_conf_dir = "/var/lib/pgsql/data"
-case node["platform"]
-when "ubuntu","debian"
-  pg_conf_dir = "/etc/postgresql/9.3/main"
-  service "postgresql" do
-    action [:enable, :start]
-  end
-  pg_database_dir = "/var/lib/postgresql/9.3/main/base"
-  directory "#{pg_database_dir}" do
-    owner "postgres"
-  end
-when "centos","redhat"
-  pg_conf_dir = "/var/lib/pgsql/9.3/data"
-  bash "Init the postgresql database" do
-    code "service postgresql-9.3 initdb en_US.UTF-8"
-    not_if do File.exists?("#{pg_conf_dir}/pg_hba.conf") end
-  end
-  service "postgresql" do
-    service_name "postgresql-9.3"
-    action [:enable, :start]
-  end
-  # Sigh, we need this so that the pg gem will install correctly
-  bash "Make sure pg_config is in the PATH" do
-    code "ln -sf /usr/pgsql-9.3/bin/pg_config /usr/local/bin/pg_config"
-    not_if "which pg_config"
-  end
-when "opensuse", "suse"
-  bash "Init the postgresql database" do
-    code <<EOC
-su -l -c 'initdb --locale=en_US.UTF-8 -D #{pg_conf_dir}' postgres
-sed -i -e '/POSTGRES_DATADIR/ s@=.*$@="#{pg_conf_dir}"@' /etc/sysconfig/postgresql
-EOC
-    not_if do File.exists?("#{pg_conf_dir}/pg_hba.conf") end
-  end
-  service "postgresql" do
-    action [:enable, :start]
-  end
-
-  # Why does opensuse consider ping to be a security risk?
-  bash "Allow everyone to ping" do
-    code "chmod u+s /usr/bin/ping /usr/bin/ping6"
-  end
+# Sigh, we need this so that the pg gem will install correctly
+bash "Make sure pg_config is in the PATH" do
+  code "ln -sf /usr/pgsql-9.3/bin/pg_config /usr/local/bin/pg_config"
+  not_if "which pg_config"
 end
 
-
-# This will configure us to only listen on a local UNIX socket
-template "#{pg_conf_dir}/postgresql.conf" do
-  source "postgresql.conf.erb"
-  notifies :restart, "service[postgresql]", :immediately
-end
-
-template  "#{pg_conf_dir}/pg_hba.conf" do
-  source "pg_hba.conf.erb"
-  notifies :restart, "service[postgresql]",:immediately
-end
-
-bash "create crowbar user for postgres" do
-  code "sudo -H -u postgres createuser -d -S -R -w crowbar"
-  not_if "sudo -H -u postgres -- psql postgres -tAc \"SELECT 1 FROM pg_roles WHERE rolname='crowbar'\" |grep -q 1"
+# Why does opensuse consider ping to be a security risk?
+bash "Allow everyone to ping" do 
+  code "chmod u+s $(which ping) $(which ping6)"
 end
 
 (prereqs["gems"]["required_pkgs"] rescue []).each do |g|
