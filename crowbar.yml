@@ -197,7 +197,7 @@ rpms:
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
     repos:
-      - rpm http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
+      - rpm http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
       - bare bsdtar 20 http://download.opensuse.org/repositories/home:/AndreasStieger:/branches:/Archiving/CentOS_CentOS-6/
       - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/ocb/
@@ -219,6 +219,7 @@ rpms:
       - openssl-devel
       - gecode
       - gecode-devel
+      - iproute
     pkgs:
       # openldap stuff
       - openldap
@@ -246,7 +247,7 @@ rpms:
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
     repos:
-      - rpm http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
+      - rpm http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
       - bare bsdtar 20 http://download.opensuse.org/repositories/home:/AndreasStieger:/branches:/Archiving/CentOS_CentOS-6/
       - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/ocb/
@@ -269,6 +270,7 @@ rpms:
       - openssl-devel
       - gecode
       - gecode-devel
+      - iproute
     pkgs:
       # openldap stuff
       - openldap
