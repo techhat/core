@@ -46,16 +46,6 @@ class Jig < ActiveRecord::Base
     Jig.where(:name=>jig, :active=>true).length > 0
   end
 
-  # Create a node in all jig. The exact actions depend on the jig.
-  def self.create_node(node)
-    broadcast_to_jigs { |jig| jig.create_node(node) }    
-  end
-
-  # Delete a node from all jig. The exact actions depend on the jig.
-  def self.delete_node(node)
-    broadcast_to_jigs { |jig|  jig.delete_node(node) }    
-  end
-
   # OVERRIDE with actual methods
   def delete_node(node)
     Rails.logger.debug("jig.delete_node(#{node.name}) not implemented for #{self.class}.  This may be OK")
