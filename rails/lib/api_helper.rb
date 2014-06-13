@@ -76,13 +76,19 @@ module ApiHelper
       end
     end
 
+    def unsafe_locked_transaction(&block)
+      retriable_transaction do
+        ActiveRecord::Base.connection.execute("LOCK TABLE #{table_name}")
+        yield if block_given?
+      end
+    end
+
     # Run a transaction with a lock on the table this class uses
     def locked_transaction(&block)
       unless connection.open_transactions.zero?
         raise "locked_transaction cannot be called from within another transaction!"
       end
-      retriable_transaction do
-        ActiveRecord::Base.connection.execute("LOCK TABLE #{table_name}")
+      unsafe_locked_transaction do
         yield if block_given?
       end
     end
