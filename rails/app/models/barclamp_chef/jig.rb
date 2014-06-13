@@ -24,11 +24,9 @@ class BarclampChef::Jig < Jig
 
   def make_run_list(nr)
     runlist = Array.new
-    nr.node.active_node_roles.each do |n|
-      next if (n.node.id != nr.node.id) || (n.jig.id != nr.jig.id)
-      Rails.logger.info("Chefjig: Need to add #{n.role.name} to run list for #{nr.node.name}")
-      runlist << "role[#{n.role.name}]"
-    end
+    runlist << "recipe[barclamp]"
+    runlist << "recipe[ohai]"
+    runlist << "recipe[utils]"
     runlist << "role[#{nr.role.name}]"
     Rails.logger.info("Chefjig: discovered run list: #{runlist}")
     Chef::RunList.new(*runlist)
@@ -55,18 +53,24 @@ class BarclampChef::Jig < Jig
       data_bag_path = "#{chef_path}/data_bags"
       user_data_bag_path = "/var/tmp/barclamps/#{nr.role.barclamp.name}/chef"
       cookbook_path = "#{chef_path}/cookbooks"
-      FileUtils.cd(cookbook_path) do
-        unless BarclampChef.knife("cookbook upload -o . -a")
-          raise "Could not upload all Chef cookbook components from #{cookbook_path}"
-        end
-      end if File.directory?(cookbook_path)
       [data_bag_path,user_data_bag_path].each do |db_path|
         Dir.glob(File.join(db_path,"*.json")).each do |d|
           data_bag_name = d.split('/')[-1]
           next unless File.directory?(d)
           next if (data_bag_name == "..") || (data_bag_name == ".")
-          unless BarclampChef.knife("data bag from file '#{data_bag_name}' '#{d}'")
-            raise "Could not upload Chef data bags from #{data_bag_path}/#{data_bag_name}"
+          Chef::DataBag.load(data_bag_name) || Chef::DataBag.new(data_bag_name).create
+          data_bag_item_data = Yajl::Parser.parse(IO.read(d))
+          data_bag_item = Chef::DataBagItem.load(data_bag_name,data_bag_item_data["id"])
+          if data_bag_item
+            unless data_bag_item.raw_data == data_bag_item_data
+              data_bag_item.raw_data = data_bag_item_data
+              data_bag_item.save
+            end
+          else
+            data_bag_item = Chef::DataBagItem.new
+            data_bag_item.raw_data = data_bag_item_data
+            data_bag_item.data_bag = data_bag_name
+            data_bag_item.create
           end
         end if File.directory?(db_path)
       end
@@ -89,26 +93,26 @@ class BarclampChef::Jig < Jig
     # We should really be much more clever about building
     # and maintaining the run list, but this will do to start off.
     chef_node.attributes.normal = {}
-    chef_node.save
     chef_node.run_list(Chef::RunList.new(chef_noderole.to_s))
     chef_node.save
     # SSH into the node and kick chef-client.
     # If it passes, go to ACTIVE, otherwise ERROR.
-    out,err,ok = BarclampCrowbar::Jig.ssh("root@#{nr.node.name} chef-client")
+    out,err,ok = nr.node.ssh("chef-client")
     raise("Chef jig run for #{nr.name} failed\nOut: #{out}\nErr:#{err}") unless ok.success?
     # Reload the node, find any attrs on it that map to ones this
     # node role cares about, and write them to the wall.
+    Rails.logger.info("Chef jig: Reloading Chef objects")
     chef_node, chef_noderole = chef_node_and_role(nr.node)
-    Node.transaction do
+    NodeRole.transaction do
+      wall = mash_to_hash(chef_node.attributes.normal)
+      discovery = {"ohai" => mash_to_hash(chef_node.attributes.automatic.to_hash)}
+      Rails.logger.debug("Chef jig: Saving runlog")
       nr.update!(runlog: out)
-      node_disc = nr.node.discovery
-      node_disc["ohai"] = chef_node.attributes.automatic
-      nr.node.discovery_merge(node_disc)
+      Rails.logger.debug("Chef jig: Saving wall")
+      nr.update!(wall: wall)
+      Rails.logger.debug("Chef jig: Saving discovery attributes")
+      nr.node.discovery_merge(discovery)
     end
-    new_attrs = chef_node.attributes.normal
-    nr.update!(wall: deep_diff(data,new_attrs))
-    chef_noderole.default_attributes(data.deep_merge(new_attrs))
-    chef_noderole.save
   end
 
   def create_node(node)
@@ -138,6 +142,26 @@ class BarclampChef::Jig < Jig
 
   def node_role_name(node)
     "crowbar-#{node.name.tr(".","_")}"
+  end
+
+  
+  def mash_to_hash(src)
+    case
+    when src.kind_of?(Hash)
+      res = Hash.new
+      src.each do |k,v|
+        res[k.to_s] = mash_to_hash(v)
+      end
+      res
+    when src.kind_of?(Array)
+      res = Array.new
+      src.each do |v|
+        res << mash_to_hash(v)
+      end
+      res
+    else
+      src
+    end
   end
 
   def chef_node_and_role(node)

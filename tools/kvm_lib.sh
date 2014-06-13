@@ -444,7 +444,12 @@ run_kvm() {
         kvmargs+=(-no-reboot)
     fi
     # If we are running under X, then use a graphical display.
-    if [[ $DISPLAY ]]; then
+    if [[ $TMUX && $OCB_SESSION && $SESSION = $OCB_SESSION ]]; then
+        kvmargs+=( -vnc "unix:${vm_logdir%.*}.vncsock" -monitor stdio)
+        echo "Attach to this VM with 'ssvncviewer \"${vm_logdir%.*}.vncsock\"'"
+        tmux new-window -n "$SESSION/kvm-$VMID" -c "$vm_logdir" "$KVM ${kvmargs[*]} $*"
+        tmux set-window-option -t "$SESSION/kvm-$VMID" remain-on-exit off
+    elif [[ $DISPLAY ]]; then
         kvmargs+=( -sdl -daemonize )
         "$KVM" "${kvmargs[@]}" "$@"
     else

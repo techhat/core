@@ -15,12 +15,26 @@
 
 class BarclampChef::Server < Role
 
+  def sysdata(nr)
+    addr = nr.node.addresses.detect{|addr|addr.v4?}.addr
+    { "chefjig" => {
+        "server" => {
+          "fqdn" => nr.node.name,
+          "address" => addr,
+          "url" => "https://#{addr}",
+          "deploy" => true,
+          "client-name" => "crowbar"
+        }
+      }
+    }
+  end
+
   def on_active(nr)
     j = BarclampChef::Jig.where(:name => "chef").first
-    j.server = "https://#{nr.node.name}"
-    j.client_name = "crowbar"
+    j.server = Attrib.get("chef-server_url",nr)
+    j.client_name = Attrib.get("chef-server_admin_client_name",nr)
     j.active = true
-    j.key = "/home/crowbar/.chef/crowbar.pem"
+    j.key = "/home/crowbar/.chef/#{j.client_name}.pem"
     j.save!
   end
 

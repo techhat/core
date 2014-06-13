@@ -1,5 +1,5 @@
 class BarclampChef::Client < Role
-  def on_transition(nr)
+  def on_todo(nr)
     # Create chef metadata if needed.
     NodeRole.transaction do
       d = (nr.sysdata["chefjig"]["client"]["key"] rescue nil)

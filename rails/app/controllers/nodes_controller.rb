@@ -43,6 +43,19 @@ class NodesController < ApplicationController
     end
   end
 
+  # Get the addresses allocated to a node on a network.
+  def addresses
+    nodename = params[:node_id]
+    @node = nodename == "admin" ?  Node.admin.where(:available => true).first : Node.find_key(nodename)
+    params.require(:network)
+    @net = Network.find_key(params[:network])
+    res = {"node" => @node.name,
+      "network" => @net.name,
+      "addresses" => @net.node_allocations(@node).map{|a|a.to_s}
+    }
+    render :json => res, :content_type=>cb_content_type(:addresses, "object")
+  end
+
   # RESTful DELETE of the node resource
   def destroy
     @node = Node.find_key(params[:id] || params[:name])

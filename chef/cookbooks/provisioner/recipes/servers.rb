@@ -20,81 +20,10 @@ v4addr=node.address("admin",IP::IP4)
 v6addr=node.address("admin",IP::IP6)
 node.normal["crowbar"]["provisioner"]["server"]["v4addr"]=v4addr.addr if v4addr
 node.normal["crowbar"]["provisioner"]["server"]["v6addr"]=v6addr.addr if v6addr
-node.normal["crowbar"]["provisioner"]["server"]["proxy"]="#{v4addr.addr}:8123"
 web_port = node["crowbar"]["provisioner"]["server"]["web_port"]
 provisioner_web="http://#{v4addr.addr}:#{web_port}"
 node.normal["crowbar"]["provisioner"]["server"]["webserver"]=provisioner_web
 localnets = ["127.0.0.1","::1","fe80::/10"] + node.all_addresses.map{|a|a.network.to_s}.sort
-upstream_proxy = ( node["crowbar"]["provisioner"]["server"]["upstream_proxy"] || nil rescue nil)
-upstream_proxy_address = nil
-upstream_proxy_port = nil
-if upstream_proxy
-  matchers = /http:\/\/(?<address>(\[[0-9a-f:]+\])|([^:]+)):(?<port>[0-9]+)/.match(upstream_proxy)
-  raise "COuld not parse upstream proxy!" unless matchers["address"]
-  upstream_proxy_address = matchers["address"]
-  upstream_proxy_port = matchers["port"] || 80
-end
-
-# Once the local proxy service is set up, we need to use it.
-proxies = {
-  "http_proxy" => "http://#{node["crowbar"]["provisioner"]["server"]["proxy"]}",
-  "https_proxy" => "http://#{node["crowbar"]["provisioner"]["server"]["proxy"]}",
-  "no_proxy" => localnets.join(",")
-}
-
-package "squid" do
-  action :install
-end
-
-proxy_cache_dir = "/var/cache/squid"
-
-user "squid" do
-  action :create
-  system true
-end
-
-group "squid" do
-  action :create
-  system true
-  members "squid"
-end
-
-template "/etc/squid/squid.conf" do
-  action :create
-  owner "squid"
-  group "squid"
-  notifies :reload, "service[squid]"
-  variables(:user => "squid",
-            :localname => node.name,
-            :localnets => localnets,
-            :port => 8123,
-            :cache_dir => proxy_cache_dir,
-            :upstream_address => upstream_proxy_address,
-            :upstream_port => upstream_proxy_port)
-end
-
-directory proxy_cache_dir do
-  action :create
-  recursive true
-  owner "squid"
-  group "squid"
-end
-
-bash "Initialize squid directory" do
-  code "squid -z"
-  not_if "test -f #{proxy_cache_dir}/swap.state"
-end
-
-bash "Increase squid start timeout" do
-  code "echo SQUID_PIDFILE_TIMEOUT=60 >>/etc/sysconfig/squid"
-  only_if "test -f /etc/sysconfig/squid"
-  not_if "grep -q SQUID_PIDFILE_TIMEOUT /etc/sysconfig/squid"
-end
-
-service "squid" do
-  reload_command "squid -k reconfigure"
-  action [:enable, :start]
-end
 
 node.set["apache"]["listen_ports"] = [ node["crowbar"]["provisioner"]["server"]["web_port"]]
 include_recipe "apache2"
@@ -110,33 +39,6 @@ template "#{node["apache"]["dir"]}/sites-available/provisioner.conf" do
   notifies :reload, resources(:service => "apache2")
 end
 apache_site "provisioner.conf"
-
-template "/etc/environment" do
-  source "environment.erb"
-  variables(:values => proxies)
-  action :nothing
-  subscribes :create, "service[apache2]"
-end
-
-template "/etc/profile.d/proxy.sh" do
-  source "proxy.sh.erb"
-  variables(:values => proxies)
-  action :nothing
-  subscribes :create, "service[apache2]"
-end
-
-case node["platform"]
-when "redhat","centos"
-  template "/etc/yum.conf" do
-    source "yum.conf.erb"
-    action :nothing
-    subscribes :create, "service[apache2]"
-    variables(
-              :distro => node["platform"],
-              :proxy => proxies["http_proxy"]
-              )
-  end
-end
 
 # Set up the TFTP server as well.
 case node["platform"]

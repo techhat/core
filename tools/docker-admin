@@ -18,24 +18,6 @@
 # $@ = Command to run, if nothing then /bin/bash -i
 
 # If we are not running inside of Docker, put ourselves in a container.
-declare -A image_map
-#image_map["ubuntu"]="ubuntu:precise"
-image_map["ubuntu"]="opencrowbar/ubuntu:12.04-4"
-#image_map["centos"]="centos:6.4"
-image_map["centos"]="opencrowbar/centos:6.5-6"
-image_map["opensuse"]="mmckeen/opensuse-13-1:latest"
-image_map["fedora"]="fedora:20"
-image_map["debian"]="debian:jessie"
-image="${image_map[$1]}"
-tftproot="/tftpboot"
-if [[ ! $image ]]; then
-    echo "$1 is not an image we can run on!"
-    printf "Try one of: "
-    printf "%s " "${!image_map[@]}"
-    echo
-    exit 1
-fi
-shift
 if ! which docker &>/dev/null; then
     echo "Please install Docker!"
     exit 1
@@ -53,6 +35,27 @@ fi
 mountdir="${mountdir%/tools/docker-admin}"
 # This gets us to the parent directory of core, where presumably the rest of our repos are checked out
 mountdir="${mountdir%/*}"
+. "$mountdir/core/tools/tmux_lib.sh"
+
+declare -A image_map
+#image_map["ubuntu"]="ubuntu:precise"
+image_map["ubuntu"]="opencrowbar/ubuntu:12.04-4"
+#image_map["centos"]="centos:latest"
+image_map["centos"]="opencrowbar/centos:6.5-7"
+image_map["opensuse"]="mmckeen/opensuse-13-1:latest"
+image_map["fedora"]="fedora:20"
+image_map["debian"]="debian:jessie"
+image="${image_map[$1]}"
+tftproot="/tftpboot"
+if [[ ! $image ]]; then
+    echo "$1 is not an image we can run on!"
+    printf "Try one of: "
+    printf "%s " "${!image_map[@]}"
+    echo
+    exit 1
+fi
+shift
+
 echo "We will mount $mountdir at /opt/opencrowbar"
 mkdir -p "$HOME/.cache/opencrowbar/tftpboot"
 

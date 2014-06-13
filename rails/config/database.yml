@@ -1,30 +1,19 @@
-development:
-  adapter: postgresql
-  database: opencrowbar_dev
-  port: 5432
-  username: crowbar
-  pool: 10
-  timeout: 5000
-  reaping_frequency: 3
-
-# Warning: The database defined as "test" will be erased and
-# re-generated from your development database when you run "rake".
-# Do not set this db to the same as development or production.
-test: &test
-  adapter: postgresql
-  database: opencrowbar_test
-  port: 5432
-  username: crowbar
-  pool: 10
-  timeout: 5000
-  reaping_frequency: 3
-
-production:
+production: &default
   adapter: postgresql
   database: opencrowbar
-  port: 5432
   username: crowbar
   pool: 32
   timeout: 5000
   reaping_frequency: 3
 
+
+development:
+  <<: *default
+  database: opencrowbar_dev
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test: &test
+  <<: *default
+  database: opencrowbar_test
