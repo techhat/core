@@ -25,7 +25,8 @@ Engineers value documentation that explains how to get a development workstation
     1. additional information, see http://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux
   1. Make sure your environment does not use proxy for local addresses: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
     1. tip: add this to your login init
-  1. `apt-get install git`
+  1. you need to get the code: `sudo apt-get install git`
+  1. we use TMUX to work in multiple screens: `sudo apt-get install tmux`
 
 ###Position Boot Assets
   
