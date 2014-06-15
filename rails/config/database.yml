@@ -1,11 +1,13 @@
-production: &default
+base: &default
   adapter: postgresql
-  database: opencrowbar
   username: crowbar
   pool: 32
   timeout: 5000
   reaping_frequency: 3
 
+production:
+  <<: *default
+  database: opencrowbar
 
 development:
   <<: *default
