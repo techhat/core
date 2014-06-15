@@ -72,6 +72,7 @@ class Barclamp < ActiveRecord::Base
       bc['jigs'].each do |jig|
         raise "Jigs must have a name" unless jig['name'] && !jig['name'].empty?
         raise "Jigs must have a type" unless jig['class'] && !jig["class"].empty?
+        Rails.logger.info("Creating jig #{jig['name']} from #{barclamp.name}")
         jig_name = jig["name"]
         jig_desc = jig['description'] || "Imported by #{barclamp.name}"
         jig_type = jig['class']
@@ -89,7 +90,7 @@ class Barclamp < ActiveRecord::Base
  
         # temporary until jigs have a barlcamp import support method
         if jig_type.start_with?("BarclampChef")
-          Rails.logger.info("Import: #{bc_name} is a chef-type jig. Using Berkshelf.")
+          Rails.logger.info("Import: #{jig_name} is a chef-type jig. Using Berkshelf.")
           cookbook_path = File.expand_path(File.join(source_path, 'chef/cookbooks/'))
           berksfile = cookbook_path + '/Berksfile'
           raise "Import: No Berksfile found for #{bc_name} in #{berksfile}" unless File.exists?(berksfile)
@@ -97,7 +98,7 @@ class Barclamp < ActiveRecord::Base
           raise "Import: Unable to berks install #{berksfile}: #{result}" unless $?.exitstatus == 0
           Rails.logger.info("Import: berks install: #{result}\n")
           if jig_type.end_with?("SoloJig")
-            Rails.logger.info("Import: #{bc_name} is a chef-solo-type jig. Using Berkshelf packaging.")
+            Rails.logger.info("Import: #{jig_name} is a chef-solo-type jig. Using Berkshelf packaging.")
             result = berks(cookbook_path,"package /var/cache/crowbar/cookbooks/package.tar.gz")
             raise "Import: Unable to berks package #{berksfile}: #{result}" unless $?.exitstatus == 0
             Rails.logger.info("Import: berks package: #{result}\n")
@@ -126,6 +127,7 @@ class Barclamp < ActiveRecord::Base
       # iterate over the roles in the yml file and load them all.
       # Jigs are now late-bound, so we just load everything.
       bc['roles'].each do |role|
+        Rails.logger.info("Importing role #{role['name']} for #{barclamp.name}")
         role_name = role["name"]
         role_jig = Jig.find_by!(name: role["jig"])
         role_type_candidates = []
@@ -177,6 +179,7 @@ class Barclamp < ActiveRecord::Base
                                     :attrib_at => attr_at)
         end
         role['attribs'].each do |attrib|
+          Rails.logger.info("Importing attrib #{attrib['name']} for role #{role['name']} in barclamp #{barclamp.name}")
           attrib_type_candidates = []
           attrib_type_candidates << "#{r.jig.type}Attrib"
           attrib_type_candidates << "#{bc_namespace}::Attrib::#{attrib["name"].camelize}"
@@ -198,6 +201,7 @@ class Barclamp < ActiveRecord::Base
         end if r && role['attribs']
       end if bc['roles']
       bc['attribs'].each do |attrib|
+        Rails.logger.info("Importing attrib #{attrib['name']} for barclamp #{barclamp.name}")
         attrib_type_candidates = []
         attrib_type_candidates << "#{bc_namespace}::Attrib::#{attrib["name"].camelize}"
         attrib_type_candidates << "Attrib"

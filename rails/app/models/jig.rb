@@ -221,50 +221,7 @@ class Jig < ActiveRecord::Base
     Run.run!
   end
 
-  # Return all keys from hash A that do not exist in hash B, recursively
-  def deep_diff(a,b)
-    raise "Only pass hashes to deep_diff" unless a.kind_of?(Hash) && b.kind_of?(Hash)
-    # Base case, hashes are equal.
-    res = Hash[]
-    b.each do |k,v|
-      case
-        # Simple cases first:
-        # if a does not have a key named k, then b[k] is in the result set.
-      when !a.has_key?(k) then res[k] = v
-        # if a[k] == v, then k is not in the result set.
-      when a[k] == v then next
-        # a[k] != v, and both are Hashes.  res[k] is their deep_diff.
-      when a[k].kind_of?(Hash) && v.kind_of?(Hash)
-        maybe_res = deep_diff(a[k],v)
-        res[k] = maybe_res unless maybe_res.nil? || maybe_res.empty?
-        # v wins.
-      else res[k] = v
-      end
-    end
-    res
-  end
-
 private
-
-
-=begin
-  Utility method to iterate over jigs, and callback to  the mandatory block.
-  If an error occurs on one jig, iteration continues to others.
-  Jigs are left to manage thier own transactions - if one jig failes, the 
-  others should not be impacted (hence no over arching transaction)
-=end
-  def self.broadcast_to_jigs(desc="no description")
-    raise "no block given" unless block_given?
-    Jig.all.each { |x|
-      begin
-        yield x
-      rescue => exc
-        Rails.logger.warn("failed to invoke #{desc} on jig: #{x.inspect}")
-        Rails.logger.warn("Exception: #{exc.inspect}")
-        Rails.logger.warn("Backtrace: #{exc.backtrace}")
-      end
-    }
-  end
 
   def make_role_requires
     return true unless client_role_name

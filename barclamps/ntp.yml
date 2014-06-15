@@ -15,7 +15,7 @@
 
 roles:
   - name: ntp-server
-    jig: chef-solo
+    jig: chef
     requires:
       - dns-client
       - network-admin
@@ -24,7 +24,7 @@ roles:
         description: "Addresses of the NTP servers to use for cluster-wide time synchronization"
         map: 'crowbar/ntp/servers'
   - name: ntp-client
-    jig: chef-solo
+    jig: chef
     requires:
       - dns-client
       - ntp-server

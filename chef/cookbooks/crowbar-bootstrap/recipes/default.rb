@@ -20,7 +20,7 @@
 
 crowbar_yml = "/opt/opencrowbar/core/crowbar.yml"
 sledgehammer_signature = "0f61af2f6be9288d5529e15aa223e036730a8387"
-
+ 
 unless File.exists?(crowbar_yml)
   raise "No crowbar checkout to bootstrap!"
 end
@@ -41,22 +41,25 @@ unless prereqs["os_support"].member?(os_token)
 end
 
 tftproot = "/tftpboot"
-sledgehammer_url="http://rcbdrepo.opencrowbar.org/sledgehammer/#{sledgehammer_signature}"
+sledgehammer_url="http://opencrowbar.s3-website-us-east-1.amazonaws.com/sledgehammer/#{sledgehammer_signature}"
 sledgehammer_dir="#{tftproot}/sledgehammer/#{sledgehammer_signature}"
 
 
 repos = []
 pkgs = []
+raw_pkgs = []
 
 # Find all the upstream repos and packages we will need.
 if prereqs[os_pkg_type] && prereqs[os_pkg_type][os_token]
   repos << prereqs[os_pkg_type][os_token]["repos"]
   pkgs << prereqs[os_pkg_type][os_token]["build_pkgs"]
   pkgs << prereqs[os_pkg_type][os_token]["required_pkgs"]
+  raw_pkgs << prereqs[os_pkg_type][os_token]["raw_pkgs"]
 end
 repos << prereqs[os_pkg_type]["repos"]
 pkgs << prereqs[os_pkg_type]["build_pkgs"]
 pkgs << prereqs[os_pkg_type]["required_pkgs"]
+raw_pkgs << prereqs[os_pkg_type]["raw_pkgs"]
 
 Chef::Log.debug(repos)
 Chef::Log.debug(pkgs)
@@ -68,6 +71,10 @@ pkgs.flatten!
 pkgs.compact!
 pkgs.uniq!
 pkgs.sort!
+raw_pkgs.flatten!
+raw_pkgs.compact!
+raw_pkgs.uniq!
+raw_pkgs.sort!
 
 Chef::Log.debug(repos)
 
@@ -108,10 +115,26 @@ file "/tmp/install_pkgs" do
   action :nothing
 end
 
+template "/etc/gemrc" do
+  source "gemrc.erb"
+  variables(:proxy => ENV["http_proxy"])
+end
+
 template "/tmp/required_pkgs" do
   source "required_pkgs.erb"
   variables( :pkgs => pkgs )
   notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+end
+
+unless raw_pkgs.empty?
+  dest = "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+  FileUtils.mkdir_p(dest)
+  raw_pkgs.each do |pkg|
+    bash "Fetch #{pkg}" do
+      code "curl -fgL -o '#{dest}/#{pkg.split('/')[-1]}' '#{pkg}'"
+      not_if do File.file?("#{dest}/#{pkg.split('/')[-1]}") end
+    end
+  end
 end
 
 case node["platform"]
@@ -126,14 +149,13 @@ when "centos","redhat","suse","opensuse","fedora"
   file "/etc/sysconfig/network" do
     action :create
     content "NETWORKING=yes"
-  end
-
+  end if File.file?("/etc/sysconfig/network")
+  repofile_path = case node["platform"]
+                  when "centos","redhat" then "/etc/yum.repos.d"
+                  when "suse","opensuse" then "/etc/zypp/repos.d"
+                  else raise "Don't know where to put repo files for #{node["platform"]}'"
+                  end
   repos.each do |repo|
-    repofile_path = case node["platform"]
-                    when "centos","redhat" then "/etc/yum.repos.d"
-                    when "suse","opensuse" then "/etc/zypp/repos.d"
-                    else raise "Don't know where to put repo files for #{node["platform"]}'"
-                    end
     rtype,rdest = repo.split(" ",2)
     case rtype
     when "rpm"
@@ -184,11 +206,37 @@ end
 bash "Install required files" do
   code case node["platform"]
        when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "centos","redhat","fedora" then "yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "suse","opensuse" then "zypper -n install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm /tmp/install_pkgs"
        else raise "Don't know how to install required files for #{node["platform"]}'"
        end
   only_if do ::File.exists?("/tmp/install_pkgs") end
+end
+
+unless raw_pkgs.empty?
+  case node["platform"]
+  when "centos","redhat","suse","opensuse","fedora"
+    bash "Create repodata for raw_pkgs" do
+      code "createrepo ."
+      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+    end
+    template "#{repofile_path}/crowbar-raw_pkgs.repo" do
+      source "crowbar.repo.erb"
+      variables(
+                :repo_name => "raw_pkgs",
+                :repo_prio => 20,
+                :repo_url => "file:///tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+                )
+    end
+  when "debian","ubuntu"
+    template "/etc/apt/sources.list.d/crowbar.list" do
+      source "crowbar.list.erb"
+      variables( :repos => repos )
+      notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+    end
+  else
+    raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
+  end
 end
 
 directory "/var/run/sshd" do
@@ -200,6 +248,10 @@ end
 bash "Regenerate Host SSH keys" do
   code "ssh-keygen -q -b 2048 -P '' -f /etc/ssh/ssh_host_rsa_key"
   not_if "test -f /etc/ssh/ssh_host_rsa_key"
+end
+
+bash "Unlock the root account" do
+  code "while grep -q '^root:!' /etc/shadow; do usermod -U root; done"
 end
 
 # We need Special Hackery to run sshd in docker.
@@ -279,49 +331,20 @@ template "/etc/sudoers.d/crowbar" do
   mode 0440
 end
 
-pg_conf_dir = "/var/lib/pgsql/data"
-case node["platform"]
-when "ubuntu","debian"
-  pg_conf_dir = "/etc/postgresql/9.3/main"
-  service "postgresql" do
-    action [:enable, :start]
-  end
-  pg_database_dir = "/var/lib/postgresql/9.3/main/base"
-  directory "#{pg_database_dir}" do
-    owner "postgres"
-  end
-when "centos","redhat"
-  pg_conf_dir = "/var/lib/pgsql/9.3/data"
-  bash "Init the postgresql database" do
-    code "service postgresql-9.3 initdb en_US.UTF-8"
-    not_if do File.exists?("#{pg_conf_dir}/pg_hba.conf") end
-  end
-  service "postgresql" do
-    service_name "postgresql-9.3"
-    action [:enable, :start]
-  end
-  # Sigh, we need this so that the pg gem will install correctly
-  bash "Make sure pg_config is in the PATH" do
-    code "ln -sf /usr/pgsql-9.3/bin/pg_config /usr/local/bin/pg_config"
-    not_if "which pg_config"
-  end
+# Sigh, we need this so that the pg gem will install correctly
+bash "Make sure pg_config is in the PATH" do
+  code "ln -sf /usr/pgsql-9.3/bin/pg_config /usr/local/bin/pg_config"
+  not_if "which pg_config"
 end
 
-# This will configure us to only listen on a local UNIX socket
-template  "#{pg_conf_dir}/pg_hba.conf" do
-  source "pg_hba.conf.erb"
-  notifies :restart, "service[postgresql]",:immediately
-end
-
-bash "create crowbar user for postgres" do
-  code "sudo -H -u postgres createuser -d -S -R -w crowbar"
-  not_if "sudo -H -u postgres -- psql postgres -tAc \"SELECT 1 FROM pg_roles WHERE rolname='crowbar'\" |grep -q 1"
+# Why does opensuse consider ping to be a security risk?
+bash "Allow everyone to ping" do 
+  code "chmod u+s $(which ping) $(which ping6)"
 end
 
 (prereqs["gems"]["required_pkgs"] rescue []).each do |g|
   gem_package g do
     action :install
-    options "--http-proxy #{proxies["http_proxy"]} --no-ri --no-rdoc --bindir /usr/local/bin"
   end
 end
 

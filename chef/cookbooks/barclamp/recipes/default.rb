@@ -22,5 +22,5 @@ chef_gem "cstruct" do
 end
 
 class Chef::Recipe
-  include BarclampLibrary
+  include ::BarclampLibrary
 end

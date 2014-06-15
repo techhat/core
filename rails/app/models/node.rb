@@ -141,6 +141,12 @@ class Node < ActiveRecord::Base
   def address
     addresses.detect{|a|a.reachable?}
   end
+
+  def url_address
+    res = address
+    (res.v6? ? "[#{res.addr}]" : res.addr).to_s
+  end
+
   #
   # Helper function to test admin without calling admin. Style-thing.
   #

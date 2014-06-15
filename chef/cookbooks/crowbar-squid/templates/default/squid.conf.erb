@@ -1,7 +1,9 @@
 visible_hostname <%=@localname%>
 cache_effective_user <%=@user%>
 pid_filename /var/run/squid.pid
-acl localhost src 127.0.0.1/32
+http_port <%=@port%>
+
+acl localhost src 127.0.0.1
 acl localhost src ::1
 
 <% @localnets.each do |net| -%>
@@ -24,19 +26,18 @@ acl CONNECT method CONNECT
 
 # Allow PURGE from localhost.
 acl PURGE method PURGE
+always_direct allow to_localnet
+<% if @upstream_address -%>
+cache_peer <%=@upstream_address%> parent <%=@upstream_port%> 0 default
+never_direct allow all
+<% end -%>
 http_access allow PURGE localhost
 http_access deny PURGE
-
 http_access deny !Safe_ports
 http_access deny CONNECT !SSL_ports
 http_access allow localnet
 http_access deny all
-http_port <%=@port%>
-<% if @upstream_address -%>
-always_direct allow to_localnet
-cache_peer <%=@upstream_address%> parent <%=@upstream_port%> 0 default
-never_direct allow all
-<% end -%>
+
 cache_mem 256 MB
 maximum_object_size_in_memory 512 KB
 memory_replacement_policy lru

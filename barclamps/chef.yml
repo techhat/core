@@ -44,7 +44,7 @@ roles:
       - name: chef-client_key
         description: 'The private key that this node should use to authenticate with the chef server'
         map: 'chefjig/client/key'
-    wants-atribs:
+    wants-attribs:
       - chef-server_url
   - name: chef-solo
     jig: script

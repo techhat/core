@@ -1,0 +1,6 @@
+#!/bin/bash
+. /etc/profile
+find /opt/opencrowbar -path '*/chef/cookbooks/Berksfile' | while read -r -s berksfile; do
+    su -l -c "berks install -b '$berksfile'" crowbar
+    su -l -c "berks upload -b '$berksfile' --no-ssl-verify" crowbar
+done

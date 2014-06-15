@@ -71,7 +71,7 @@ as their init system, perform the following steps:
 
 Time saving tips
 
-  * preload the with `docker pull opencrowbar/centos:6.5-4`
+  * preload the with `docker pull opencrowbar/centos`
   * test docker, use `docker run -i -t centos /bin/bash`
   * a caching proxy server (e.g.: Squid) is highly recommended
 
@@ -157,6 +157,7 @@ This will perform the following actions:
   bind them to eth0.
   * Mark the admin node as alive, and converge the default set of admin
   noderoles.
+  * You can turn off the TMUX launching using `export TMUX=false`
 
 Options:
 
@@ -168,6 +169,9 @@ deploying (or if anything goes wrong), you will be left at a running
 shell inside the container.
 
 ### Booting slave VMs from the admin node
+
+Prereq : `sudo apt-get install bridge-utils`
+
 
 #### Bare Metal (the easy way)
 If your development environment is running on bare metal (as opposed
@@ -199,6 +203,7 @@ If your development environment is running in VMs then:
 ### Development Admin
 
   1. Dev/Simulator allows you to play with the UI and BDD tests which is good for developers working on the UI/API and Annealer logic
+    1. (optionally) Disable TMUX mode using `export TMUX=false`
     1. Start with `tools/docker-admin centos ./development.sh`
     1. Dev mode creates a special user `developer/Cr0wbar!`
     1. To monitor the logs inside the container, use `tail -f /var/log/crowbar/development.log`

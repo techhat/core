@@ -1,5 +1,4 @@
 #!/bin/bash
-SESSION="crowbar-docker"
 NODE_DIR="$HOME/.cache/opencrowbar/tftpboot/nodes"
 
 if [[ $0 = /* ]]; then
@@ -13,18 +12,7 @@ fi
 # This gets us to core
 tools="${tools%/*}"
 
-if ! which tmux &>/dev/null; then
-    echo "Docker-slaves needs tmux installed!"
-    exit 1
-fi
-
-if [[ ! $TMUX ]]; then
-    tmux new-session -n control -s $SESSION "$0 $*"
-    docker ps |grep '/crowbar-init' |awk '{print $1}' |xargs docker kill
-    tmux kill-session -t $SESSION
-    exit
-fi
-tmux set-option set-remain-on-exit on
+. "$tools/tmux_lib.sh"
 
 on_admin() {
     ssh root@172.17.0.2 -- "$@"
@@ -51,6 +39,3 @@ for ((n=1;n<=$1;n++)); do
         fi
     fi
 done
-
-echo "Leaving this session (with C-b d) will kill it and all the containers attached to it."
-/bin/bash -i

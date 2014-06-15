@@ -172,6 +172,7 @@ Crowbar::Application.routes.draw do
             put :undebug
             put :redeploy
             put :commit
+            get 'addresses'
           end
           resources :node_roles do
             resources :attribs

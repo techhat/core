@@ -16,14 +16,14 @@
 include_recipe "utils"
 package "bind9" do
   case node[:platform]
-  when "centos","redhat", "suse"
+  when "centos","redhat", "suse","opensuse"
     package_name "bind"
   end
   action :install
 end
 package "bind9utils" do
   case node[:platform]
-  when "centos","redhat", "suse"
+  when "centos","redhat", "suse", "opensuse"
     package_name "bind-utils"
   end
   action :install
@@ -51,7 +51,7 @@ end
 
 service "bind9" do
   case node[:platform]
-  when "centos","redhat","suse"
+  when "centos","redhat","suse","opensuse"
     service_name "named"
   end
   supports :restart => true, :status => true, :reload => true
@@ -67,7 +67,7 @@ files.each do |file|
     source "#{file}.erb"
     case node[:platform]
     when "ubuntu","debian" then group "bind"
-    when "centos","redhat","suse" then group "named"
+    when "centos","redhat","suse","opensuse" then group "named"
     end
     mode 0644
     owner "root"
@@ -95,7 +95,7 @@ template "/etc/bind/named.conf" do
   owner "root"
   case node[:platform]
   when "ubuntu","debian" then group "bind"
-  when "centos","redhat","suse" then group "named"
+  when "centos","redhat","suse","opensuse" then group "named"
   end
   variables(:forwarders => node[:crowbar][:dns][:forwarders])
   notifies :restart, "service[bind9]", :immediately
