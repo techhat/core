@@ -457,6 +457,7 @@ en:
       bridge: "Bridge"
       team: "Team"
       conduit: "Conduit"
+      ranges: "Ranges"
       start: "Start Server"
     settings:
       title: 'Session Settings'
