@@ -37,6 +37,7 @@ http_access deny !Safe_ports
 http_access deny CONNECT !SSL_ports
 http_access allow localnet
 http_access deny all
+cache deny to_localnet
 
 cache_mem 256 MB
 maximum_object_size_in_memory 512 KB
