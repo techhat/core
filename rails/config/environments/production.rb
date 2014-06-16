@@ -12,8 +12,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-# Author: RobHirschfeld
-#
 
 # Settings specified here will take precedence over those in config/environment.rb
 
