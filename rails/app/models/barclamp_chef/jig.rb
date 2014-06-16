@@ -41,49 +41,18 @@ class BarclampChef::Jig < Jig
 
   def run(nr,data)
     prep_chef_auth
-    unless (Chef::Role.load(nr.role.name) rescue nil)
-      # If we did not find the role in question, then the chef
-      # data from the barclamp has not been uploaded.
-      # Do that here, and then set chef_role.
-      chef_path = File.join(nr.barclamp.source_path, on_disk_name)
-      unless File.directory?(chef_path)
-        raise("No Chef data at #{chef_path}")
-      end
-      role_path = "#{chef_path}/roles"
-      data_bag_path = "#{chef_path}/data_bags"
-      user_data_bag_path = "/var/tmp/barclamps/#{nr.role.barclamp.name}/chef"
-      cookbook_path = "#{chef_path}/cookbooks"
-      [data_bag_path,user_data_bag_path].each do |db_path|
-        Dir.glob(File.join(db_path,"*.json")).each do |d|
-          data_bag_name = d.split('/')[-1]
-          next unless File.directory?(d)
-          next if (data_bag_name == "..") || (data_bag_name == ".")
-          Chef::DataBag.load(data_bag_name) || Chef::DataBag.new(data_bag_name).create
-          data_bag_item_data = Yajl::Parser.parse(IO.read(d))
-          data_bag_item = Chef::DataBagItem.load(data_bag_name,data_bag_item_data["id"])
-          if data_bag_item
-            unless data_bag_item.raw_data == data_bag_item_data
-              data_bag_item.raw_data = data_bag_item_data
-              data_bag_item.save
-            end
-          else
-            data_bag_item = Chef::DataBagItem.new
-            data_bag_item.raw_data = data_bag_item_data
-            data_bag_item.data_bag = data_bag_name
-            data_bag_item.create
-          end
-        end if File.directory?(db_path)
-      end
-      if nr.role.respond_to?(:jig_role)
-        Chef::Role.json_create(nr.role.jig_role(nr)).save
-      elsif File.exist?("#{role_path}/#{nr.role.name}.rb")
-        @@load_role_mutex.synchronize do
-          Chef::Config[:role_path] = role_path
-          Chef::Role.from_disk(nr.role.name, "ruby").save
+    if nr.role.respond_to?(:jig_role)
+      jr = nr.role.jig_role(nr)
+      unless (Chef::Role.load(jr['name']) rescue nil)
+        begin
+          Chef::Role.json_create(nr.role.jig_role(nr)).save
+        rescue Net::HTTPServerException
+          Rails.logger.info("Role #{jr["name"]} already exists in the Chef server")
         end
-      else
-        raise "Could not find or synthesize a Chef role for #{nr.name}"
       end
+    end
+    unless (Chef::Role.load(nr.role.name) rescue nil)
+      raise "Chef role for #{nr.role.name} is not in the Chef server!"
     end
     chef_node, chef_noderole = chef_node_and_role(nr.node)
     chef_noderole.default_attributes(data[:data])

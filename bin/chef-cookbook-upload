@@ -1,6 +1,21 @@
 #!/bin/bash
+if [[ $(whoami) != crowbar ]]; then
+    su -l -c "$0" crowbar
+    exit $?
+    fi
 . /etc/profile
+IFS=$'\n'
 find /opt/opencrowbar -path '*/chef/cookbooks/Berksfile' | while read -r -s berksfile; do
-    su -l -c "berks install -b '$berksfile'" crowbar
-    su -l -c "berks upload -b '$berksfile' --no-ssl-verify" crowbar
+   berks install -b "$berksfile"
+   berks upload -b "$berksfile" --no-ssl-verify
 done
+
+roles=($(find /opt/opencrowbar -path '*/chef/roles/*.rb'))
+if [[ $roles ]]; then
+   knife role from file "${roles[@]}"
+fi
+
+data_bags=($(find /opt/opencrowbar -path '*/chef/data_bags/*' -type d))
+if [[ $data_bags ]]; then
+    knife data bag from file "${data_bags[@]}"
+fi
