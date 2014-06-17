@@ -22,4 +22,8 @@ This is the TL;DR version; the full version is [here](docker-admin.md).
      critical files and extracts the ISOs.
   2. `tools/kvm-slave` (to launch a KVM-based compute node)
 
-Once Crowbar is bootstrapped (or if anything goes wrong), you will get a shell running inside the container.  Exiting the shell will kill Docker.
+Once Crowbar is bootstrapped (or if anything goes wrong), you will get a shell running inside a 'tmux' session, the first of which is in the container.  Exiting the shell will kill Docker.
+
+More about tmux:
+
+http://tmuxp.readthedocs.org/en/latest/about_tmux.html
