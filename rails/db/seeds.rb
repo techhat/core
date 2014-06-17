@@ -17,10 +17,7 @@
 source_path = File.expand_path(File.join(__FILE__,"../../.."))
 yml_blob = YAML.load_file(File.join(source_path,"crowbar.yml"))
 ActiveRecord::Base.transaction do
-  Barclamp.import("crowbar",yml_blob,source_path)
-  Dir.glob("/opt/opencrowbar/**/crowbar_engine/barclamp_*/db/seeds.rb") do |seedfile|
-    "#{seedfile.split('/')[-3].camelize}::Engine".constantize.load_seed
-  end
+  Barclamp.import("core",yml_blob,source_path)
 end
 
 ActiveRecord::Base.transaction do
