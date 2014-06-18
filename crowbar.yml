@@ -24,7 +24,7 @@ os_support:
   - fedora-20
 
 barclamps:
-  - name: core
+  - name: crowbar
     description: "Foundational Roles"
   - name: test
     description: "Test Barclamp Integrations"
