@@ -438,7 +438,7 @@ class NodeRole < ActiveRecord::Base
 
   def run_hooks
     meth = "on_#{STATES[state]}".to_sym
-    if proposed? && previous_changes.empty?
+    if proposed?
       # on_proposed only runs on initial noderole creation.
       Rails.logger.debug("NodeRole #{name}: Calling #{meth} hook.")
       role.send(meth,self)

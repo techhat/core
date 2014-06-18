@@ -157,7 +157,9 @@ class Role < ActiveRecord::Base
 
   # Make sure there is a deployment role for ourself in the deployment.
   def add_to_deployment(dep)
-    DeploymentRole.find_or_create_by!(role_id: self.id, deployment_id: dep.id)
+    DeploymentRole.unsafe_locked_transaction do
+      DeploymentRole.find_or_create_by!(role_id: self.id, deployment_id: dep.id)
+    end
   end
 
   def add_to_node(node)

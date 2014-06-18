@@ -269,9 +269,10 @@ class Node < ActiveRecord::Base
     Node.transaction do
       reload
       update!(bootenv: "sledgehammer")
-      node_roles.update_all(run_count: 0)
+      node_roles.update_all(run_count: 0, state: NodeRole::PROPOSED)
     end
     reboot
+    commit!
   end
 
   def target

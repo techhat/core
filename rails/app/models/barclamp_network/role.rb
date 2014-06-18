@@ -56,22 +56,30 @@ class BarclampNetwork::Role < Role
 
   def on_proposed(nr)
     node = nr.node(true)
-    return if network.allocations.node(node).count != 0
+    if network.allocations.node(node).count != 0
+      Rails.logger.debug("#{nr.node}: Network #{network.name} already has allocated addresses.")
+      return
+    end
+
     # v4 automatic address allocation handling
     addr_range = if node.is_admin? && network.ranges.exists?(name: "admin")
-                   network.ranges.find_by!(name: "admin")
+                   network.ranges.find_by(name: "admin")
                  else
-                   network.ranges.find_by!(name: "host")
+                   network.ranges.find_by(name: "host")
                  end
-    # get the suggested ip address (if any) - nil = automatically assign
-    suggestion = node.attribs.find_by!(name: "hint-#{network.name}-v4addr").get(node)
-    addr_range.allocate(nr.node, suggestion)
+    if addr_range
+      # get the suggested ip address (if any) - nil = automatically assign
+      suggestion = node.attribs.find_by!(name: "hint-#{network.name}-v4addr").get(node)
+      Rails.logger.debug("#{node.name}: Allocating address for #{network.name} in #{addr_range.name}")
+      addr_range.allocate(nr.node, suggestion)
+    end
     # v6 automatic address handling
     addr_range = network.ranges.find_by(name: "host-v6")
-    return unless addr_range
-    suggestion = node.attribs.find_by!(name: "hint-#{network.name}-v6addr").get(node) ||
-      node.auto_v6_address(network)
-    addr_range.allocate(nr.node, suggestion)
+    if addr_range
+      Rails.logger.debug("#{node.name}: Allocating address for #{network.name} in #{addr_range.name}")
+      suggestion = node.attribs.find_by!(name: "hint-#{network.name}-v6addr").get(node) ||
+        node.auto_v6_address(network)
+      addr_range.allocate(nr.node, suggestion)
+    end
   end
-
 end
