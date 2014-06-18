@@ -5,11 +5,13 @@ The following table can help figure out which OpenCrowbar services are running o
 Port
 * 22 - SSH
 * 3000 - Crowbar API & UI
-* ? -  Chef Server UI
-* ? - Chef API
-* ? - Postgresql Database
+* 4000 -  Chef Server UI
+* 443 - Chef API
+* 5432 - Postgresql Database
 * 8091 - TFTP Server (provides PXE images)
-* ? - NTP
-* ? - DNS
-* ? - DHCP
-* ? - Squid Proxy
+* 123 - NTP
+* 53 - DNS
+* 68 - DHCP
+* 3128 - Squid Proxy
+
+Please review and edit these port numbers.
