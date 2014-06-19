@@ -106,14 +106,15 @@ ifs = Mash.new
 old_ifs = node["crowbar_wall"]["network"]["interfaces"] || Mash.new rescue Mash.new
 if_mapping = Mash.new
 addr_mapping = Mash.new
+
 default_route = {}
 
 # Silly little helper for sorting Crowbar networks.
 # Netowrks that use vlans and bridges will be handled later
 def net_weight(net)
   res = 0
-  if node["crowbar"]["network"][net]["use_vlan"] then res += 1 end
-  if node["crowbar"]["network"][net]["add_bridge"] then res += 1 end
+  if net["use_vlan"] then res += 1 end
+  if net["use_bridge"] then res += 1 end
   res
 end
 
@@ -121,18 +122,17 @@ end
 # The supported reference format is <sign><speed><#> where
 #  * sign is optional, and determines behavior if exact match is not found.
 #    + allows speed upgrade,
-#    - allows downgrade, and 
+#    - allows downgrade, and
 #    ? allows either. If no sign is specified, an exact match must be found.
 #  * speed designates the interface speed. 10m, 100m, 1g and 10g are supported
 #  * The final number designates the zero-based offset into the set of physical
 #    interfaces that have the requested speed we want.
-def resolve_conduit(net)
+def resolve_conduit(conduit)
   if node["crowbar_ohai"]["in_docker"]
     return ["eth0"]
   end
   known_ifs = node["crowbar"]["sorted_ifs"]
   speeds = %w{10m 100m 1g 10g}
-  conduit = node["crowbar"]["network"][net]["conduit"]
   intf_re = /^([-+?]?)(\d{1,3}[mg])(\d+)$/
   finders = conduit.split(',').map{|f|f.strip}
   raise "#{conduit} does not want any interfaces!" if finders.nil? || finders.empty?
@@ -166,7 +166,6 @@ def resolve_conduit(net)
     end
     res = finders.map{|f|candidates[f[3].to_i]}.compact
     if res.length == finders.length
-      node.set["crowbar"]["network"][net]["resolved_interfaces"] = res
       return res
     end
   end
@@ -174,7 +173,7 @@ def resolve_conduit(net)
 end
 
 # If we do not have an admin address allocated yet, do nothing.
-if (node["crowbar"]["network"]["admin"]["addresses"] rescue []).empty?
+unless node["crowbar"]["network"]["addresses"].values.any?{|v|v["network"] == "admin"}
   Chef::Log.info("Network: #{node.fqdn} has not been allocated an address on the admin network.")
   Chef::Log.info("Network: Leaving the configuration alone.")
   return
@@ -184,15 +183,18 @@ end
 ::Kernel.system("killall -w -q -r '^dhclient'")
 
 # Dynamically create our new local interfaces.
-node["crowbar"]["network"].keys.sort{|a,b|
-  net_weight(a) <=> net_weight(b)
-}.each do |name|
-  next if name == "bmc"
+node["crowbar"]["network"]["addresses"].keys.sort{|a,b|
+  net_weight(node["crowbar"]["network"]["addresses"][a]) <=> net_weight(node["crowbar"]["network"]["addresses"][b])
+}.each do |addr|
+  network = node["crowbar"]["network"]["addresses"][addr]
+  # Skip BMC conduits.
+  next if network["conduit"] == "bmc"
+  # This will wind up being the interfaces that the address will be bound to.
   net_ifs = Array.new
-  network = node["crowbar"]["network"][name]
-  addrs = (network["addresses"] || []).map{|addr|IP.coerce(addr)}
-  base_ifs = resolve_conduit(name).map{|i| Nic.new(i)}.sort
-  Chef::Log.info("Using base interfaces #{base_ifs.map{|i|i.name}.inspect} for network #{name}")
+  # This is the basic interfaces that the conduit definition implies we should use.
+  base_ifs = resolve_conduit(network["conduit"]).map{|i| Nic.new(i)}.sort
+  netname = "#{addr} in network range #{network['network']}:#{network['range']}"
+  Chef::Log.info("Using base interfaces #{base_ifs.map{|i|i.name}.inspect} for #{netname}")
   base_ifs.each do |i|
     ifs[i.name] ||= Hash.new
     ifs[i.name]["addresses"] ||= Array.new
@@ -200,7 +202,7 @@ node["crowbar"]["network"].keys.sort{|a,b|
   end
   case base_ifs.length
   when 1
-    Chef::Log.info("Using interface #{base_ifs[0]} for network #{name}")
+    Chef::Log.info("Using interface #{base_ifs[0]} for #{netname}")
     our_iface = base_ifs[0]
   else
     # We want a bond.  Figure out what mode it should be.  Default to 5
@@ -213,11 +215,11 @@ node["crowbar"]["network"].keys.sort{|a,b|
          (i.slaves.sort == base_ifs))
     end
     if bond
-      Chef::Log.info("Using bond #{bond.name} for network #{name}")
+      Chef::Log.info("Using bond #{bond.name} for #{netname}")
     else
       bond = Nic::Bond.create("bond#{Nic.nics.select{|i| Nic::bond?(i)}.length}",
                        team_mode)
-      Chef::Log.info("Creating bond #{bond.name} for network #{name}")
+      Chef::Log.info("Creating bond #{bond.name} for #{netname}")
     end
     ifs[bond.name] ||= Hash.new
     ifs[bond.name]["addresses"] ||= Array.new
@@ -251,10 +253,10 @@ node["crowbar"]["network"].keys.sort{|a,b|
     end
     vlan = "#{our_iface.name}.#{network["vlan"]}"
     if Nic.exists?(vlan)
-      Chef::Log.info("Using vlan #{vlan} for network #{name}")
+      Chef::Log.info("Using vlan #{vlan} for #{netname}")
       our_iface = Nic.new vlan
     else
-      Chef::Log.info("Creating vlan #{vlan} for network #{name}")
+      Chef::Log.info("Creating vlan #{vlan} for #{netname}")
       our_iface = Nic::Vlan.create(our_iface,network["vlan"])
     end
     # Destroy any vlan interfaces for this vlan that might
@@ -273,7 +275,7 @@ node["crowbar"]["network"].keys.sort{|a,b|
     net_ifs << our_iface.name
   end
   # Ditto for a bridge.
-  if network["add_bridge"]
+  if network["use_bridge"]
     unless system("which brctl")
       p = package "bridge-utils" do
         action :nothing
@@ -287,10 +289,10 @@ node["crowbar"]["network"].keys.sort{|a,b|
                "br-#{name}"
              end
     br = if Nic.exists?(bridge)
-           Chef::Log.info("Using bridge #{bridge} for network #{name}")
+           Chef::Log.info("Using bridge #{bridge} for #{netname}")
            Nic.new bridge
          else
-           Chef::Log.info("Creating bridge #{bridge} for network #{name}")
+           Chef::Log.info("Creating bridge #{bridge} for #{netname}")
            Nic::Bridge.create(bridge)
          end
     ifs[br.name] ||= Hash.new
@@ -304,11 +306,11 @@ node["crowbar"]["network"].keys.sort{|a,b|
     net_ifs << our_iface.name
   end
   # Make sure our addresses are correct
-  if_mapping[name] = net_ifs
+  if_mapping[network['network']] = net_ifs
+  addr_mapping[network['network']] ||= Array.new
+  addr_mapping[network['network']] << addr
   ifs[our_iface.name]["addresses"] ||= Array.new
-  ifs[our_iface.name]["addresses"] += addrs
-  addr_mapping[name] ||= Array.new
-  addr_mapping[name] += addrs.map{|addr|addr.to_s}
+  ifs[our_iface.name]["addresses"] << IP.coerce(addr)
   # Ditto for our default route
   if network["router_pref"] && (network["router_pref"].to_i < route_pref)
     Chef::Log.info("#{name}: Will use #{network["router"]} as our default route")

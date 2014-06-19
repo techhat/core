@@ -46,12 +46,15 @@ class NetworkRangesController < ::ApplicationController
     params.require(:name)
     params.require(:new_first)
     params.require(:new_last)
-    @range = NetworkRange.new
-    @range.first = params[:new_first]
-    @range.last = params[:new_last]
-    @range.name = params[:name]
-    @range.network_id = params[:network_id]
-    @range.save!
+    @range =  NetworkRange.create! params.permit(:name,
+                                                 :network_id,
+                                                 :first,
+                                                 :last,
+                                                 :conduit,
+                                                 :vlan,
+                                                 :use_vlan,
+                                                 :use_bridge,
+                                                 :use_team)
     render api_show @range
   end
 
@@ -62,7 +65,14 @@ class NetworkRangesController < ::ApplicationController
     else
       @network_range = NetworkRange.where(:name=>params[:name], :network_id=>params[:network_id]).first
     end
-    @network_range.update_attributes!(params.permit(:name,:first,:last))
+    @network_range.update_attributes!(params.permit(:name,
+                                                    :first,
+                                                    :last,
+                                                    :conduit,
+                                                    :vlan,
+                                                    :use_vlan,
+                                                    :use_bridge,
+                                                    :use_team))
     render api_show @network_range
   end
 

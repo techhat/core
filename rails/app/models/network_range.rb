@@ -42,6 +42,33 @@ class NetworkRange < ActiveRecord::Base
     write_attribute("last",IP.coerce(addr).to_s)
   end
 
+  def conduit
+    read_attribute("conduit") || network.conduit
+  end
+
+  def vlan
+    read_attribute("vlan") || network.vlan
+  end
+
+  def team_mode
+    read_attribute("team_mode") || network.team_mode
+  end
+
+  def use_vlan
+    res = read_attribute("use_vlan")
+    network.use_vlan if res.nil?
+  end
+
+  def use_bridge
+    res = read_attribute("use_bridge")
+    network.use_bridge if res.nil?
+  end
+
+  def use_team
+    res = read_attribute("use_team")
+    network.use_team if res.nil?
+  end
+
   def === (other)
     addr = IP.coerce(other)
     (first <= addr) && (addr <= last) 
@@ -91,17 +118,19 @@ class NetworkRange < ActiveRecord::Base
   private
 
   def sanity_check_range
-    # Range sanity checking is easy.
-    # Just make sure that the start and end are in the same subnets,
-    # and that the start comes before the end.
     unless network
       errors.add("NetworkRange does not have an associated network!")
+    end
+
+    # Check conduit, vlan, team, and bond sanity
+    Network.check_sanity(self).each do |err|
+      errors.add("NetworkRange #{fullname}: #{err}")
     end
 
     unless name
       errors.add("NetworkRange must have a name")
     end
-    
+
     unless first.class == last.class
       errors.add("NetworkRange #{fullname}: #{first.inspect} and #{last.inspect} must be of the same type")
     end
@@ -124,6 +153,9 @@ class NetworkRange < ActiveRecord::Base
         end
         if other === last
           errors.add("NetworkRange #{fullname}: last address #{last.to_s} overlaps with range #{other.fullname}")
+        end
+        unless Network.check_conduit_sanity(conduit, other.conduit)
+          errors.add("NetworkRange #{fullname}: Conduit mapping overlaps with network range #{other.fullname}")
         end
       end
     end
