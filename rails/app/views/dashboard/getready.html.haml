@@ -1,7 +1,7 @@
 %h1
   =t '.title'
 
-= form_for :dashboard, :'data-remote' => true, :url => '/dashboard/getready', :html => { :method=>:put, :'data-type' => 'html',  :id => 'getready', :class => "formtastic" } do |f|
+= form_for :dashboard, :'data-remote' => true, :url => '/dashboard/getready', :html => { :method=>:post, :'data-type' => 'json',  :id => 'getready', :class => "formtastic" } do |f|
 
   %dl
     = dl_item t('.deployment'), text_field_tag(:deployment, t('.default'), :size => 15)
@@ -20,7 +20,9 @@
       - if @nodes and @nodes.count > 0
         - @nodes.sort_by{|n| n.name }.each do |node|
           %tr.node{ :class => cycle(:odd, :even, :name => "nodes"), :id => node.id }
-            %td= link_to node.name, node_path(node.id), :title=>node.description
+            %td
+              = check_box_tag "node_#{node.id}", "include", !node.is_admin?
+              = link_to node.name, node_path(node.id), :title=>node.description
             %td= "=LED="
             %td= "=OS Picker="
       - else
