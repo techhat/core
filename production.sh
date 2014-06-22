@@ -102,6 +102,27 @@ admin_net='
   ]
 }'
 
+bmc_net='
+{
+  "name": "bmc",
+  "deployment": "system",
+  "conduit": "bmc",
+  "ranges": [
+    {
+      "conduit": "1g0",
+      "name": "admin",
+      "first": "192.168.128.10/22",
+      "last": "192.168.128.20/22"
+    },
+    {
+      "name": "host",
+      "first": "192.168.128.21/22",
+      "last": "192.168.131.254/22"
+    }
+  ]
+}'
+
+
 admin_node="
 {
   \"name\": \"$FQDN\",
@@ -117,21 +138,12 @@ ip_re='([0-9a-f.:]+/[0-9]+)'
 
 # Create a stupid default admin network
 crowbar networks create "$admin_net"
-#curl -s -f --digest -u $(cat /etc/crowbar.install.key) \
-#    -X POST http://localhost:3000/network/api/v2/networks \
-#    -d "name=admin" \
-#    -d "deployment=system" \
-#    -d "conduit=1g0"  \
-#    -d 'ranges='
+
+# Create the equally stupid BMC network
+crowbar networks create "$bmc_net"
 
 # Create the admin node entry.
 crowbar nodes create "$admin_node"
-#curl -s -f --digest -u $(cat /etc/crowbar.install.key) \
-#    -X POST http://localhost:3000/api/v2/nodes \
-#    -d "name=$FQDN" \
-#    -d 'admin=true' \
-#    -d 'alive=false' \
-#    -d 'bootenv=local'
 
 # Bind the admin role to it, and commit the resulting
 # proposed noderoles.
