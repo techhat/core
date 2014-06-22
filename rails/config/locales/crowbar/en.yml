@@ -229,9 +229,17 @@ en:
       apps: "Applications"
     getready:
       title: "Ready State Wizard"
+      deployment: "Deployment"
+      default: "pilot"
+      range: "Range Name"
+      range_base: "public"
+      first_ip: "First CIDR"
+      last_ip:  "Last CIDR"
+      conduit: "Net Conduit"
       name: "Node"
       state: "State"
       os: "Operating System"
+      create: "Run Wizard"
   deployments:
     index:
       title: "Deployments"
