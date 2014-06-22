@@ -1,4 +1,6 @@
-###Copyright 2012-2013 Riot Games
+### Berkshelf v2
+
+Copyright 2012-2013 Riot Games
 
     Jamie Winsor (<jamie@vialstudios.com>)
     Josiah Kiehl (<jkiehl@riotgames.com>)

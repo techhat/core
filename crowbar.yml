@@ -25,7 +25,7 @@ os_support:
 
 barclamps:
   - name: crowbar
-    description: "Self-referential barclamp enabling other barclamps"
+    description: "Foundational Roles"
   - name: test
     description: "Test Barclamp Integrations"
   - name: network

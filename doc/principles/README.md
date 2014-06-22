@@ -1,4 +1,4 @@
-# Functional DevOps “FuncOps”
+# Operational Principles
 
 The operational model behind Crowbar is entering its third generation and its important to understand the principles behind that model.  The model is critical because it shapes how Crowbar approaches the infrastructure at a fundamental level so it makes it easier to interact with the platform if you see how we are approaching operations.  Crowbar’s goal is to create emergent services.
 

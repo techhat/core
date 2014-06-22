@@ -1,8 +1,7 @@
 ## Contributing to OpenCrowbar
 
 Before [submitting pull requests]
-(https://help.github.com/articles/using-pull-requests), please ensure you are
-covered by a [CLA](CLA.md).
+(https://help.github.com/articles/using-pull-requests), please make sure you understand the Apache license.  We consider submitting a pull to be accepting the project license terms.
 
 #### Guidelines for Pull Requests
 
@@ -13,9 +12,9 @@ covered by a [CLA](CLA.md).
    * Does not inject vendor information (Name or Product) into OpenCrowbar expect
      where relevant to explain utility of push (e.g.: help documentation &
      descriptions).
-   * Passes code review by Dell OpenCrowbar team reviewer
+   * Passes code review by OpenCrowbar team reviewer
    * Does not degrade the security model of the product
-   * Items requiring more scrutiny, including signing CLA
+   * Items requiring more scrutiny
       * Major changes
       * New barclamps
       * New technology
@@ -23,10 +22,10 @@ covered by a [CLA](CLA.md).
 #### Timing
 
    * Accept no non-bug fix push requests within 2 weeks of a release fork
-   * No SLA - code accepted at Dell's discretion. No commitment to accept
+   * No SLA - code accepted at PTLs discretion. No commitment to accept
      changes.
 
-#### Coding Expectations [PRELIMINARY / PROPOSED 8/31]
+#### Coding Expectations
 
    * Copyright & License header will be included in files that can tolerate
      headers
@@ -47,7 +46,6 @@ covered by a [CLA](CLA.md).
      break build or deploy our commercial products
    * For operating systems that are non-core, we will _not_ validate on the
      target OS for the push (e.g.: not testing SUSE install at this point)
-   * For non-DellCloudEdge barclamps &ndash; no rules!
    * Eventually, we would expect that a pull request would be built and tested
      in our CI system before the push can be accepted
 '
