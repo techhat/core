@@ -1,6 +1,6 @@
 name              'bind9'
-maintainer        "Dell, Inc"
-maintainer_email  "crowbar@dell.com"
+maintainer       "OpenCrowbar team"
+maintainer_email "opencrowbar@googlegroups.com"
 license           "Apache 2.0"
 description       "Manages Bind9 for Crowbar"
 long_description  "Managed Bind9 for Crowbar"
