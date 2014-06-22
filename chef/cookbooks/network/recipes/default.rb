@@ -104,8 +104,7 @@ end
 route_pref = 10000
 ifs = Mash.new
 old_ifs = node["crowbar_wall"]["network"]["interfaces"] || Mash.new rescue Mash.new
-if_mapping = Mash.new
-addr_mapping = Mash.new
+if_mapping = Array.new
 
 default_route = {}
 
@@ -305,10 +304,7 @@ node["crowbar"]["network"]["addresses"].keys.sort{|a,b|
     our_iface = br
     net_ifs << our_iface.name
   end
-  # Make sure our addresses are correct
-  if_mapping[network['network']] = net_ifs
-  addr_mapping[network['network']] ||= Array.new
-  addr_mapping[network['network']] << addr
+  if_mapping << [network['network'],network['range'],addr,net_ifs.reverse]
   ifs[our_iface.name]["addresses"] ||= Array.new
   ifs[our_iface.name]["addresses"] << IP.coerce(addr)
   # Ditto for our default route
@@ -463,7 +459,6 @@ Chef::Log.info("Saving interfaces to crowbar_wall: #{saved_ifs.inspect}")
 
 node.set["crowbar_wall"]["network"]["interfaces"] = saved_ifs
 node.set["crowbar_wall"]["network"]["nets"] = if_mapping
-node.set["crowbar_wall"]["network"]["addrs"] = addr_mapping
 
 case node["platform"]
 when "debian","ubuntu"

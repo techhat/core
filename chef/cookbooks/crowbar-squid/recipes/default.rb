@@ -13,7 +13,7 @@
 #
 # This recipe sets up Squid
 
-if (node[:crowbar_wall][:network][:addrs][:admin] rescue nil)
+if (node[:crowbar_wall][:network] rescue nil)
   v4addr=node.address("admin",IP::IP4)
   v6addr=node.address("admin",IP::IP6)
 else
