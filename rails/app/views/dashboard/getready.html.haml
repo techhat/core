@@ -1,0 +1,24 @@
+%h1
+  =t '.title'
+
+- # filter to only show unallocated nodes, with an option to display all
+= form_for :dashboard, :'data-remote' => true, :url => '/dashboard/getready', :html => { :method=>:put, :'data-type' => 'html',  :id => 'getready', :class => "formtastic" } do |f|
+  %table.data.box
+    %thead
+      %tr
+        %th= t('.name')
+        %th= t('.state')
+        %th= t('.os')
+    %tbody
+      - if @nodes and @nodes.count > 0
+        - @nodes.sort_by{|n| n.name }.each do |node|
+          %tr.node{ :class => cycle(:odd, :even, :name => "nodes"), :id => node.id }
+            %td= link_to node.name, node_path(node.id), :title=>node.description
+            %td= "=LED="
+            %td= "=OS Picker="
+      - else
+        %tr
+          %td{ :colspan=>4 }
+            = t 'no_items'
+
+.clear

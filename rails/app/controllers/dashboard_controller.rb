@@ -105,4 +105,8 @@ class DashboardController < ApplicationController
     end
   end
 
+  def getready
+    @nodes = Deployment.system.nodes
+  end
+
 end

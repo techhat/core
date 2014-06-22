@@ -227,6 +227,11 @@ en:
       clients: "Infrastructure Clients"
       services: "Services"
       apps: "Applications"
+    getready:
+      title: "Ready State Wizard"
+      name: "Node"
+      state: "State"
+      os: "Operating System"
   deployments:
     index:
       title: "Deployments"
