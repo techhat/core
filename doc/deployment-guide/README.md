@@ -2,7 +2,7 @@
 
 The files located in this directory provide key information sought by software engineers, systems operators, DevOps staff, and end users.
 
-> Help us build this documentation!  Don't know how to do a Github pull request?  Email the update (markdown prefered) to `crowbar@dell.com` and recommend where it should go and we'll make it happen.
+> Help us build this documentation!  Don't know how to do a Github pull request?  Email the update (markdown prefered) to `opencrowbar@googlegroups.com` and recommend where it should go and we'll make it happen.
 
 Here is a guide to [deploy OpenCrowbar onto a CentOS 6.5 or Red Hat Enterprise Linux 6.5 _admin_ node](./Install-CentOS-RHEL-6.5-AdminNode.md).
 

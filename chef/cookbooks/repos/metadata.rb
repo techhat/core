@@ -1,6 +1,6 @@
 name              'repos'
-maintainer        "Dell, Inc"
-maintainer_email  "crowbar@dell.com"
+maintainer       "OpenCrowbar team"
+maintainer_email "opencrowbar@googlegroups.com"
 license           "Apache 2.0"
 description       "repos"
 long_description  "repos"

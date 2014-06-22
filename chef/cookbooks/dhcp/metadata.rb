@@ -1,6 +1,6 @@
 name             'dhcp'
-maintainer       "Dell Crowbar Team"
-maintainer_email "crowbar@dell.com"
+maintainer       "OpenCrowbar team"
+maintainer_email "opencrowbar@googlegroups.com"
 license          "Apache 2.0"
 description      "Maintains DHCP server for Crowbar"
 long_description "Maintains DHCP server for Crowbar"
