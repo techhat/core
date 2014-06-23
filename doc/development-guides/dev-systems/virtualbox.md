@@ -37,7 +37,7 @@ VirtualBox
   * `sudo vi /etc/network/interfaces`
   * add the following lines
     * `auto eth1`
-   * `iface eth1 inet static`
+    * `iface eth1 inet static`
     * `address 192.168.222.6`
   * `sudo service network restart`
   * validate network by using Putty to SSH into crowbar@192.168.222.6
