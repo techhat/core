@@ -1,6 +1,6 @@
 name              'crowbar-hacks'
-maintainer        "Dell, Inc"
-maintainer_email  "crowbar@dell.com"
+maintainer       "OpenCrowbar team"
+maintainer_email "opencrowbar@googlegroups.com"
 license           "Apache 2.0"
 description       "crowbar-hacks"
 long_description  "crowbar-hacks"
