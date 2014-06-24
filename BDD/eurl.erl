@@ -16,7 +16,7 @@
 -export([post/3, put/3, delete/1, delete/2, post_params/1, post/5, put_post/3, put_post/4, put_post/5, uri/1, path/1, path/2]).
 -export([get_http/1, get_result/1, get_result/2, get_result/3, get/1, get/2, get/3, get_page/3, peek/2, search/2, search/3]).
 -export([find_button/2, find_link/2, find_block/4, find_block/5, find_form/2, find_div/2, html_body/1, html_head/1, find_heading/2]).
--export([form_submit/2, form_fields_merge/2]).
+-export([form_submit/2, form_submit/1, form_fields_merge/2]).
 -export([encode/1]).
 -include("bdd.hrl").
 
@@ -344,16 +344,17 @@ delete(URI)  ->
   bdd_utils:log(trace, eurl, delete, "Result ~p", [Result]),
   Result.
 
-form_submit(Config, Form) ->
+form_submit(_Config, Form) -> bdd_utils:depricate({2014, 8, 1}, eurl, form_submit, eurl, form_submit, [Form]).
+form_submit(Form) ->
   {fields, FormFields} = lists:keyfind(fields, 1, Form),
   {target, Target} = lists:keyfind(target, 1, Form),
   {method, Method} = lists:keyfind(method, 1, Form),
   Fields = "?" ++ string:join([ K ++ "=" ++ encode(V) || {K, V, _, _} <- FormFields],"&"),
   URL = uri(path(Target, Fields)),
-  bdd_utils:log(Config, debug, "eurl:form_submit ~pting to ~p", [Method, URL]),
-  Result = simple_auth:request(Config, Method, {URL, [], "application/html", []}, [{timeout, 10000}], []),  
+  bdd_utils:log(debug, "eurl:form_submit ~pting to ~p", [Method, URL]),
+  Result = simple_auth:request(Method, {URL, [], "application/html", []}, [{timeout, 10000}], []),  
   {ok, {{"HTTP/1.1",ReturnCode, _State}, _Head, Body}} = Result,
-  bdd_utils:log(Config, trace, "bdd_utils:put_post Result ~p: ~p", [ReturnCode, Body]),
+  bdd_utils:log(trace, "bdd_utils:put_post Result ~p: ~p", [ReturnCode, Body]),
   {ReturnCode, Body}.
 
 form_fields_merge(SetField, FromFields) ->
