@@ -105,6 +105,7 @@ class DashboardController < ApplicationController
     end
   end
 
+  # multi-step node allocation
   def getready
     if request.get?
       @nodes = Deployment.system.nodes

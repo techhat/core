@@ -1,3 +1,5 @@
+- admin = Node.admin.where(:available => true).first
+- available_os = Attrib.get("provisioner-available-oses", admin).map{ |k,v| k } rescue []
 %h1
   =t '.title'
 
@@ -13,18 +15,23 @@
   %table.data.box
     %thead
       %tr
-        %th= t('.name')
+        %th{:width=>'5%'}
         %th= t('.state')
+        %th= t('.name')
         %th= t('.os')
     %tbody
       - if @nodes and @nodes.count > 0
         - @nodes.sort_by{|n| n.name }.each do |node|
           %tr.node{ :class => cycle(:odd, :even, :name => "nodes"), :id => node.id }
+            %td= check_box_tag "node_#{node.id}", "include", !node.is_admin?
+            %td.status
+              .led{:class => node.status, :title=>t(node.status, :scope=>'status', :default=>node.status)} 
+            %td= link_to node.name, node_path(node.id), :title=>node.description
             %td
-              = check_box_tag "node_#{node.id}", "include", !node.is_admin?
-              = link_to node.name, node_path(node.id), :title=>node.description
-            %td= "=LED="
-            %td= "=OS Picker="
+              - if available_os.count > 0
+                = f.select :os, available_os
+              - else
+                = t 'no_items'
       - else
         %tr
           %td{ :colspan=>4 }
