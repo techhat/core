@@ -86,7 +86,7 @@ step(Given, {step_when, _N, ["I click on the", Menu, "menu item"]}) ->
   URL = eurl:find_link(Menu, Block),
   click_link(URL, Menu);
 
-step(Given, {step_when, _N, ["I fill in", Fields, "and submit using the",ButtonText,"button"]}) ->
+step(Given, {step_given, _N, ["I fill in", Fields, "and submit using the",ButtonText,"button"]}) ->
   % assume a single form element
   Form = eurl:find_form(Given, ButtonText),
   bdd_utils:log(trace, "bdd_webrat:step When I fill in is Given ~p using ~p",[Form, Fields]),
