@@ -14,7 +14,9 @@
 
 class Network < ActiveRecord::Base
 
-  ADMIN_NET = "admin"
+  ADMIN_NET      = "admin"
+  V6AUTO         = "auto"
+  DEFAULTCONDUIT = '1g1'
 
   validate        :check_network_sanity
   after_commit    :add_role, on: :create
@@ -91,12 +93,12 @@ class Network < ActiveRecord::Base
   # for auto, we add an IPv6 prefix
   def auto_prefix
     # Add our IPv6 prefix.
-    if (name == ADMIN_NET and v6prefix.nil?) || (v6prefix == "auto")
+    if (name == ADMIN_NET and v6prefix.nil?) || (v6prefix == V6AUTO)
       Role.logger.info("Network: Creating automatic IPv6 prefix for #{name}")
       user = User.admin.first
       # this config code really needs to move to Crowbar base
       cluster_prefix = user.settings(:network).v6prefix[name]
-      if cluster_prefix.nil? or cluster_prefix.eql? "auto"
+      if cluster_prefix.nil? or cluster_prefix.eql? V6AUTO
         cluster_prefix = Network.make_global_v6prefix
         user.settings(:network).v6prefix[name] = cluster_prefix
       end

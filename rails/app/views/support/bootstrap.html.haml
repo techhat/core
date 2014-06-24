@@ -32,10 +32,10 @@
               = link_to 'system', deployments_path(:id=>'system')
               = hidden_field_tag :deployment, 'system'
             %td= text_field_tag :vlan, "-1", :size=>4
-            %td= text_field_tag :v6prefix, "auto", :size=>4
+            %td= text_field_tag :v6prefix, Network::V6AUTO, :size=>4
             %td= text_field_tag :bridge, "-1", :size=>4
             %td= text_field_tag :team_mode, "-1", :size=>4
-            %td= text_field_tag :conduit, "10g1", :size=>4
+            %td= text_field_tag :conduit, Network::DEFAULTCONDUIT, :size=>4
             %td
               = '192.168.124.0/24'
               = hidden_field_tag :ranges, '"ranges":[{"name": "admin","first": "192.168.124.10/22","last": "192.168.124.11/22"}, {"name": "host", "first": "192.168.124.81/22","last": "192.168.127.254/22"},{"name": "dhcp","first": "192.168.124.21/22","last": "192.168.124.80/22"}]'
