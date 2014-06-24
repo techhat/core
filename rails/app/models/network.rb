@@ -15,7 +15,7 @@
 class Network < ActiveRecord::Base
 
   ADMIN_NET      = "admin"
-  V6AUTO         = "auto"
+  V6AUTO         = "auto"   # if this changes, update the :v6prefix validator too!
   DEFAULTCONDUIT = '1g1'
 
   validate        :check_network_sanity

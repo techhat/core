@@ -344,6 +344,7 @@ delete(URI)  ->
   bdd_utils:log(trace, eurl, delete, "Result ~p", [Result]),
   Result.
 
+% refactor - this uses old post and returns!
 form_submit(_Config, Form) -> bdd_utils:depricate({2014, 8, 1}, eurl, form_submit, eurl, form_submit, [Form]).
 form_submit(Form) ->
   {fields, FormFields} = lists:keyfind(fields, 1, Form),

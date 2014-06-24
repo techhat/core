@@ -86,14 +86,17 @@ step(Given, {step_when, _N, ["I click on the", Menu, "menu item"]}) ->
   URL = eurl:find_link(Menu, Block),
   click_link(URL, Menu);
 
+step(_Given, {step_given, {_Scenario, _N}, ["I post", Fields, "to", URL]}) ->
+  eurl:put_post(URL, json:output(Fields), post);
+
 step(Given, {step_given, _N, ["I fill in", Fields, "and submit using the",ButtonText,"button"]}) ->
   % assume a single form element
   Form = eurl:find_form(Given, ButtonText),
-  bdd_utils:log(trace, "bdd_webrat:step When I fill in is Given ~p using ~p",[Form, Fields]),
+  bdd_utils:log(debug, "bdd_webrat:step When I fill in is Given ~p using ~p",[Form, Fields]),
   {fields, FormFields} = lists:keyfind(fields, 1, Form),
   SubmitFields = {fields, [eurl:form_fields_merge(F, Fields) || F <- FormFields]},
   NewForm = lists:keyreplace(fields, 1, Form, SubmitFields),
-  bdd_utils:log(trace, "bdd_webrat:step When I fill in submitting ~p",[NewForm]),
+  bdd_utils:log(debug, "bdd_webrat:step When I fill in submitting ~p",[NewForm]),
   eurl:form_submit(NewForm);
   
 step(Result, {step_then, _N, ["I should not see", Text]}) -> 
@@ -101,7 +104,7 @@ step(Result, {step_then, _N, ["I should not see", Text]}) ->
 	eurl:search(Text,Result, false);
 
 step(Result, {step_then, {_Scenario, _N}, ["I should not see", Text, "in section", Id]}) -> 
-	bdd_utils:log(trace, "step_then result ~p should NOT have ~p on the page", [Result, Text]),
+	bdd_utils:log(debug, "step_then result ~p should NOT have ~p on the page", [Result, Text]),
   step(Result, {step_then, {_Scenario, _N}, ["I should see", Text, "in section", Id]}) =:= false;
 
 step(Result, {step_then, {_Scenario, _N}, ["I should see an input box with",Input]}) ->
