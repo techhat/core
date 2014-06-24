@@ -62,7 +62,7 @@
     - @node.node_roles.each do |nr|
       = link_to nr.role.name, node_roles_path(nr.id) if nr.role.noop?
     - aroles = @deployment.available_roles
-    - if current_user and current_user.settings(:ui).noop_roles
+    - if current_user and current_user.settings(:ui).milestone_roles
       - aroles.keep_if {| r | r.noop? } 
     - if aroles.length > 0 
       = form_for :node_roles, :'data-remote' => true, :url => node_roles_path(:node_id=>@node.id, :deployment=>@deployment.id, :version=>'v2'), :html => { :method=>:post, :'data-type' => 'json',  :class => "formtastic" } do |f|

@@ -125,6 +125,7 @@ class Network < ActiveRecord::Base
                                         :description => I18n.t('automatic_by', :name=>name),
                                         :library => false,
                                         :implicit => true,
+                                        :milestone => true,    # may need more logic later, this is safest for first pass
                                         :bootstrap => (self.name.eql? ADMIN_NET),
                                         :discovery => (self.name.eql? ADMIN_NET)  )
         RoleRequire.create!(:role_id => r.id, :requires => "network-server")

@@ -32,6 +32,7 @@ roles:
     jig: test
     flags:
       - implicit
+      - milestone
     requires:
       - test-server
       - test-library

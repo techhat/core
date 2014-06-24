@@ -159,6 +159,7 @@ class Barclamp < ActiveRecord::Base
                              :template=>template,
                              :provides=>role_provides,
                              :conflicts=>role_conflicts,
+                             :milestone=>flags.include?('milestone'),
                              :library=>flags.include?('library'),
                              :implicit=>flags.include?('implicit'),
                              :bootstrap=>flags.include?('bootstrap'),

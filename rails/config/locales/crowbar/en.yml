@@ -465,7 +465,7 @@ en:
       fast_refresh: 'Fast Reload'
       millis: 'milliseconds'
       debug: 'Debug Hints'
-      noop_roles: 'System Roles Only'
+      milestone_roles: 'System Roles Only'
       expand: 'Expand Error'
       doc_sources: 'Doc Source'
       edge: "Edge UI"

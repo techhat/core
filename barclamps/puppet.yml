@@ -26,4 +26,5 @@ roles:
   - name: puppet-sa
     jig: noop
     requires:
+      - milestone
       - puppet-test
