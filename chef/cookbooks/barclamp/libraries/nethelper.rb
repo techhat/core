@@ -21,9 +21,10 @@ class Chef
     def all_addresses(type=::IP)
       addresses(nil,type,nil)
     end
-    def address(net="admin",type=::IP,range=nil)
-      self.addresses(net,type,range).first ||
-        (::IP.coerce("#{self[:crowbar][:network][net][:address]}/#{self[:crowbar][:network][net][:netmask]}") rescue nil) ||
+    def address(net="admin",type=::IP,range=nil,exact=false)
+      res = self.addresses(net,type,range).first
+      return res if res || exact
+      (::IP.coerce("#{self[:crowbar][:network][net][:address]}/#{self[:crowbar][:network][net][:netmask]}") rescue nil) ||
         ::IP.coerce(self[:ipaddress])
     end
     def interfaces(net="admin",range=nil)
