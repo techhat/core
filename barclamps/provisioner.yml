@@ -120,6 +120,7 @@ roles:
           required: true
           enum:
             - ubuntu-12.04
+            - ubuntu-14.04
             - redhat-6.5
             - centos-6.5
             - fedora-20
