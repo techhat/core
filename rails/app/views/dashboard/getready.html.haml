@@ -1,0 +1,42 @@
+- admin = Node.admin.where(:available => true).first
+- available_os = Attrib.get("provisioner-available-oses", admin).map{ |k,v| k } rescue []
+%h1
+  =t '.title'
+
+= form_for :dashboard, :'data-remote' => true, :url => '/dashboard/getready', :html => { :method=>:post, :'data-type' => 'json',  :id => 'getready', :class => "formtastic" } do |f|
+
+  %dl
+    = dl_item t('.deployment'), text_field_tag(:deployment, t('.default'), :size => 15)
+    = dl_item t('.conduit'), text_field_tag(:conduit, Network::DEFAULTCONDUIT, :size => 15)
+    = dl_item t('.range'), text_field_tag(:range, t('.range_base'), :size => 15)
+    = dl_item t('.first_ip'), text_field_tag(:first_ip, "10.10.10.10/24", :size => 15)
+    = dl_item t('.last_ip'), text_field_tag(:last_ip, "10.10.10.250/24", :size => 15)
+
+  %table.data.box
+    %thead
+      %tr
+        %th{:width=>'5%'}
+        %th= t('.state')
+        %th= t('.name')
+        %th= t('.os')
+    %tbody
+      - if @nodes and @nodes.count > 0
+        - @nodes.sort_by{|n| n.name }.each do |node|
+          %tr.node{ :class => cycle(:odd, :even, :name => "nodes"), :id => node.id }
+            %td= check_box_tag "node_#{node.id}", "include", !node.is_admin?
+            %td.status
+              .led{:class => node.status, :title=>t(node.status, :scope=>'status', :default=>node.status)} 
+            %td= link_to node.name, node_path(node.id), :title=>node.description
+            %td
+              - if available_os.count > 0
+                = f.select :os, available_os, :selected=>available_os[0]
+              - else
+                = t 'no_items'
+      - else
+        %tr
+          %td{ :colspan=>4 }
+            = t 'no_items'
+
+  %input.button{:type => "submit", :name => "create", :method=>:post, :value => t('.create')}
+
+.clear

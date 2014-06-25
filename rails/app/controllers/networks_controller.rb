@@ -42,7 +42,7 @@ class NetworksController < ::ApplicationController
     params[:use_bridge] = true
     params[:deployment_id] = Deployment.find_key(params[:deployment]).id if params.has_key? :deployment
     params[:deployment_id] ||= 1
-    params[:v6prefix] ||= "auto"
+    params[:v6prefix] ||= Network::V6AUTO
     params.require(:name)
     params.require(:conduit)
     params.require(:deployment_id)

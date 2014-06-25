@@ -61,6 +61,8 @@ Crowbar::Application.routes.draw do
   scope 'dashboard' do
     get 'list(/:deployment)'  => 'dashboard#list', :as => :bulk_edit
     put 'list'                => 'dashboard#list', :as => :bulk_update
+    get 'getready'            => 'dashboard#getready', :as => :getready
+    post 'getready'           => 'dashboard#getready', :as => :post_getready
     get 'layercake'           => 'dashboard#layercake', :as => :layercake
   end
   
