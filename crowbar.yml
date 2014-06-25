@@ -391,6 +391,7 @@ rpms:
       - gecode
       - gecode-devel
       - iproute
+      - squid
     pkgs:
       # openldap stuff
       - openldap
