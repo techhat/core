@@ -198,6 +198,11 @@ class Node < ActiveRecord::Base
     dres.deep_merge(res)
   end
 
+  def power
+    @power = Power.new(self) unless @power
+    @power
+  end
+
   def method_missing(m,*args,&block)
     method = m.to_s
     if method.starts_with? "attrib_"
@@ -248,11 +253,6 @@ class Node < ActiveRecord::Base
     end
   end
 
-  def reboot
-    update!(alive: false)
-    ssh("reboot")
-  end
-  
   def debug
     Node.transaction do
       reload

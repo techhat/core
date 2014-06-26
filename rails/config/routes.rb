@@ -169,7 +169,7 @@ Crowbar::Application.routes.draw do
             resources :node_roles
             resources :attribs
             resources :roles
-            put :reboot
+            put :power
             put :debug
             put :undebug
             put :redeploy
