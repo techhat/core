@@ -13,7 +13,7 @@
 % limitations under the License. 
 % 
 -module(eurl).
--export([post/3, put/3, delete/1, delete/2, post_params/1, post/5, put_post/3, put_post/4, put_post/5, uri/1, path/1, path/2]).
+-export([post/2, post/3, put/2, put/3, delete/1, delete/2, post_params/1, post/5, put_post/3, put_post/4, put_post/5, uri/1, path/1, path/2]).
 -export([get_http/1, get_result/1, get_result/2, get_result/3, get/1, get/2, get/3, get_page/3, peek/2, search/2, search/3]).
 -export([find_button/2, find_link/2, find_block/4, find_block/5, find_form/2, find_div/2, html_body/1, html_head/1, find_heading/2]).
 -export([form_submit/2, form_submit/1, form_fields_merge/2]).
@@ -322,8 +322,11 @@ post(Config, URL, Parameters, ReturnCode, StateRegEx) ->
 	end. 
 
 % Post using JSON to convey the values
-post(_Config, Path, JSON)    -> put_post(Path, JSON, post).
-put(_Config, Path, JSON)     -> put_post(Path, JSON, put).
+post(Path, JSON)             -> put_post(Path, JSON, post).
+put(Path, JSON)              -> put_post(Path, JSON, put).
+% DEPRICATE
+post(_Config, Path, JSON)    -> bdd_utils:depricate({2014, 10, 1}, eurl, post, eurl, post, [Path, JSON]).
+put(_Config, Path, JSON)     -> bdd_utils:depricate({2014, 10, 1}, eurl, put, eurl, put, [Path, JSON]).
   
 % DEPRICATE Put using JSON to convey the values
 put_post(_Config, Path, JSON, Action)               -> R = put_post(Path, JSON, Action), {R#http.code, R#http.data}.
