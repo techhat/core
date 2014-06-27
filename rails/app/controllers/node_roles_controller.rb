@@ -103,7 +103,7 @@ class NodeRolesController < ApplicationController
     @node_role = NodeRole.find_key params[:id]
     @node_role.todo!
     respond_to do |format|
-      format.html { render :action => :show }
+      format.html { redirect_to node_role_path(@node_role.id) }
       format.json { render api_show @node_role }
     end
 
