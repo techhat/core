@@ -79,6 +79,7 @@ device-mapper-multipath
 emacs-nox
 openssh
 createrepo
+tcpdump
 
 %post --nochroot
 export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
