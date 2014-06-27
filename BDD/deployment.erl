@@ -62,14 +62,7 @@ inspector(Deployment) ->
 json(Name, Description, Order) ->
   crowbar:json([{name, Name}, {description, Description}, {order, Order}]).
 
-
-step(_, {step_when, {_S, _N}, ["I propose a",deployment,Deployment,"on the",barclamp,Barclamp]}) ->
-  Path = eurl:path(["api","v2","barclamps",Barclamp,"deployments"]),
-  JSON = json(Deployment, g(description), g(order)),
-  PutPostResult = eurl:put_post([], Path, JSON, post, all),
-  {Code, Result} = PutPostResult,
-  bdd_utils:log(debug, deployment, step, "deploy from barclamp ~p named ~p got ~p", [Path, JSON, Code]),
-  bdd_restrat:ajax_return(Path, post, Code, Result);
+% steps
 
 step(_Global, {step_setup, _N, _}) -> 
   % create DEPLOYMENTS(s) for tests
