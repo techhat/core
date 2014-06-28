@@ -28,6 +28,7 @@ class Barclamp < ActiveRecord::Base
   has_many          :roles,     :dependent => :destroy
   belongs_to        :barclamp,  :dependent => :destroy
   alias_attribute   :parent,    :barclamp
+  serialize         :cfg_data
 
   scope :roots,     where(["barclamp_id = id"])
 
@@ -41,7 +42,6 @@ class Barclamp < ActiveRecord::Base
 
   def self.import(bc_name="core", bc=nil, source_path=nil, parent_id=nil)
     Barclamp.transaction do
-      barclamp = Barclamp.find_or_create_by!(name: bc_name)
       source_path ||= File.expand_path(File.join(Rails.root, '..'))
       bc_file = File.expand_path(File.join(source_path, bc_name)) + '.yml'
 
@@ -50,6 +50,7 @@ class Barclamp < ActiveRecord::Base
         raise "Barclamp metadata #{bc_file} for #{bc_name} not found" unless File.exists?(bc_file)
         bc = YAML.load_file bc_file
       end
+      barclamp = Barclamp.find_by(name: bc_name) || Barclamp.create!(name: bc_name, cfg_data: bc)
       bc_namespace = "Barclamp#{bc_name.camelize}"
 
       Rails.logger.info "Importing Barclamp #{bc_name} from #{source_path}"
@@ -66,7 +67,8 @@ class Barclamp < ActiveRecord::Base
                                   :source_url  => source_url,
                                   :build_on    => gitdate,
                                   :barclamp_id => parent_id || barclamp.id,
-                                  :commit      => gitcommit)
+                                  :commit      => gitcommit,
+                                  :cfg_data    => bc)
 
       # load the jig information.
       bc['jigs'].each do |jig|
@@ -109,15 +111,6 @@ class Barclamp < ActiveRecord::Base
       # load the barclamps submodules information.
       bc['barclamps'].each do |sub_details|
         name = sub_details['name']
-        subm = Barclamp.find_or_create_by!(name: name)
-        # barclamp data import
-        subm.update_attributes!(:description => sub_details['description'] || name.humanize,
-                                :version     => version,
-                                :source_path => source_path,
-                                :source_url  => source_url,
-                                :build_on    => gitdate,
-                                :barclamp_id => parent_id || barclamp.id,
-                                :commit      => gitcommit)
         subm_file = File.join(source_path,"barclamps","#{name}.yml")
         next unless File.exists?(subm_file)
         Barclamp.import name, YAML.load_file(subm_file), source_path, barclamp.id

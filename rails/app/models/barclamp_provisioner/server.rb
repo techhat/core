@@ -38,7 +38,7 @@ class BarclampProvisioner::Server < Role
         }
       }
     }
-    
+
   end
 
 end

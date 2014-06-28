@@ -171,9 +171,7 @@ EOC
   # If we are running in online mode, we need to do a few extra tasks.
   if node["crowbar"]["provisioner"]["server"]["online"]
     # This information needs to be saved much earlier.
-    Dir.glob("/opt/opencrowbar/*/crowbar.yml").each do |yml_file|
-      bc = YAML.load_file(yml_file)
-
+     node["crowbar"]["provisioner"]["barclamps"].each do |bc|
       # Grab any extra_files that we may need.
       bc["extra_files"].each do |f|
         src, dest = f.strip.split(" ",2)
