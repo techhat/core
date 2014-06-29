@@ -132,6 +132,8 @@ repository:
 
     tools/docker-admin centos ./production.sh admin.smoke.test
 
+> note: the crowbar-bootstrap step takes a while, be patient
+
 This will perform the following actions:
 
   * If needed, pull the latest opencrowbar/centos image from the public
