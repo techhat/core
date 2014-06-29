@@ -28,6 +28,98 @@ net_re = /\/pci(.+)\/net\/(.+)$/
 net_sysfs = "/sys/class/net"
 raise "This recipe only works on Linux" unless File.directory?(net_sysfs)
 
+chef_gem "cstruct"
+require "socket"
+require "cstruct"
+
+
+# From: "/usr/include/linux/sockios.h"
+SIOCETHTOOL = 0x8946
+
+# From: "/usr/include/linux/ethtool.h"
+ETHTOOL_GSET = 1
+ETHTOOL_GLINK = 10
+
+# From: "/usr/include/linux/ethtool.h"
+class EthtoolCmd < CStruct
+  uint32 :cmd
+  uint32 :supported
+  uint32 :advertising
+  uint16 :speed
+  uint8  :duplex
+  uint8  :port
+  uint8  :phy_address
+  uint8  :transceiver
+  uint8  :autoneg
+  uint8  :mdio_support
+  uint32 :maxtxpkt
+  uint32 :maxrxpkt
+  uint16 :speed_hi
+  uint8  :eth_tp_mdix
+  uint8  :reserved2
+  uint32 :lp_advertising
+  uint32 :reserved_a0
+  uint32 :reserved_a1
+end
+
+SPEEDS = Array.new
+# Bitfield for ETHTOOL_GSET results, by powers of 2 (just the speeds)
+SPEEDS[0] = [10,   "10m"]   # 0:  10   baseT, half duplex
+SPEEDS[1] = [10,   "10m"]   # 1:  10   baseT, full duplex
+SPEEDS[2] = [100,  "100m"]  # 2:  100  baseT, half duplex
+SPEEDS[3] = [100,  "100m"]  # 3:  100  baseT, full duplex
+SPEEDS[4] = [1000, "1g"]    # 4:  1000 baseT, half duplex
+SPEEDS[5] = [1000, "1g"]    # 5:  1000 baseT, full duplex
+                            # 6:  Autonegotiate enabled
+                            # 7:  TP connection
+                            # 8:  AUI connection
+                            # 9:  MII connection
+                            # 10: Fibre connection
+                            # 11: BNC connection
+SPEEDS[12] = [10000,"10g"]  # 12: 10000 baseT, full duplex
+                            # 13: Pause support
+                            # 14: Asym Pause support
+SPEEDS[15] = [2500,  "2g"]  # 15: 2500 baseX, full duplex
+                            # 16: Backplane
+SPEEDS[17] = [1000,  "1g"]  # 17: 1000 baseKX, full duplex
+SPEEDS[18] = [10000,"10g"]  # 18: 10000 baseKX4, full duplex
+SPEEDS[19] = [10000,"10g"]  # 19: 10000 baseKR, full duplex
+SPEEDS[20] = [10000,"10g"]  # 20: 10000 baseR, FEC
+SPEEDS[21] = [20000,"20g"]  # 21: 20000 baseMLD2, full duplex
+SPEEDS[22] = [20000,"20g"]  # 22: 20000 baseKR2, full duplex
+SPEEDS[23] = [40000,"40g"]  # 23: 40000 baseKR4, full duplex
+SPEEDS[24] = [40000,"40g"]  # 24: 40000 baseCR4, full duplex
+SPEEDS[25] = [40000,"40g"]  # 25: 40000 baseSR4, full duplex
+SPEEDS[26] = [40000,"40g"]  # 26: 40000 baseLR4, full duplex
+
+class EthtoolValue < CStruct
+  uint32 :cmd
+  uint32 :value
+end
+
+def nic_speeds(nic)
+  begin
+    ecmd = EthtoolCmd.new
+    ecmd.cmd = ETHTOOL_GSET
+    ifreq = [nic, ecmd.data].pack("a16p")
+    sock = Socket.new(Socket::AF_INET, Socket::SOCK_DGRAM, 0)
+    sock.ioctl(SIOCETHTOOL, ifreq)
+
+    rv = ecmd.class.new
+    rv.data = ifreq.unpack("a16p")[1]
+
+    res = []
+    SPEEDS.each_index do |i|
+      next unless SPEEDS[i] && ((rv.supported & (1 << i)) != 0)
+      res << SPEEDS[i]
+    end
+    res.sort.uniq.reverse.map{|i|i[1]}
+  rescue Exception => e
+    Chef::Log.error("Failed to get ioctl for speed: #{e.message}")
+    [ "1g", "0g" ]
+  end
+end
+
 # Get all of the network devices that are real physical devices.
 #  We consider a real physical device to be anything that lives on a PCI bus.
 nics = Hash[]
@@ -160,8 +252,8 @@ def resolve_conduit(conduit)
   # offsets.
   wanted_speeds.each do |speed|
     candidates = known_ifs.select do |i|
-      # Fastest speed is at the end, and that is all we care about comparing right now.
-      node.automatic_attrs["crowbar_ohai"]["detected"]["network"][i]["speeds"][-1] == speed
+      # Fastest speed is at the beginning, and that is all we care about comparing right now.
+     nic_speeds(i).first == speed
     end
     res = finders.map{|f|candidates[f[3].to_i]}.compact
     if res.length == finders.length
@@ -198,6 +290,7 @@ node["crowbar"]["network"]["addresses"].keys.sort{|a,b|
     ifs[i.name] ||= Hash.new
     ifs[i.name]["addresses"] ||= Array.new
     ifs[i.name]["type"] = "physical"
+    ifs[i.name]["speeds"] = nic_speeds(i.name)
   end
   case base_ifs.length
   when 1

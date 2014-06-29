@@ -162,6 +162,10 @@ class ::Nic
     sysfs("carrier") == "1"
   end
 
+  def iftype
+    sysfs("type").to_i
+  end
+
   # Get the mac address of a nic.
   def mac
     sysfs("address") rescue "00:00:00:00:00:00"

@@ -13,14 +13,6 @@
 # limitations under the License.
 #
 
-
-chef_gem "cstruct" do
-  action :install
-  version "1.0.1"
-  options "--http-proxy #{ENV["http_proxy"]}" if ENV["http_proxy"]
-  not_if "gem search --local cstruct |grep -q cstruct"
-end
-
 class Chef::Recipe
   include ::BarclampLibrary
 end
