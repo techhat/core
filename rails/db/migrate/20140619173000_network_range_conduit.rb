@@ -1,4 +1,4 @@
-# Copyright 2011, Dell
+# Copyright 2014, Victor Lowther
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,9 +13,17 @@
 # limitations under the License.
 #
 
-actions :run
+class NetworkRangeConduit < ActiveRecord::Migration
 
-attribute :name, :kind_of => String, :name_attribute => true
-attribute :password, :kind_of => String
-attribute :settle_time, :kind_of => Integer, :default => 1
+  def change
+    change_table :network_ranges do |t|
+      t.string       :conduit,    null: true
+      t.integer      :vlan,       null: true, default: 0
+      t.boolean      :use_vlan,   null: true, default: false
+      t.boolean      :use_bridge, null: true, default: false
+      t.integer      :team_mode,  null: true, default: 5
+      t.boolean      :use_team,   null: true, default: false
+    end
+  end
 
+end

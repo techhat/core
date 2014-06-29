@@ -63,8 +63,17 @@ class NodesController < ApplicationController
     render api_delete @node
   end
 
-  def reboot
-    node_action :reboot
+  def power
+    params.require(:poweraction)
+    @node = Node.find_key(params[:id] || params[:name] || params[:node_id])
+    @poweraction = params[:poweraction].to_sym
+    render :json => {
+      "id" => @node.id,
+      "action" => params[:poweraction],
+      "result" => @node.power.send(@poweraction)
+    },
+    :status => 200,
+    :content_type => cb_content_type(:json,"result")
   end
 
   def debug

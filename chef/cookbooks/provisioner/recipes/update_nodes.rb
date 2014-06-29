@@ -90,6 +90,14 @@ new_clients = {}
       target mnode_name
       action :add
     end
+  when "ubuntu-14.04-install"
+    provisioner_debian mnode_name do
+      distro "ubuntu"
+      version "14.04"
+      address v4addr
+      target mnode_name
+      action :add
+    end
   when "centos-6.5-install"
     provisioner_redhat mnode_name do
       distro "centos"

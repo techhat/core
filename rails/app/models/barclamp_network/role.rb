@@ -37,11 +37,25 @@ class BarclampNetwork::Role < Role
   end
 
   def sysdata(nr)
-    our_addrs = network.node_allocations(nr.node).map{|a|a.to_s}
-    res = {"crowbar" => {
-        "network" => {
+    addrs = {}
+    nr.node.network_allocations.where(network_id: network.id).each do |addr|
+      
+      addrs[addr.address.to_s] = { "network" => addr.network.name,
+        "range" => addr.range.name,
+        "conduit" => addr.range.conduit.split(',').map{|a|a.strip}.sort.join(','),
+        "vlan" => addr.range.vlan,
+        "team_mode" => addr.range.team_mode,
+        "use_vlan" => !!addr.range.use_vlan,
+        "use_team" => !!addr.range.use_team,
+        "use_bridge" => !!addr.range.use_bridge
+      }
+    end
+
+    res = { "crowbar" =>
+      { "network" =>
+        { "addresses" => addrs,
           network.name => {
-            "addresses" => our_addrs
+            "addresses" => addrs.keys.sort
           }
         }
       }

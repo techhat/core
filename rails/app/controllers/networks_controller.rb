@@ -66,7 +66,15 @@ class NetworksController < ::ApplicationController
           range_params.require(:network_id)
           range_params.require(:first)
           range_params.require(:last)
-          NetworkRange.create! range_params.permit(:name,:network_id,:first,:last)
+          NetworkRange.create! range_params.permit(:name,
+                                                   :network_id,
+                                                   :first,
+                                                   :last,
+                                                   :conduit,
+                                                   :vlan,
+                                                   :use_vlan,
+                                                   :use_bridge,
+                                                   :use_team)
         end
         params.delete :ranges
       end

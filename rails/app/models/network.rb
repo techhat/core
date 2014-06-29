@@ -35,6 +35,13 @@ class Network < ActiveRecord::Base
 
   belongs_to :deployment
 
+  def self.address(params)
+    raise "Must pass a hash of args" unless params.kind_of?(Hash)
+    network = Network.find_by!(name: params[:network])
+    range = network.ranges.find_by!(name: params[:range])
+    range.network_allocations.where(node_id: params[:node]).first
+  end
+
   def self.make_global_v6prefix
     prefix_array = []
     raw_prefix_array = (["fc".hex] + IO.read("/dev/random",5).unpack("C5"))
@@ -44,6 +51,64 @@ class Network < ActiveRecord::Base
       prefix_array << a
     end
     prefix_array.reverse.map{|a|sprintf('%04x',a)}.join(':')
+  end
+
+  def self.check_conduit_sanity(a,b)
+    hash_a = {}
+    hash_b = {}
+    a.split(',').each do |e|
+      hash_a[e.strip] = true
+    end
+    b.split(',').each do |e|
+      hash_b[e.strip] = true
+    end
+    # Conduits are allowed to overlap perfectly or not at all.
+    return hash_a == hash_b || (hash_a.keys & hash_b.keys).empty?
+  end
+
+  def self.check_sanity(n)
+    res = []
+    # First, check the conduit to be sure it is sane.
+    intf_re =  /^bmc|([-+?]?)(\d{1,3}[mg])(\d+)$/
+    if n.conduit.nil? || n.conduit.empty?
+      res << "Conduit definition cannot be empty"
+    end
+    intfs = n.conduit.split(",").map{|intf|intf.strip}
+    ok_intfs, failed_intfs = intfs.partition{|intf|intf_re.match(intf)}
+    unless failed_intfs.empty?
+      res << "Invalid abstract interface names in conduit: #{failed_intfs.join(", ")}"
+    end
+    if intfs.length > 1
+      matches = intfs.map{|intf|intf_re.match(intf)}
+      tmpl = matches[0]
+      if ! matches.all?{|i|(i[1] == tmpl[1]) && (i[2] == tmpl[2])}
+        res << "Not all abstract interface names have the same speed and flags: #{n.conduit}"
+      end
+    end
+
+    # Check to see that requested VLAN information makes sense.
+    if n.use_vlan && !(1..4095).member?(n.vlan)
+      res << "VLAN #{n.vlan} not sane"
+    end
+
+    # Check to see if our requested teaming makes sense.
+    if n.use_team
+      if intfs.length < 2
+        res << "Want bonding, but requested conduit #{n.conduit} has one member"
+      elsif intfs.length > 8
+        res << "Want bonding, but requested conduit #{n.conduit} has too many members"
+      end
+      res << "Invalid bonding mode" unless (0..6).member?(n.team_mode)
+    elsif intfs.length != 1
+      # Conduit can only contain one abstract interface if we don't want bonding.
+      res << "Do not want bonding, but requested conduit #{n.conduit} has multiple members"
+    end
+
+    # Should be obvious, but...
+    unless n.name && !n.name.empty?
+      res << "No name"
+    end
+    res
   end
 
   def template_cleaner(a)
@@ -130,7 +195,8 @@ class Network < ActiveRecord::Base
                                         :bootstrap => (self.name.eql? ADMIN_NET),
                                         :discovery => (self.name.eql? ADMIN_NET)  )
         RoleRequire.create!(:role_id => r.id, :requires => "network-server")
-        RoleRequire.create!(:role_id => r.id, :requires => "crowbar-installed-node") unless name.eql? ADMIN_NET
+        # The admin net must be bound before any other network can be bound.
+        RoleRequire.create!(:role_id => r.id, :requires => "network-admin") unless name.eql? ADMIN_NET
         # attributes for jig configuraiton
         Attrib.create!(:role_id => r.id,
                          :barclamp_id => bc.id,
@@ -211,69 +277,22 @@ class Network < ActiveRecord::Base
 
   def check_network_sanity
 
-    # First, check the conduit to be sure it is sane.
-    intf_re =  /^([-+?]?)(\d{1,3}[mg])(\d+)$/
-    if conduit.nil? || conduit.empty?
-      errors.add("Network #{name}: Conduit definition cannot be empty")
-    end
-    intfs = conduit.split(",").map{|intf|intf.strip}
-    ok_intfs, failed_intfs = intfs.partition{|intf|intf_re.match(intf)}
-    unless failed_intfs.empty?
-      errors.add("Network #{name}: Invalid abstract interface names in conduit: #{failed_intfs.join(", ")}")
-    end
-    matches = intfs.map{|intf|intf_re.match(intf)}
-    tmpl = matches[0]
-    if ! matches.all?{|i|(i[1] == tmpl[1]) && (i[2] == tmpl[2])}
-      errors.add("Network #{name}: Not all abstract interface names have the same speed and flags: #{conduit}")
+    Network.check_sanity(self).each do |err|
+      errors.add("Network #{name}: #{err}")
     end
 
-    # Conduit is sane, check to see that it satisfies the overlap constraints for interacting
-    # with other networks.
-    # Either all the interfaces in a conduit must overlap perfectly, or none of them can.
-    ifhash = Hash.new
-    intfs.each{ |i| ifhash[i] = true }
-
+    # Check to see that this network's conduits either overlap perfectly or not at all
+    # with conduits on other networks.  Ranges are not considered here.'
     Network.all.each do |net|
-      # A conduit definition can overlap with another conduit definition either perfectly or not at all.
-      nethash = Hash.new
-      net.conduit.split(",").map{|i|i.strip}.each do |i|
-        nethash[i] = true
-      end
-      next if nethash == ifhash
-      nethash.keys.each do |k|
-        next unless ifhash[k]
-        errors.add("Network #{name}: Conduit mapping overlaps with #{net.name} at abstract interface #{k}}")
+      unless Network.check_conduit_sanity(conduit,net.conduit)
+        errors.add("Network #{name}: Conduit mapping overlaps with network #{net.name}")
       end
     end
 
-    # Check to see that requested VLAN information makes sense.
-    if use_vlan && !(1..4095).member?(vlan)
-      errors.add("Network #{name}: VLAN #{vlan} not sane")
-    end
-
-    # Check to see if our requested teaming makes sense.
-    if use_team
-      if intfs.length < 2
-        errors.add("Network #{name}: Want bonding, but requested conduit #{conduit} has one member")
-      elsif intfs.length > 8
-        errors.add("Network #{name}: Want bonding, but requested conduit #{conduit} has too many members")
-      end
-      errors.add("Network #{name}: Invalid bonding mode") unless (0..6).member?(team_mode)
-    else
-      # Conduit can only contain one abstract interface if we don't want bonding.
-      unless intfs.length == 1
-        errors.add("Network #{name}: Do not want bonding, but requested conduit #{conduit} has multiple members")
-      end
-    end
-
-    # Should be obvious, but...
-    unless name && !name.empty?
-      errors.add("Cannot create a network without a name")
-    end
 
     # We also must have a deployment
     unless deployment
-      errors.add("Cannot create a network without binding it to a deployment")
+      errors.add("Network #{name}: Cannot create a network without binding it to a deployment")
     end
 
   end

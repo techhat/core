@@ -32,7 +32,7 @@ module ApiHelper
       col,key = case
                 when db_id?(key) then [:id, key.to_i]
                 when key.is_a?(ActiveRecord::Base) then [:id, key.id]
-                when self.respond_to?(:name_column) then [name_column, :key]
+                when self.respond_to?(:name_column) then [name_column, key]
                 else [:name, key]
                 end
       begin

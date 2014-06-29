@@ -6,7 +6,7 @@ Welcome to the OpenCrowbar Project - the gateway to a new hardware provisioning 
 
 Documentation close by and located in under the **/doc** directory of OpenCrowbar and for each workload module.
 
-Please refer to the [/doc directories](/doc/Index.md) for detailed information.  We attempt to define and maintain one sub-directory for each functional element.  This structure is intended to be common across all workloads in the [OpenCrowbar project](https://github.com/opencrowbar/)
+Please refer to the [/doc directories](/doc/README.md) for detailed information.  We attempt to define and maintain one sub-directory for each functional element.  This structure is intended to be common across all workloads in the [OpenCrowbar project](https://github.com/opencrowbar/)
 
 > Please, do NOT add documentation in locations outside of the  **/doc** directory trees!  If necessary, expand this README to include pointers to important **/doc** information.
 

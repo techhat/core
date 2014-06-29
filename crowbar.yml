@@ -191,6 +191,126 @@ debs:
     - bind9utils
     # ntp
     - ntp
+  ubuntu-14.04:
+    raw_pkgs:
+      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.1.1-1_amd64.deb
+      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef_11.12.8-1_amd64.deb
+    repos:
+      - deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted universe multiverse
+      - deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main restricted universe multiverse
+      - deb http://us.archive.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse
+      - deb-src http://us.archive.ubuntu.com/ubuntu/ trusty-updates main restricted universe multiverse
+      - deb http://archive.canonical.com/ubuntu trusty partner
+      - deb-src http://archive.canonical.com/ubuntu trusty partner
+      - deb http://extras.ubuntu.com/ubuntu trusty main
+      - deb-src http://extras.ubuntu.com/ubuntu trusty main
+      - deb http://security.ubuntu.com/ubuntu trusty-security main restricted universe multiverse
+      - deb-src http://security.ubuntu.com/ubuntu trusty-security main restricted universe multiverse
+      - deb http://apt.postgresql.org/pub/repos/apt/ trusty-pgdg main
+      - deb http://get.docker.io/ubuntu docker main
+    pkgs:
+      - rpcbind
+  #repos:
+    # Rabbit MQ repo
+    #- deb http://www.rabbitmq.com/debian/ testing main
+  required_pkgs:
+    - build-essential
+    - curl
+    - kwalify
+    - libpq-dev
+    - libxml2-dev
+    - libxslt1-dev
+    - postgresql-9.3
+    - postgresql-client-9.3
+    - postgresql-contrib-9.3
+    - ruby1.9.1
+    - ruby1.9.1-dev
+    - sudo
+    - vim
+    - zlib1g-dev
+    # openssh stuff
+    - openssh-client
+    - openssh-server
+    - less
+    - efibootmgr
+    - iputils-ping
+    # Package mangling stuff
+    - createrepo
+    - dpkg-dev
+    # To let us extract ISO images without loopback mounting them.
+    - bsdtar
+    - git
+  build_pkgs:
+    - bison
+    - flex
+    - make
+  pkgs:
+    # build-essential stuff
+    - build-essential
+    - binutils-doc
+    - autoconf
+    - flex
+    - bison
+    - patch
+    # crowbar stuff
+    - curl
+    - postgresql-9.3
+    - postgresql-client-9.3
+    - postgresql-contrib-9.3
+    - libpq-dev
+    - kwalify
+    - libcurl4-gnutls-dev
+    # minicom stuff
+    - minicom
+    # openldap stuff
+    - libnss-ldap
+    - libpam-ldap
+    - ldap-utils
+    - db4.8-util
+    - slapd
+    # rabbitmq stuff
+    - rabbitmq-server
+    # ruby stuff
+    - ruby1.9.1
+    - ruby1.9.1-dev
+    # runit stuff
+    - runit
+    # sudo stuff
+    #- sudo
+    # java stuff
+    #- sun-java6-jdk
+    #- sun-java6-jre
+    - dpkg-dev
+    - screen
+    - tcpdump
+    - alien
+    - graphviz
+    - vim
+    # for nokogiri
+    - libxslt1.1
+    # docker support (Ubuntu only for now)
+    - linux-image-generic-lts-raring 
+    - linux-headers-generic-lts-raring
+    - lxc-docker
+    # provisioner
+    - dhcp3-server
+    - nfs-common
+    - nfs-kernel-server
+    - ipmitool
+    - syslinux
+    - tftpd-hpa
+    - efibootmgr
+    # apache stuff
+    - apache2
+    - apache2-prefork-dev
+    - libapache2-mod-fcgid
+    - libapache2-mod-wsgi   
+    # dns
+    - bind9
+    - bind9utils
+    # ntp
+    - ntp
+
 rpms:
   redhat-6.5:
     raw_pkgs:
@@ -271,6 +391,7 @@ rpms:
       - gecode
       - gecode-devel
       - iproute
+      - squid
     pkgs:
       # openldap stuff
       - openldap
