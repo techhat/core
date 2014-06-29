@@ -30,7 +30,7 @@
               %td= link_to node.name, node_path(node.id), :title=>node.description
               %td
                 - if available_os.count > 0
-                  = f.select :os, available_os, :selected=>available_os[0]
+                  = f.select "node_#{node.id}_os", available_os, :selected=>available_os[0]
                 - else
                   = t 'no_items'
       - else
