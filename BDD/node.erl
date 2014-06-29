@@ -83,6 +83,12 @@ add_node(Name, Params, Atom) -> add_node(Name, g(role), Params, Atom).
 add_node(Name, Role, Params, Atom) ->
   O = create_node(Name, Params, Atom),
   bind(O#obj.id, Role),
+  % add os choices for admin node
+  case Role of
+    "crowbar-admin-node" -> node_role:available_os(O#obj.id, ["ubuntu-12.04","centos-6.5"]);
+    _ -> noop
+  end,
+  % complete deploy
   commit(O#obj.id),
   alive(O#obj.id),
   O.

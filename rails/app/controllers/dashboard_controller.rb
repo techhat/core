@@ -115,15 +115,18 @@ class DashboardController < ApplicationController
         n = Network.find_or_create_by_name! :name=>params[:deployment], :conduit=>params[:conduit], :deployment=>d, :v6prefix=>Network::V6AUTO
         NetworkRange.create! :name=>params[:range], :network=>n, :first=>params[:first_ip], :last=>params[:last_ip] if n.ranges.count == 0
       end
+      ready = Role.find_key 'crowbar-installed-node'
+      ready.add_to_deployment d
       # TODO add network & range create
       Node.transaction do
         params.each do |node_id, value|
           if node_id =~ /^node_([0-9]*)/
             n = Node.find $1.to_i
             n.deployment = d
-            #n.save!
+            n.save!
             Rails.logger.info "Dashboard GetReady Deployment #{d.name} added node #{n.name}"
-            # TODO add OS assignment
+            # OS assignment
+            ready.add_to_node_in_deployment n, d
           end
         end
       end

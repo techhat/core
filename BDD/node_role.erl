@@ -15,6 +15,7 @@
 % 
 -module(node_role).
 -export([step/2, json/3, validate/1, inspector/0, g/1, bind/2, bind/3]).
+-export([attrib_set/3, available_os/2]).
 -include("bdd.hrl").
 
 % Commont Routine
@@ -65,6 +66,16 @@ bind(Node, Role, Deployment) ->
   Path = bdd_restrat:alias(node_role, g, [path]),
   JSON = json:output([{"node", Node}, {"role", Role}, {"deployment", Deployment}]),
   bdd_crud:create(Path, JSON).
+
+% specialized function
+
+available_os(AdminNode, OS) -> 
+  attrib_set(AdminNode, "provisioner-base-images", json:output([{data,[{crowbar,[{provisioner, [{server, [{available_oses, [{K, true} || K <- OS]}]}]}]}]}])).
+
+attrib_set(Node, Attrib, ValueJSON) ->
+  bdd_utils:log(debug, node_role, attrib_set, "Calling with node ~p attrib ~p set ~p", [Node, Attrib, ValueJSON]),
+  URI = eurl:path([node:g(path), Node, "node_roles", Attrib]),
+  eurl:put(URI, ValueJSON).
 
 % Common Routines
 

@@ -15,6 +15,7 @@
 % 
 -module(deployment).
 -export([step/2, json/3, validate/1, inspector/1, g/1, create/3]).
+-export([attrib_set/3]).
 -include("bdd.hrl").
 
 % Commont Routine
@@ -61,6 +62,12 @@ inspector(Deployment) ->
 % Creates JSON used for POST/PUT requests
 json(Name, Description, Order) ->
   crowbar:json([{name, Name}, {description, Description}, {order, Order}]).
+
+% specialized function
+
+attrib_set(Deployment, Attrib, ValueJSON) ->
+  URI = eurl:path([g(path), Deployment, "attribs", Attrib]),
+  eurl:put(URI, ValueJSON).
 
 % steps
 
