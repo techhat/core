@@ -232,7 +232,7 @@ en:
       deployment: "Deployment"
       default: "pilot"
       range: "Range Name"
-      range_base: "public"
+      range_base: "host"
       first_ip: "First CIDR"
       last_ip:  "Last CIDR"
       conduit: "Net Conduit"
