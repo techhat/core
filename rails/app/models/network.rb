@@ -35,6 +35,13 @@ class Network < ActiveRecord::Base
 
   belongs_to :deployment
 
+  def self.address(params)
+    raise "Must pass a hash of args" unless params.kind_of?(Hash)
+    network = Network.find_by!(name: params[:network])
+    range = network.ranges.find_by!(name: params[:range])
+    range.network_allocations.where(node_id: params[:node]).first
+  end
+
   def self.make_global_v6prefix
     prefix_array = []
     raw_prefix_array = (["fc".hex] + IO.read("/dev/random",5).unpack("C5"))

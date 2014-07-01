@@ -481,11 +481,10 @@ module OpenCrowbar
       @blob["name"]
     end
 
-    def do_reboot(*rest)
-      obj, res = REST.put("#{self.class.path}/#{id}/reboot")
+    def do_power_Val(action,*rest)
+      obj, res = REST.put("#{self.class.path}/#{id}/power?poweraction=#{action}")
       maybe_json_die(obj,res)
-      @blob = obj
-      self
+      obj
     end
 
     def do_debug(*rest)
