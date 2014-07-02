@@ -110,7 +110,7 @@ class DashboardController < ApplicationController
     if request.get?
       @nodes = Deployment.system.nodes
     elsif request.post?
-      d = Deployment.find_or_create_by_name! :name=>params[:deployment], :parent_id=>Deployment.system
+      d = Deployment.find_or_create_by_name! :name=>params[:deployment], :parent=>Deployment.system
       if params[:conduit]
         n = Network.find_or_create_by_name! :name=>params[:deployment], :conduit=>params[:conduit], :deployment=>d, :v6prefix=>Network::V6AUTO
         NetworkRange.create! :name=>params[:range], :network=>n, :first=>params[:first_ip], :last=>params[:last_ip] if n.ranges.count == 0
