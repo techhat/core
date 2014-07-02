@@ -19,6 +19,11 @@
         %th= t('.state')
         %th= t('.name')
         %th= t('.os')
+        %th= t('.disk')
+        %th= t('.mem')
+        %th= t('.nics')
+        %th= t('.proc')
+        %th= t('.asset')
     %tbody
       - if @nodes and @nodes.count > 1
         - @nodes.sort_by{|n| n.name }.each do |node|
@@ -33,9 +38,14 @@
                   = f.select "node_#{node.id}_os", available_os, :selected=>available_os[0]
                 - else
                   = t 'no_items'
+              %td= "#{node.attrib_number_of_drives || 0}, #{t('.raid')}: #{t((node.attrib_raid_set || 'not_set'))}"
+              %td= format_memory(node.attrib_memory)
+              %td= node.attrib_nics.count
+              %td= node.attrib_cpu
+              %td= node.attrib_asset_tag
       - else
         %tr
-          %td{ :colspan=>4 }
+          %td{ :colspan=>9}
             = t 'no_items'
 
   %input.button{:type => "submit", :name => "create", :method=>:post, :value => t('.create')}

@@ -240,6 +240,12 @@ en:
       state: "State"
       os: "Operating System"
       create: "Run Wizard"
+      disk: "Disks"
+      mem: "RAM"
+      proc: "Processor"
+      nics: "NICs"
+      asset: "Asset Tag"
+      raid: "RAID"
   deployments:
     index:
       title: "Deployments"
