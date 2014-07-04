@@ -434,6 +434,9 @@ class NodeRole < ActiveRecord::Base
     NodeRole.transaction do
       update!(state: (activatable? ? TODO : BLOCKED))
     end
+    if !node.alive && node.power.actions.member?(:on)
+      node.power.on
+    end
   end
 
   def run_hooks
