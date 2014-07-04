@@ -40,7 +40,7 @@
                   = t 'no_items'
               %td= "#{node.attrib_number_of_drives || 0}, #{t('.raid')}: #{t((node.attrib_raid_set || 'not_set'))}"
               %td= format_memory(node.attrib_memory)
-              %td= node.attrib_nics.count
+              %td= node.attrib_nics.count rescue 0
               %td= node.attrib_cpu
               %td= node.attrib_asset_tag
       - else
