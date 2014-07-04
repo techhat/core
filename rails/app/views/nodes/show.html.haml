@@ -20,6 +20,34 @@
 
 = render :partial => 'show', :locals => { :node => @node }
 
+%h3= "Power actions"
+%p.buttons
+  - [ :on, :off, :reboot, :reset, :cycle, :identify].select{|m|@node.power.actions.member?(m)}.each do |meth|
+    = link_to "#{meth.to_s}", "/api/v2/nodes/#{@node.id}/power?poweraction=#{meth.to_s}", :method=>:put, :class => 'button', :'data-remote' => true,:'data-confirm' => t('are_you_sure') 
+
+%h3= "Address allocations"
+%table.data.box
+  %thead
+    %tr
+      %th= "Network"
+      %th= "Range"
+      %th= "Address"
+      %th= "Conduit"
+      %th= "VLAN"
+  %tbody
+    - @node.network_allocations.order("id ASC").each do |a|
+      %tr
+        %td
+          = a.network.name
+        %td
+          = a.network_range.name
+        %td
+          = a.address.to_s
+        %td
+          = a.network_range.conduit
+        %td
+          = a.network_range.use_vlan? ? a.network_range.vlan : "None"
+
 %h3= t '.node_roles'
 - node_roles = NodeRole.committed_by_node(@node).order("cohort, id")
 = render :partial=>'node_roles/index', :locals => { :list => node_roles }
