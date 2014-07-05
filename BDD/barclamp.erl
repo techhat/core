@@ -38,7 +38,8 @@ validate(JSON) when is_record(JSON, obj) ->
       bdd_utils:is_a(J, string, source_path), 
       bdd_utils:is_a(J, string, source_url), 
       bdd_utils:is_a(J, dbid, barclamp_id), 
-      bdd_utils:is_a(J, length, 11),
+      bdd_utils:is_a(J, string, cfg_data),
+      bdd_utils:is_a(J, length, 12),
       crowbar_rest:validate(J)],
   bdd_utils:assert(R, debug);
 validate(JSON) -> 
