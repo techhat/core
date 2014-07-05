@@ -202,6 +202,7 @@ is_a(Type, Value) ->
     {_, dbid}    -> lists:member(true, [nomatch =/= re:run(Value, "^[0-9]*$"), "null" =:= Value]);
     {_, name}    -> nomatch =/= re:run(Value, "^[A-Za-z][\-_A-Za-z0-9.]*$");
     {_, boolean} -> lists:member(Value,[true,false,"true","false"]);
+    {_, boolnull} -> lists:member(Value,[true,false,"true","false","null"]);
     {_, str}     -> case Value of V when is_list(V) -> check([is_list(V), length(V)=:=0]); _ -> false end; 
     {_, string}  -> is_list(Value);                              % cannot be empty
     {_, cidr}    -> nomatch =/= re:run(Value, "^([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])\.([0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5])(\/([0-9]|1[0-9]|2[0-9]|3[0-2]))?$");
