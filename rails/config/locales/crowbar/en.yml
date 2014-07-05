@@ -206,7 +206,12 @@ en:
       description: "Description"
       roles: "Roles"
     show:
+      description: "Description"
       roles: "Roles"
+      source_path: "Source Path"
+      source_url: "Source URL"
+      version: "Version"
+      rawconfig: "Raw Configuration YML"
   dashboard:
     list:
       title: "Bulk Edit Nodes"
