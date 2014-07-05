@@ -15,5 +15,6 @@
 
 class Scaffolds::BarclampsController < ApplicationController
   active_scaffold :barclamp do |conf|
+    list.columns.exclude :cfg_data
   end
 end 
