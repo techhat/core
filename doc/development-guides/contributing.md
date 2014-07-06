@@ -6,12 +6,14 @@
 
   1. create a personal fork of the `https://github.com/opencrowbar/core`
     1. Fork the code if you want to be able to submit changes
-    1. You may want to rename your fork in Github to something like 'crowbar-core' to make it easier to track.  We'll assume that you did that in these directions
+    1. rename your fork in Github to something like 'crowbar-core' to make it easier to track.  We'll assume that you did that in these directions
+    1. remember to update your public SSH key to github
   1. setup your git identity (one time only)
     1. `git config --global user.name "user.name"`
     1. `git config --global user.email "email.address"`
   1. add a personal remote: `git remote add personal `https://github.com/[yourgitnamehere]/[crowbar-core]`
   1. you can check your remotes using `git remote -v`
+  2. get the latest code from your repo `git fetch personal`
 
 ##To create a pull request
 
