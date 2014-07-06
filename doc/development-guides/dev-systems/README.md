@@ -7,21 +7,22 @@ Engineers value documentation that explains how to get a development workstation
 > An attempt has been made to pre-stage downloads so several steps can be done in parallel.  The docker image pull also has a large download it's OK to read ahead and start that too.
 
 ###Base OS Installed
+
   1. VirtualBox, THREE network interfaces
     1. (assumed to be eth0) bridge external 
     1. (assumed to be eth1) on a host-only network - you need to setup to talk to the VM, we don't use it.
     1. (assumed to be eth2) on a host-only network - *NO IP assignment* or OS interface configuration (`/etc/network/interfaces` or `/etc/sysconfig`). If using Docker, setup bridging as in [docker-admin.md](docker-admin.md)
   1. Setup an .ssh keypair
     1. use `ssh-keygen -t rsa`
-    2. Alternativly use `rssh-keygen`
+    2. if that fails, try `rssh-keygen`
   1. Passwordless sudo: `sudo sed -ie "s/%sudo\tALL=(ALL:ALL) ALL/%sudo ALL=(ALL) NOPASSWD: ALL/g" /etc/sudoers`
     1. additional information, see http://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux
   1. Optional, [SAMBA and CNTLM](samba_cntlm.md) if you are developing on Windows using VMs and/or behind corporate firewalls
-  1. Setup a [Squid Proxy](proxy-cache.md)
-  1. Make sure your environment does not use proxy for local addresses: `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
+  1. Setup a [Squid Proxy](proxy-cache.md) to ensure downloads are fast (needed by Crowbar too)
+  1. Make sure your environment does not use proxy for local addresses: 
+    1. `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
     1. tip: add this to your login init
-  1. you need to get the code: `sudo apt-get install git`
-  1. we use TMUX to work in multiple screens: `sudo apt-get install tmux`
+  1. you need git and tmux: `sudo apt-get install git tmux`
 
 ###Position Boot Assets
   
@@ -39,10 +40,10 @@ Examples:
   1. get git
     1. ubuntu: `sudo apt-get install git`
   1. get the code: `git clone https://github.com/opencrowbar/core`
-
-Notes: 
-  * If you want to **commit code or docs fixes**, please review [the Contributor guide](../contributing.md)
-  * Optional [build Sledgehammer](build_sledgehammer) step for highly advanced developers only.
+  1. if you want to contribute
+    1. review [Contribute Guidelines](../contributing-code.md)
+    2. setup your [personal git fork](../contributing.md)
+  1. Advanced user optional [build Sledgehammer](build_sledgehammer)
 
 ###Setup Docker Admin Node 
   1. follow steps in [docker-admin.md](docker-admin.md)
