@@ -6,7 +6,7 @@ These are optional Items that we find handy if you are developing on Windows usi
 
   1. ubuntu: `sudo apt-get install samba`
   1. `sudo vi /etc/samba/smb.conf` 
-    1. at the bottom add the example of share block to add [[https://gist.github.com/cloudedge/298121043ea8ec2b9620]] 
+    1. at the bottom add [the example of share block](https://gist.github.com/cloudedge/298121043ea8ec2b9620) to add 
     1. edit to match your system if needed
     1. `sudo service smbd restart`
   1. connect from your host using `\\[machine address]\crowbar_dev`
