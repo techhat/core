@@ -8,10 +8,8 @@ Engineers value documentation that explains how to get a development workstation
 
 ###Base OS Installed
 
-  1. VirtualBox, THREE network interfaces
-    1. (assumed to be eth0) bridge external 
-    1. (assumed to be eth1) on a host-only network - you need to setup to talk to the VM, we don't use it.
-    1. (assumed to be eth2) on a host-only network - *NO IP assignment* or OS interface configuration (`/etc/network/interfaces` or `/etc/sysconfig`). If using Docker, setup bridging as in [docker-admin.md](docker-admin.md)
+  Go to [This tutorial](virtualbox.md), if you are setting Crowbar up with VirtualBox.
+
   1. Setup an .ssh keypair
     1. use `ssh-keygen -t rsa`
     2. if that fails, try `rssh-keygen`
