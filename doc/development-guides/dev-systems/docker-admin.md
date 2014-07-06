@@ -72,8 +72,8 @@ as their init system, perform the following steps:
 Time saving tips
 
   * preload the with `docker pull opencrowbar/centos`
+    * while you wait, you can setup your [git remotes](../contributing.md) in another session
   * test docker, use `docker run -i -t centos /bin/bash`
-  * a caching proxy server (e.g.: Squid) is highly recommended
 
 ### The docker-admin command and its environment
 
