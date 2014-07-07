@@ -44,22 +44,34 @@ tftproot = "/tftpboot"
 sledgehammer_url="http://opencrowbar.s3-website-us-east-1.amazonaws.com/sledgehammer/#{sledgehammer_signature}"
 sledgehammer_dir="#{tftproot}/sledgehammer/#{sledgehammer_signature}"
 
-
 repos = []
 pkgs = []
 raw_pkgs = []
+gems = []
+extra_files = []
 
 # Find all the upstream repos and packages we will need.
-if prereqs[os_pkg_type] && prereqs[os_pkg_type][os_token]
-  repos << prereqs[os_pkg_type][os_token]["repos"]
-  pkgs << prereqs[os_pkg_type][os_token]["build_pkgs"]
-  pkgs << prereqs[os_pkg_type][os_token]["required_pkgs"]
-  raw_pkgs << prereqs[os_pkg_type][os_token]["raw_pkgs"]
+
+Dir.glob("/opt/opencrowbar/**/crowbar.yml").each do |prereq_file|
+  prereqs = YAML.load(File.open(prereq_file))
+  if prereqs[os_pkg_type]
+    if prereqs[os_pkg_type][os_token]
+      repos << prereqs[os_pkg_type][os_token]["repos"]
+      pkgs << prereqs[os_pkg_type][os_token]["build_pkgs"]
+      pkgs << prereqs[os_pkg_type][os_token]["required_pkgs"]
+      raw_pkgs << prereqs[os_pkg_type][os_token]["raw_pkgs"]
+    end
+    repos << prereqs[os_pkg_type]["repos"]
+    pkgs << prereqs[os_pkg_type]["build_pkgs"]
+    pkgs << prereqs[os_pkg_type]["required_pkgs"]
+    raw_pkgs << prereqs[os_pkg_type]["raw_pkgs"]
+  end
+  if prereqs["gems"] && prereqs["gems"]["required_pkgs"]
+    gems << prereqs["gems"]["required_pkgs"]
+  end
+
+  extra_files << prereqs["extra_files"]
 end
-repos << prereqs[os_pkg_type]["repos"]
-pkgs << prereqs[os_pkg_type]["build_pkgs"]
-pkgs << prereqs[os_pkg_type]["required_pkgs"]
-raw_pkgs << prereqs[os_pkg_type]["raw_pkgs"]
 
 Chef::Log.debug(repos)
 Chef::Log.debug(pkgs)
@@ -75,6 +87,12 @@ raw_pkgs.flatten!
 raw_pkgs.compact!
 raw_pkgs.uniq!
 raw_pkgs.sort!
+gems.flatten!
+gems.compact!
+gems.uniq!
+extra_files.flatten!
+extra_files.compact!
+extra_files.uniq!
 
 Chef::Log.debug(repos)
 
@@ -126,14 +144,61 @@ template "/tmp/required_pkgs" do
   notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
 end
 
+repofile_path = case node["platform"]
+                when "centos","redhat" then "/etc/yum.repos.d"
+                when "suse","opensuse" then "/etc/zypp/repos.d"
+                else raise "Don't know where to put repo files for #{node["platform"]}'"
+                end
+
 unless raw_pkgs.empty?
   dest = "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
   FileUtils.mkdir_p(dest)
+  bash "Trigger raw_pkg metadata update" do
+    code "touch #{dest}/canary"
+    action :nothing
+  end
   raw_pkgs.each do |pkg|
+    next if File.file?("#{dest}/#{pkg.split('/')[-1]}")
     bash "Fetch #{pkg}" do
       code "curl -fgL -o '#{dest}/#{pkg.split('/')[-1]}' '#{pkg}'"
-      not_if do File.file?("#{dest}/#{pkg.split('/')[-1]}") end
+      notifies :run, "bash[Trigger raw_pkg metadata update]", :immediately
     end
+  end
+  bash "Update package metadata in #{dest}" do
+    cwd dest
+    code <<EOC
+[[ -f "#{dest}/canary" ]] || exit 0
+case #{os_pkg_type} in
+    debs) dpkg-scanpackages . |gzip -9 >Packages.gz;;
+    rpms) createrepo .;;
+    *) echo "Cannot create package metadata for #{os_pkg_type}"
+       exit 1;;
+esac
+rm "#{dest}/canary"
+EOC
+  end
+  case node["platform"]
+  when "centos","redhat","suse","opensuse","fedora"
+    bash "Create repodata for raw_pkgs" do
+      code "createrepo ."
+      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+    end
+    template "#{repofile_path}/crowbar-raw_pkgs.repo" do
+      source "crowbar.repo.erb"
+      variables(
+                :repo_name => "raw_pkgs",
+                :repo_prio => 20,
+                :repo_url => "file:///tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+                )
+    end
+  when "debian","ubuntu"
+    template "/etc/apt/sources.list.d/crowbar.list" do
+      source "crowbar.list.erb"
+      variables( :repos => repos )
+      notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+    end
+  else
+    raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
   end
 end
 
@@ -150,11 +215,6 @@ when "centos","redhat","suse","opensuse","fedora"
     action :create
     content "NETWORKING=yes"
   end if File.file?("/etc/sysconfig/network")
-  repofile_path = case node["platform"]
-                  when "centos","redhat" then "/etc/yum.repos.d"
-                  when "suse","opensuse" then "/etc/zypp/repos.d"
-                  else raise "Don't know where to put repo files for #{node["platform"]}'"
-                  end
   repos.each do |repo|
     rtype,rdest = repo.split(" ",2)
     case rtype
@@ -213,29 +273,18 @@ bash "Install required files" do
   only_if do ::File.exists?("/tmp/install_pkgs") end
 end
 
-unless raw_pkgs.empty?
-  case node["platform"]
-  when "centos","redhat","suse","opensuse","fedora"
-    bash "Create repodata for raw_pkgs" do
-      code "createrepo ."
-      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
-    end
-    template "#{repofile_path}/crowbar-raw_pkgs.repo" do
-      source "crowbar.repo.erb"
-      variables(
-                :repo_name => "raw_pkgs",
-                :repo_prio => 20,
-                :repo_url => "file:///tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
-                )
-    end
-  when "debian","ubuntu"
-    template "/etc/apt/sources.list.d/crowbar.list" do
-      source "crowbar.list.erb"
-      variables( :repos => repos )
-      notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
-    end
-  else
-    raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
+extra_files.each do |f|
+  src, dest = f.strip.split(" ",2)
+  target_dir = "#{tftproot}/files/#{dest}"
+  target = "#{target_dir}/#{src.split("/")[-1]}"
+  next if File.exists?(target)
+  Chef::Log.info("Installing extra file '#{src}' into '#{target}'")
+  directory target_dir do
+    action :create
+    recursive true
+  end
+  bash "#{target}: Fetch #{src}" do
+    code "curl -fgL -o '#{target}' '#{src}'"
   end
 end
 
@@ -342,9 +391,10 @@ bash "Allow everyone to ping" do
   code "chmod u+s $(which ping) $(which ping6)"
 end
 
-(prereqs["gems"]["required_pkgs"] rescue []).each do |g|
-  gem_package g do
-    action :install
+gems.each do |gem|
+  bash "install gem #{gem}" do
+    code "gem install #{gem}"
+    not_if "gem list --local |grep -q '^#{gem}'"
   end
 end
 

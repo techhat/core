@@ -4,7 +4,8 @@ shopt -s nullglob extglob globstar
 rm -rf /var/cache/crowbar \
     /usr/share/ruby/gems/* \
     /usr/lib/ruby/gems/* \
-    /var/lib/gems/*/gems
+    /var/lib/gems/*/gems \
+    /opt/opencrowbar/core/rails/Gemfile.lock
 touch /tmp/install_pkgs
 ./bootstrap.sh && \
     chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o 'recipe[crowbar-bootstrap::cleanup]' || {

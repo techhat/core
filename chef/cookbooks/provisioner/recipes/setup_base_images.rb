@@ -172,24 +172,6 @@ EOC
   if node["crowbar"]["provisioner"]["server"]["online"]
     # This information needs to be saved much earlier.
      node["crowbar"]["provisioner"]["barclamps"].each do |bc|
-      # Grab any extra_files that we may need.
-      bc["extra_files"].each do |f|
-        src, dest = f.strip.split(" ",2)
-        target_dir = "#{tftproot}/files/#{dest}"
-        target = "#{target_dir}/#{src.split("/")[-1]}"
-        next if File.exists?(target)
-        Chef::Log.info("Installing extra file '#{src}' into '#{target}'")
-        directory target_dir do
-          action :create
-          recursive true
-        end
-
-        bash "#{target}: Fetch #{src}" do
-          code "curl -fgL -o '#{target}' '#{src}'"
-        end
-
-      end if bc["extra_files"]
-
       # Populate our known online repos.
       if bc[pkgtype]
         bc[pkgtype]["repos"].each do |repo|

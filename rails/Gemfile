@@ -39,6 +39,7 @@ gem 'delayed_job'
 gem 'delayed_job_active_record'
 gem 'ledermann-rails-settings', :require => 'rails-settings'
 gem 'jquery-rails'
+gem 'net-ssh'
 gem 'chef', "11.6"
 gem 'open4'
 
