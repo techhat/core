@@ -416,6 +416,10 @@ class NodeRole < ActiveRecord::Base
       return unless proposed? || blocked?
       update!(committed_data: proposed_data)
       block_or_todo
+      if !node.alive && node.power.actions.member?(:on)
+        node.power.on
+      end
+      self
     end
   end
 
@@ -433,9 +437,6 @@ class NodeRole < ActiveRecord::Base
   def block_or_todo
     NodeRole.transaction do
       update!(state: (activatable? ? TODO : BLOCKED))
-    end
-    if !node.alive && node.power.actions.member?(:on)
-      node.power.on
     end
   end
 
