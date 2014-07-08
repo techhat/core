@@ -21,10 +21,9 @@ Not Currently Available (but expected):
 
 1. Prereqs
 
-> The docker-slaves script uses the docker-slave script.  They are different!
-
-   1. Install TMux: `sudo apt-get install tmux`
    1. Pull the slave container: `docker pull opencrowbar/ubuntu-slave`
+
+> The docker-slaves script uses the docker-slave script.  They are different!
 
 Wait until the admin node is up and admin node annealing is complete!
 
@@ -34,6 +33,8 @@ This creates the number of Docker nodes requested using the Crowbar
 CLI on the Admin node.  This script relies on `ssh root@172.17.0.2` to 
 access the Crowbar CLI and will fail if that access is not available; however
 configuring keys and ssh is part of the normal `docker-admin` script process.
+
+> if your Admin IP is not 172.17.0.2, then will need to change the _temporarily_ hard coded 
 
 It will run up to 40 of them all under TMux if
 they were created successfully. Please review [TMux intro](http://code.tutsplus.com/tutorials/intro-to-tmux--net-33889) to learn how to use this tool.  Quick tips are: Ctrl-B then N(ext), P(revious) X(close)
