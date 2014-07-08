@@ -14,7 +14,7 @@
       %th= t '.ranges'
   %tbody
     - @networks.each do |n|
-      %tr
+      %tr.node{ :class => cycle(:odd, :even) }
         %td= link_to n.name, network_path(n.id)
         %td= n.description
         %td= n.deployment.name
@@ -25,7 +25,7 @@
         %td= n.conduit
         %td= n.ranges.map{ |r| r.name }.join(', ')
     = form_for :network, :'data-remote' => true, :url => networks_path(), :html => { :method=>:post, :'data-type' => 'html',  :class => "formtastic" } do |f|
-      %tr
+      %tr.node{ :class => cycle(:odd, :even) }
         %td= text_field_tag :name, t('default'), :size=>6
         %td= text_field_tag :description, "", :size=>20
         %td= select_tag :deployment_id, options_from_collection_for_select(Deployment.all, :id, :name)

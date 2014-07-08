@@ -20,7 +20,7 @@
             = render :partial => attrib.ui_renderer, :locals => {:obj=>obj, :obj_type => obj_type, :attrib=>attrib, :editable=>editable }
         - rescue Exception => e
           - if current_user and current_user.settings(:ui).debug
-            %tr
+            %tr.node{ :class => cycle(:odd, :even) }
               %td= t '.error'
               %td= e.message
               %td= t 'debug'

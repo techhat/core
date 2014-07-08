@@ -45,7 +45,7 @@
 - else
   %table.data.box
     %thead
-      %tr
+      %tr.node{ :class => cycle(:odd, :even) }
         %th= t '.attrib'
         %th= t '.description'
         %th= t '.map'

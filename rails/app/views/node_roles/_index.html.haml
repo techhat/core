@@ -13,7 +13,7 @@
         %th= t '.status'
     %tbody
       - list.each do |nr|
-        %tr
+        %tr.node{ :class => cycle(:odd, :even) }
           %td= link_to nr.deployment.name, deployment_path(:id=>nr.deployment.id) rescue t 'unknown'
           %td= link_to nr.node.name, node_path(:id=>nr.node.id) rescue t 'unknown'
           %td= link_to nr.role.name, role_path(:id=>nr.role.id) rescue t 'unknown'

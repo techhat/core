@@ -8,7 +8,7 @@
       %th= t '.description'
   %tbody
     - @jigs.each do |j|
-      %tr    
+      %tr.node{ :class => cycle(:odd, :even) }
         %td= link_to j.name, jig_path(j.id)
         %td
           - if j.active

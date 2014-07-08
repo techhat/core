@@ -37,7 +37,7 @@
               = link_to name, deployment_role_path(dr.id), :title=>dr.role.description
     %tbody
       - @nodes.each do |node|
-        %tr.node{:id => node.id}
+        %tr.node{:id => node.id, :class => cycle(:odd, :even) }
           %td.nodename
             = link_to node.alias, node_path(node.id), :title=>node.description
             - unless node.deployment_id == @deployment.id
