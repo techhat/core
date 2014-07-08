@@ -32,6 +32,13 @@ en:
       available:  "Available"
       reserved:   "Reserved"
       idle:       "Idle"
+    power: &power
+      on:       "On"
+      off:      "Off"
+      reboot:   "Reboot"
+      reset:    "Reset"
+      cycle:    "Cycle"
+      identify: "Identify"
     form: &form_common
       name: "Name"
       description: "Description"
@@ -360,6 +367,14 @@ en:
       reserve: "Reserve"
       release: "Release"
       bootenv: "Boot Environment"
+      power: "Available Power Actions"
+      network: Network"
+      range: "Range"
+      address: "Address"
+      conduit: "Conduit"
+      vlan: "VLAN"
+      addreses: "Address Allocations"
+      <<: *power
       <<: *bootenv
       <<: *bios_types
       <<: *raid_types
