@@ -150,58 +150,6 @@ repofile_path = case node["platform"]
                 else raise "Don't know where to put repo files for #{node["platform"]}'"
                 end
 
-unless raw_pkgs.empty?
-  dest = "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
-  FileUtils.mkdir_p(dest)
-  bash "Trigger raw_pkg metadata update" do
-    code "touch #{dest}/canary"
-    action :nothing
-  end
-  raw_pkgs.each do |pkg|
-    next if File.file?("#{dest}/#{pkg.split('/')[-1]}")
-    bash "Fetch #{pkg}" do
-      code "curl -fgL -o '#{dest}/#{pkg.split('/')[-1]}' '#{pkg}'"
-      notifies :run, "bash[Trigger raw_pkg metadata update]", :immediately
-    end
-  end
-  bash "Update package metadata in #{dest}" do
-    cwd dest
-    code <<EOC
-[[ -f "#{dest}/canary" ]] || exit 0
-case #{os_pkg_type} in
-    debs) dpkg-scanpackages . |gzip -9 >Packages.gz;;
-    rpms) createrepo .;;
-    *) echo "Cannot create package metadata for #{os_pkg_type}"
-       exit 1;;
-esac
-rm "#{dest}/canary"
-EOC
-  end
-  case node["platform"]
-  when "centos","redhat","suse","opensuse","fedora"
-    bash "Create repodata for raw_pkgs" do
-      code "createrepo ."
-      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
-    end
-    template "#{repofile_path}/crowbar-raw_pkgs.repo" do
-      source "crowbar.repo.erb"
-      variables(
-                :repo_name => "raw_pkgs",
-                :repo_prio => 20,
-                :repo_url => "file:///tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
-                )
-    end
-  when "debian","ubuntu"
-    template "/etc/apt/sources.list.d/crowbar.list" do
-      source "crowbar.list.erb"
-      variables( :repos => repos )
-      notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
-    end
-  else
-    raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
-  end
-end
-
 case node["platform"]
 when "debian","ubuntu"
   template "/etc/apt/sources.list.d/crowbar.list" do
@@ -271,6 +219,58 @@ bash "Install required files" do
        else raise "Don't know how to install required files for #{node["platform"]}'"
        end
   only_if do ::File.exists?("/tmp/install_pkgs") end
+end
+
+unless raw_pkgs.empty?
+  dest = "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+  FileUtils.mkdir_p(dest)
+  bash "Trigger raw_pkg metadata update" do
+    code "touch #{dest}/canary"
+    action :nothing
+  end
+  raw_pkgs.each do |pkg|
+    next if File.file?("#{dest}/#{pkg.split('/')[-1]}")
+    bash "Fetch #{pkg}" do
+      code "curl -fgL -o '#{dest}/#{pkg.split('/')[-1]}' '#{pkg}'"
+      notifies :run, "bash[Trigger raw_pkg metadata update]", :immediately
+    end
+  end
+  bash "Update package metadata in #{dest}" do
+    cwd dest
+    code <<EOC
+[[ -f "#{dest}/canary" ]] || exit 0
+case #{os_pkg_type} in
+    debs) dpkg-scanpackages . |gzip -9 >Packages.gz;;
+    rpms) createrepo .;;
+    *) echo "Cannot create package metadata for #{os_pkg_type}"
+       exit 1;;
+esac
+rm "#{dest}/canary"
+EOC
+  end
+  case node["platform"]
+  when "centos","redhat","suse","opensuse","fedora"
+    bash "Create repodata for raw_pkgs" do
+      code "createrepo ."
+      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+    end
+    template "#{repofile_path}/crowbar-raw_pkgs.repo" do
+      source "crowbar.repo.erb"
+      variables(
+                :repo_name => "raw_pkgs",
+                :repo_prio => 20,
+                :repo_url => "file:///tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
+                )
+    end
+  when "debian","ubuntu"
+    template "/etc/apt/sources.list.d/crowbar.list" do
+      source "crowbar.list.erb"
+      variables( :repos => repos )
+      notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+    end
+  else
+    raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
+  end
 end
 
 extra_files.each do |f|

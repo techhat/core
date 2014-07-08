@@ -42,6 +42,7 @@ declare -A image_map
 image_map["ubuntu"]="opencrowbar/ubuntu:12.04-4"
 #image_map["centos"]="centos:latest"
 image_map["centos"]="opencrowbar/centos:6.5-8"
+image_map["centos7"]="maxholman/centos7:latest"
 image_map["opensuse"]="mmckeen/opensuse-13-1:latest"
 image_map["fedora"]="fedora:20"
 image_map["debian"]="debian:jessie"
