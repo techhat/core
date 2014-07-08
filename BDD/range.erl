@@ -28,11 +28,17 @@ g(Item) ->
 validate(JSON) when is_record(JSON, obj) ->
   J = JSON#obj.data,
   R =[JSON#obj.type == "network_range",
-      bdd_utils:is_a(J, length, 7),
+      bdd_utils:is_a(J, length, 13),
       bdd_utils:is_a(J, string, name),
       bdd_utils:is_a(J, dbid, network_id),
       bdd_utils:is_a(J, str, first),
       bdd_utils:is_a(J, str, last),
+      bdd_utils:is_a(J, "bmc|([([0-9]){1,2}g([0-9]){1,2}", conduit),
+      bdd_utils:is_a(J, integer, vlan),
+      bdd_utils:is_a(J, boolnull, use_vlan),
+      bdd_utils:is_a(J, boolnull, use_bridge),
+      bdd_utils:is_a(J, integer, team_mode),
+      bdd_utils:is_a(J, boolnull, use_team),
       crowbar_rest:validate_core(J)],
   bdd_utils:assert(R);
 validate(JSON) -> 
