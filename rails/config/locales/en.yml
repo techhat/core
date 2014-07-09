@@ -23,6 +23,7 @@ en:
   # Global
   show: "View"
   all: "All"
+  none: "None"
   destroy: "Remove"
   save: "Save"
   add: "Add"
