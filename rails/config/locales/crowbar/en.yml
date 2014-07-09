@@ -32,8 +32,8 @@ en:
       available:  "Available"
       reserved:   "Reserved"
       idle:       "Idle"
-    power: &power
-      on:       "On"
+    power: &power_states
+      "on":       "On"
       off:      "Off"
       reboot:   "Reboot"
       reset:    "Reset"
@@ -385,7 +385,7 @@ en:
       conduit: "Conduit"
       vlan: "VLAN"
       addreses: "Address Allocations"
-      <<: *power
+      <<: *power_states
       <<: *bootenv
       <<: *bios_types
       <<: *raid_types
