@@ -15,6 +15,7 @@
 % 
 -module(deployment).
 -export([step/2, json/3, validate/1, inspector/1, g/1, create/3]).
+-export([attrib_set/3]).
 -include("bdd.hrl").
 
 % Commont Routine
@@ -62,14 +63,13 @@ inspector(Deployment) ->
 json(Name, Description, Order) ->
   crowbar:json([{name, Name}, {description, Description}, {order, Order}]).
 
+% specialized function
 
-step(_, {step_when, {_S, _N}, ["I propose a",deployment,Deployment,"on the",barclamp,Barclamp]}) ->
-  Path = eurl:path(["api","v2","barclamps",Barclamp,"deployments"]),
-  JSON = json(Deployment, g(description), g(order)),
-  PutPostResult = eurl:put_post([], Path, JSON, post, all),
-  {Code, Result} = PutPostResult,
-  bdd_utils:log(debug, deployment, step, "deploy from barclamp ~p named ~p got ~p", [Path, JSON, Code]),
-  bdd_restrat:ajax_return(Path, post, Code, Result);
+attrib_set(Deployment, Attrib, ValueJSON) ->
+  URI = eurl:path([g(path), Deployment, "attribs", Attrib]),
+  eurl:put(URI, ValueJSON).
+
+% steps
 
 step(_Global, {step_setup, _N, _}) -> 
   % create DEPLOYMENTS(s) for tests

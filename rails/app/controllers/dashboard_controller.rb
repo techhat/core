@@ -110,21 +110,27 @@ class DashboardController < ApplicationController
     if request.get?
       @nodes = Deployment.system.nodes
     elsif request.post?
-      d = Deployment.find_or_create_by_name! :name=>params[:deployment], :parent_id=>Deployment.system
+      d = Deployment.find_or_create_by_name! :name=>params[:deployment], :parent=>Deployment.system
       if params[:conduit]
         n = Network.find_or_create_by_name! :name=>params[:deployment], :conduit=>params[:conduit], :deployment=>d, :v6prefix=>Network::V6AUTO
         NetworkRange.create! :name=>params[:range], :network=>n, :first=>params[:first_ip], :last=>params[:last_ip] if n.ranges.count == 0
       end
+      # milestone for OS assignment
+      ready = Role.find_key 'crowbar-installed-node'
+      ready.add_to_deployment d
       # TODO add network & range create
-      Node.transaction do
-        params.each do |node_id, value|
-          if node_id =~ /^node_([0-9]*)/
-            n = Node.find $1.to_i
+      params.each do |node_id, value|
+        if node_id =~ /^node_([0-9]*)/
+          n = Node.find $1.to_i
+          Node.transaction do
             n.deployment = d
-            #n.save!
+            n.save!
             Rails.logger.info "Dashboard GetReady Deployment #{d.name} added node #{n.name}"
-            # TODO add OS assignment
+            # assign milestone for OS assignment
+            ready.add_to_node_in_deployment n, d
           end
+          # set desired OS to attribute
+          Attrib.set "provisioner-target_os", n, params["dashboard"]["#{node_id}_os"], :user
         end
       end
       redirect_to deployment_path(:id=>d.id)

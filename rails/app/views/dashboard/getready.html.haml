@@ -19,22 +19,33 @@
         %th= t('.state')
         %th= t('.name')
         %th= t('.os')
+        %th= t('.disk')
+        %th= t('.mem')
+        %th= t('.nics')
+        %th= t('.proc')
+        %th= t('.asset')
     %tbody
-      - if @nodes and @nodes.count > 0
+      - if @nodes and @nodes.count > 1
         - @nodes.sort_by{|n| n.name }.each do |node|
-          %tr.node{ :class => cycle(:odd, :even, :name => "nodes"), :id => node.id }
-            %td= check_box_tag "node_#{node.id}", "include", !node.is_admin?
-            %td.status
-              .led{:class => node.status, :title=>t(node.status, :scope=>'status', :default=>node.status)} 
-            %td= link_to node.name, node_path(node.id), :title=>node.description
-            %td
-              - if available_os.count > 0
-                = f.select :os, available_os, :selected=>available_os[0]
-              - else
-                = t 'no_items'
+          - unless node.is_admin?
+            %tr.node{ :class => cycle(:odd, :even, :name => "nodes"), :id => node.id }
+              %td= check_box_tag "node_#{node.id}", "include", !node.is_admin?
+              %td.status
+                .led{:class => node.status, :title=>t(node.status, :scope=>'status', :default=>node.status)} 
+              %td= link_to node.name, node_path(node.id), :title=>node.description
+              %td
+                - if available_os.count > 0
+                  = f.select "node_#{node.id}_os", available_os, :selected=>available_os[0]
+                - else
+                  = t 'no_items'
+              %td= "#{node.attrib_number_of_drives || 0}, #{t('.raid')}: #{t((node.attrib_raid_set || 'not_set'))}"
+              %td= format_memory(node.attrib_memory)
+              %td= node.attrib_nics.count rescue 0
+              %td= node.attrib_cpu
+              %td= node.attrib_asset_tag
       - else
         %tr
-          %td{ :colspan=>4 }
+          %td{ :colspan=>9}
             = t 'no_items'
 
   %input.button{:type => "submit", :name => "create", :method=>:post, :value => t('.create')}

@@ -237,7 +237,7 @@ en:
       deployment: "Deployment"
       default: "pilot"
       range: "Range Name"
-      range_base: "public"
+      range_base: "host"
       first_ip: "First CIDR"
       last_ip:  "Last CIDR"
       conduit: "Net Conduit"
@@ -245,6 +245,12 @@ en:
       state: "State"
       os: "Operating System"
       create: "Run Wizard"
+      disk: "Disks"
+      mem: "RAM"
+      proc: "Processor"
+      nics: "NICs"
+      asset: "Asset Tag"
+      raid: "RAID"
   deployments:
     index:
       title: "Deployments"

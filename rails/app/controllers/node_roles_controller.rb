@@ -75,7 +75,19 @@ class NodeRolesController < ApplicationController
   end
 
   def update
-    @node_role = NodeRole.find_key params[:id]
+    # we're being called from /nodes path we may get the name instead of ID
+    key = params[:id]
+    @node_role = if params.key? :node_id
+      node = Node.find_key params[:node_id]
+      if key.is_a?(Fixnum) or key.is_a?(Integer) or key =~ /^[0-9]+$/
+        NodeRole.find key
+      else
+        role = Role.find_by :name=>key
+        NodeRole.find_by :node_id=>node.id, :role_id=>role.id
+      end
+    else
+      NodeRole.find_key key
+    end
     # if you've been passed data then save it
     if params[:data]
       NodeRole.transaction do
