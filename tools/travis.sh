@@ -14,19 +14,6 @@
 # limitations under the License.
 #
 
-echo "REMINDER: you must be running a Crowbar server to run these tests"
-
-# we need erlang!
-if [[ ! -e /usr/bin/erl ]]; then
-  # todo, make this multi OS
-  sudo apt-get -y install erlang-base erlang-inets
-fi
-
-cd ../BDD
-
-# Clean-up
-rm -f ../erl_crash.dump /tmp/trace_*.txt
-
 # Compile
 if [[ ! -f bdd.beam  ]]; then
   echo "compiling"
@@ -34,5 +21,3 @@ if [[ ! -f bdd.beam  ]]; then
 else
   echo "using compiled code - this may skip changes to BDD erlang code.  Use tools/test_cleanup.sh to recompile"
 fi
-
-erl -s bdd test travis

@@ -16,5 +16,8 @@ script:
   - bundle exec rails server -d
 
 after_script:
-  - curl http://127.0.0.1:3000/docs?id=framework%2Flicenses 
-  - ../tools/travis.sh
+  - cd ..
+  - curl -I -fail http://127.0.0.1:3000/docs?id=framework%2Flicenses 
+  - tools/travis.sh
+  - cd BDD
+  - erl -s bdd test travis
