@@ -16,7 +16,7 @@ We've also made it easy to setup and run Crowbar using our [**Fast-Start (with D
 
 * [Live Weekly Planning and Design Meetings](http://bit.ly/crowbar-calendar)
 * [Mailing List](http://bit.ly/crowbarlist)
-* #Crowabr IRC channel on Freenode  
+* #Crowbar IRC channel on Freenode  
 
 ## Exec Summary 
 
