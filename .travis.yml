@@ -1,5 +1,20 @@
 language: ruby
 rvm:
   - "1.9.3"
-# uncomment this line if your project needs to run something other than `rake`:
-script: echo 'test'
+addons:
+  postgresql: "9.3"
+
+before_script:
+  - cd rails
+  - cp config/database.yml.travis config/database.yml
+  - psql -c 'create database opencrowbar_dev;' -U postgres
+  - bundle install
+
+script: 
+  - bundle exec rake db:migrate
+  - bundle exec script/delayed_job --queue=NodeRoleRunner -n 2 start
+  - bundle exec rails server -d
+
+after_script:
+  - curl http://127.0.0.1:3000/docs?id=framework%2Flicenses 
+  - ../tools/travis.sh
