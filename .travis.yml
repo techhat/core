@@ -4,18 +4,15 @@ rvm:
 addons:
   postgresql: "9.3"
 
-before_install:
-  - cd rails
 
-install:
+before_script:
+  - cd rails
   - cp config/database.yml.travis config/database.yml
   - psql -c 'create database opencrowbar_dev;' -U postgres
   - bundle install
 
-before_script:
-  - bundle exec rake db:migrate
-
 script: 
+  - bundle exec rake db:migrate
   - bundle exec script/delayed_job --queue=NodeRoleRunner -n 2 start
   - bundle exec rails server -d
 
