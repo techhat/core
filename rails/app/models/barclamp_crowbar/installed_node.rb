@@ -17,6 +17,6 @@ class BarclampCrowbar::InstalledNode < Role
   # If we know how to turn the node back on, and we have no children,
   # then turn the node off for now.
   def on_active(nr)
-    nr.node.power.halt if nr.children.empty? && nr.node.power.actions.member?(:on)
+    nr.node.power.halt if nr.children.empty? && nr.node.power[:on]
   end
 end
