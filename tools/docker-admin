@@ -65,6 +65,7 @@ docker_args+=(-e "OUTER_UID=$(id -u)")
 docker_args+=(-e "OUTER_GID=$(id -g)")
 [[ -f $HOME/.ssh/id_rsa.pub ]] && docker_args+=(-e "SSH_PUBKEY=$(cat "$HOME/.ssh/id_rsa.pub")")
 docker_args+=(-p "3000:3000")
+docker_args+=(-p "443:443")
 bridge="docker0"
 bridge_re='-b=([^ ])'
 bridge_addr_re='inet ([0-9.]+)/'
