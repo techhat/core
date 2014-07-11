@@ -146,8 +146,8 @@ class SupportController < ApplicationController
       current_user.settings(:ui).test = ( params[:value].eql?('true')  ? true : false )
     when 'debug'
       current_user.settings(:ui).debug = ( params[:value].eql?('true')  ? true : false )
-    when 'noop_roles'
-      current_user.settings(:ui).noop_roles = ( params[:value].eql?('true')  ? true : false )
+    when 'milestone_roles'
+      current_user.settings(:ui).milestone_roles = ( params[:value].eql?('true')  ? true : false )
     when 'expand'
       current_user.settings(:errors).expand = ( params[:value].eql?('true')  ? true : false )
     when 'doc_sources'

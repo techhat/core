@@ -29,7 +29,7 @@ class User < ActiveRecord::Base
   # user control for UI, split test and site configuration
   # see https://github.com/ledermann/rails-settings for help
   has_settings do |s|
-    s.key :ui,        :defaults => { :refresh => 15000, :fast_refresh => 5000, :debug => true, :edge => true, :test => true, :noop_roles => true }
+    s.key :ui,        :defaults => { :refresh => 15000, :fast_refresh => 5000, :debug => true, :edge => true, :test => true, :milestone_roles => true }
     s.key :errors,    :defaults => { :expand => true }
     s.key :docs,      :defaults => { :sources => true }
     s.key :network,   :defaults => { :v6prefix => {'admin'=>'auto' } }

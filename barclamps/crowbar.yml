@@ -19,6 +19,7 @@ roles:
     description: "Core Crowbar Services Bundle"
     jig: noop
     flags:
+      - milestone
       - bootstrap
       - implicit
     requires:
@@ -33,6 +34,7 @@ roles:
     description: "Crowbar Node Service Bundle"
     jig: noop
     flags:
+      - milestone
       - discovery
       - implicit
     requires:
@@ -44,6 +46,7 @@ roles:
     description: "Crowbar Node Ready Checkpoint"
     jig: noop
     flags:
+      - milestone
       - implicit
     requires:
       - crowbar-managed-node
@@ -52,6 +55,7 @@ roles:
     description: "Docker Node Ready Checkpoint"
     jig: noop
     flags:
+      - milestone
       - discovery
       - implicit
     requires:

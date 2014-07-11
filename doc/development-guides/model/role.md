@@ -75,6 +75,18 @@ again. The only user of this flag is the provisioner-os-install role.
 Indicates that this role exists only to be provided by other roles,
 and cannot actually be bound to a node.
 
+#### milestone
+
+Indicates that role is a major delivery point in the orchestration 
+lifecycle.  Milestone roles are exposed in the UI as selectable by
+the user for adding to deployments.  They are generally only added
+to deployments by users or during discovery.
+
+> Noop and Network roles are almost always Milestones.
+
+Non-milestone roles are typically added automatically when Crowbar 
+resolves the dependency graph.
+
 ### Hooks / In-line Calls
 
 Roles have several different hooks that are called as part of the
