@@ -11,7 +11,7 @@
     %tbody
       - list.each do |i|
         - state = i.state 
-        %tr
+        %tr.node{ :class => cycle(:odd, :even) }
           %td
             .led{:class => Deployment::STATES[state], :title=>Deployment.state_name(state)}
           %td= link_to i.name, deployment_path(i.id)

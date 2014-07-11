@@ -12,7 +12,7 @@
         %th= t '.roles'
     %tbody
       - @list.each do |bc|
-        %tr
+        %tr.node{ :class => cycle(:odd, :even) }
           %td= link_to bc.name, barclamp_path(bc.id)
           - if bc.parent
             %td= link_to bc.parent.name, barclamp_path(bc.parent.id)

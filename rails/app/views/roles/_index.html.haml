@@ -14,7 +14,7 @@
         %th= t '.conflicts'
     %tbody
       - mylist.each do |role|
-        %tr
+        %tr.node{ :class => cycle(:odd, :even) }
           %td= link_to role.name_i18n, role_path(:id=>role.id), :title=>role.name
           %td= link_to role.barclamp.name, barclamp_path(role.barclamp.id), :title=>role.barclamp.description
           %td= role.description
