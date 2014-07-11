@@ -96,14 +96,18 @@ class Barclamp < ActiveRecord::Base
           cookbook_path = File.expand_path(File.join(source_path, 'chef/cookbooks/'))
           berksfile = cookbook_path + '/Berksfile'
           raise "Import: No Berksfile found for #{bc_name} in #{berksfile}" unless File.exists?(berksfile)
-          result = berks(cookbook_path,"install")
-          raise "Import: Unable to berks install #{berksfile}: #{result}" unless $?.exitstatus == 0
-          Rails.logger.info("Import: berks install: #{result}\n")
-          if jig_type.end_with?("SoloJig")
-            Rails.logger.info("Import: #{jig_name} is a chef-solo-type jig. Using Berkshelf packaging.")
-            result = berks(cookbook_path,"package /var/cache/crowbar/cookbooks/package.tar.gz")
-            raise "Import: Unable to berks package #{berksfile}: #{result}" unless $?.exitstatus == 0
-            Rails.logger.info("Import: berks package: #{result}\n")
+          if Rails.env.eql? "production"
+            result = berks(cookbook_path,"install")
+            raise "Import: Unable to berks install #{berksfile}: #{result}" unless $?.exitstatus == 0
+            Rails.logger.info("Import: berks install: #{result}\n")
+            if jig_type.end_with?("SoloJig")
+              Rails.logger.info("Import: #{jig_name} is a chef-solo-type jig. Using Berkshelf packaging.")
+              result = berks(cookbook_path,"package /var/cache/crowbar/cookbooks/package.tar.gz")
+              raise "Import: Unable to berks package #{berksfile}: #{result}" unless $?.exitstatus == 0
+              Rails.logger.info("Import: berks package: #{result}\n")
+            end
+          else
+            Rails.logger.info("Skipping Berks import (only needed for production environment)")
           end
         end
       end if bc["jigs"]
