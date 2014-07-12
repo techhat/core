@@ -16,7 +16,7 @@ class RoleAddMilestone < ActiveRecord::Migration
   def self.up
     add_column :roles, :milestone, :boolean, :default=>false
     # for upgrades, we need to make sure Noop roles are milestones
-    Roles.all.each do |r|
+    Role.all.each do |r|
       if r.noop?
         r.milestone = true
         r.save!
