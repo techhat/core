@@ -28,7 +28,19 @@ net_re = /\/pci(.+)\/net\/(.+)$/
 net_sysfs = "/sys/class/net"
 raise "This recipe only works on Linux" unless File.directory?(net_sysfs)
 
-chef_gem "cstruct"
+# Sigh -- chef_gem behaviour is too flaky to rely on.
+# Fake it if we are running the omnibus version of Chef.
+if File.directory?("/opt/chef/embedded")
+  if Dir.glob("/opt/chef/embedded/lib/ruby/gems/**/cstruct*/").empty?
+    Chef::Lig.info("Manually installing cstruct gem")
+    unless system("/opt/chef/embedded/bin/gem install --no-ri --no-rdoc cstruct")
+      raise "Could not install cstruct gem!"
+    end
+    Gem.clear_paths
+  end
+else
+  chef_gem "cstruct"
+end
 require "socket"
 require "cstruct"
 
