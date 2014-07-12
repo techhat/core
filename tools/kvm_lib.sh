@@ -379,8 +379,7 @@ run_kvm() {
         else
             drive_cache=writeback
         fi
-        if "$KVM" -device \? 2>&1 |grep -q ahci && \
-            [[ $("$KVM" -version) =~ kvm-1 ]]; then
+        if "$KVM" -device \? 2>&1 |grep -q ahci; then
             kvm_use_ahci=true
         fi
     fi
