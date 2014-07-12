@@ -35,7 +35,6 @@ fi
 mountdir="${mountdir%/tools/docker-admin}"
 # This gets us to the parent directory of core, where presumably the rest of our repos are checked out
 mountdir="${mountdir%/*}"
-. "$mountdir/core/tools/tmux_lib.sh"
 
 declare -A image_map
 #image_map["ubuntu"]="ubuntu:precise"
