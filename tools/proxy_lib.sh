@@ -2,6 +2,9 @@
 
 # This mangles proxies into shape for docker and KVM admin nodes.
 declare -A mangled_proxies
+mangled_proxies['http_proxy']=''
+mangled_proxies['https_proxy']=''
+mangled_proxies['no_proxy']=''
 
 # Rewrite any proxies that refer to localhost to
 # refer to $1 instead.
