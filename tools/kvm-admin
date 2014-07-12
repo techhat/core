@@ -21,14 +21,12 @@ if [[ ! -f $admin_server_iso ]]; then
     exit 1
 fi
 
-if [[ ! -d $admin_server_loc/ocb-packages/repodata ]]; then
-    if [[ ! -d $OCBDIR/build-tools/.git ]]; then
-        echo "Cloning build-tools into $OCBDIR"
-        (cd "$OCBDIR" && git clone https://github.com/opencrowbar/build-tools)
-    fi
-    echo "Creating OCB install RPM packages"
-    "$OCBDIR/build-tools/bin/make-rpms.sh"
+if [[ ! -d $OCBDIR/build-tools/.git ]]; then
+    echo "Cloning build-tools into $OCBDIR"
+    (cd "$OCBDIR" && git clone https://github.com/opencrowbar/build-tools)
 fi
+echo "Creating OCB install RPM packages"
+"$OCBDIR/build-tools/bin/make-rpms.sh"
 
 . "$OCBDIR/core/tools/kvm_lib.sh"
 TMPDIR=$(mktemp -d /tmp/ocb-kvm-admin-XXXXXX)
