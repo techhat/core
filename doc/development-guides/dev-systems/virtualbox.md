@@ -10,8 +10,8 @@ VirtualBox
   * #1 should be IP 192.168.222.1 & DHCP should be off
   * #2 should be IP 192.168.124.1 & DHCP should be off
 * Create new Linux Ubuntu 64 bit Virtual Machine
-1. RAM: 4096
-* Disk: VDI, Dynamically Allocated, at least 40 GB (80 recommended)
+  1. RAM: 4096
+  * Disk: VDI, Dynamically Allocated, at least 40 GB (80 recommended)
 * Before Booting, go into settings
   1. System...Processor: give your self at least 2 cores
   * Storage IDE Controller; choose CD Ubuntu-12.04.4-server-amd64.iso
@@ -22,15 +22,15 @@ VirtualBox
     * Adapter 3 - Host Only #2
 * Start the server and answer the prompts
   * English & Ubuntu Server
-    1 Choose eth0 as your primary interface
+    * Choose eth0 as your primary interface
   * Name your machine and user accounts (we recommend "crowbar" as user) & time zone
   * Partitioning: guided to use entire disk and LVM
     * defaults are OK
-  * you need to select YES to continue (NO = return to selection)
+    * you need to select YES to continue (NO = return to selection)
   * Proxy depends on your environment (we'll install Squid later)
-          1. No automatic updates
-          * Install OpenSHH & Samba (space toggles, enter continues)
-          * Install GRUB boot loader
+    1. No automatic updates
+  * Install OpenSHH & Samba (space toggles, enter continues)
+  * Install GRUB boot loader
 * When Installation completes, make sure the ISO is not attached and allow reboot
 * you may want to snapshot the machine in this state
  
