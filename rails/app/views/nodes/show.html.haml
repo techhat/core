@@ -23,7 +23,7 @@
 %h3
   = t '.power'
   = ":"
-  - [ :on, :off, :reboot, :reset, :cycle, :identify].select{|m|@node.power.actions.member?(m)}.each do |meth|
+  - [ :on, :off, :reboot, :reset, :cycle, :identify].select{|m|@node.power[m]}.each do |meth|
     = link_to t(".#{meth.to_s}"), "/api/v2/nodes/#{@node.id}/power?poweraction=#{meth.to_s}", :method=>:put, :class => 'button', :'data-remote' => true,:'data-confirm' => t('are_you_sure') 
 
 %h3= t '.addresses'

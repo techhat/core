@@ -50,6 +50,7 @@ class Node < ActiveRecord::Base
   has_many    :roles,              :through => :node_roles
   has_many    :deployments,        :through => :node_roles
   has_many    :network_allocations,:dependent => :destroy
+  has_many    :node_managers,      :dependent => :destroy
   belongs_to  :deployment
   belongs_to  :target_role,        :class_name => "Role", :foreign_key => "target_role_id"
 
@@ -122,22 +123,6 @@ class Node < ActiveRecord::Base
     "root@#{shortname}"
   end
 
-  def ssh(cmd)
-    run_on(". /etc/profile; exec ssh -l root #{address.addr} -- #{cmd}")
-  end
-
-  def scp_from(remote_src, local_dest, opts="")
-    run_on("exec scp #{opts} root@[#{address.addr}]:#{remote_src} #{local_dest}")
-  end
-
-  def scp_to(local_src, remote_dest, opts="")
-    run_on("exec scp #{opts} #{local_src} root@[#{address.addr}]:#{remote_dest}")
-  end
-
-  def self.name_hash
-    Digest::SHA1.hexdigest(Node.select(:name).order("name ASC").map{|n|n.name}.join).to_i(16)
-  end
-
   def v6_hostpart
     d = Digest::MD5.hexdigest(name)
     "#{d[16..19]}:#{d[20..23]}:#{d[24..27]}:#{d[28..32]}"
@@ -198,10 +183,43 @@ class Node < ActiveRecord::Base
     dres.deep_merge(res)
   end
 
-  def power
-    @power = Power.new(self) unless @power
-    @power
+  def actions
+    @nodemgr_actions = NodeManager.gather(self) unless @nodemgr_actions
+    @nodemgr_actions
   end
+
+  def power
+    actions[:power] || {}
+  end
+
+  def transfer
+    actions[:xfer] || {}
+  end
+
+  def run(cmd)
+    raise("No run actions for #{node.name}") unless actions[:run]
+    actions[:run].run(cmd)
+  end
+
+  def ssh(cmd)
+    Rails.logger.warn("Node.ssh outdated, please update #{caller[0]} to use Node.run instead!")
+    run(cmd)
+  end
+
+  def scp_from(remote_src, local_dest, opts="")
+    Rails.logger.warn("Node.scp_from outdated, please update #{caller[0]} to use Node.transfer.copy_from instead!")
+    transfer.copy_from(remote_src,local_dest,opts)
+  end
+
+  def scp_to(local_src, remote_dest, opts="")
+    Rails.logger.warn("Node.scp_to outdated, please update #{caller[0]} to use Node.transfer.copy_to instead!")
+    transfer.copy_to(local_src,remote_dest,opts)
+  end
+
+  def self.name_hash
+    Digest::SHA1.hexdigest(Node.select(:name).order("name ASC").map{|n|n.name}.join).to_i(16)
+  end
+
 
   def method_missing(m,*args,&block)
     method = m.to_s
@@ -341,7 +359,7 @@ class Node < ActiveRecord::Base
     return false if alive == false
     return true unless Rails.env == "production"
     a = address
-    return true if a && self.ssh("echo alive")[2].success?
+    return true if a && self.run("echo alive")[2].success?
     Node.transaction do
       self[:alive] = false
       save!
@@ -350,19 +368,6 @@ class Node < ActiveRecord::Base
   end
 
   private
-
-  def run_on(cmd)
-    Rails.logger.debug("Node: #{name}: Running #{cmd}")
-    out,err = '',''
-    status = Open4::popen4ext(true,cmd) do |pid,stdin,stdout,stderr|
-      stdin.close
-      out << stdout.read
-      err << stderr.read
-      stdout.close
-      stderr.close
-    end
-    [out,err,status]
-  end
 
   def after_commit_handler
     Rails.logger.debug("Node: after_commit hook called")
@@ -420,6 +425,7 @@ class Node < ActiveRecord::Base
     # Call all role on_node_create hooks with ourself.
     # These should happen synchronously.
     # do the low cohorts first
+    node_managers << SecureShellManager.create!(username: "root", node: self)
     Rails.logger.info("Node: calling all role on_node_create hooks for #{name}")
     Role.all_cohorts.each do |r|
       Rails.logger.info("Node: Calling #{r.name} on_node_create for #{self.name}")

@@ -416,7 +416,7 @@ class NodeRole < ActiveRecord::Base
       return unless proposed? || blocked?
       update!(committed_data: proposed_data)
       block_or_todo
-      if !node.alive && node.power.actions.member?(:on)
+      if !node.alive && node.power[:on]
         node.power.on
       end
       self
