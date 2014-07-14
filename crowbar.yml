@@ -20,6 +20,7 @@ os_support:
   - ubuntu-12.04
   - redhat-6.5
   - centos-6.5
+  - centos-7.0.1406
   - opensuse-13.1
   - fedora-20
 
@@ -371,6 +372,54 @@ rpms:
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
       - bare bsdtar 20 http://download.opensuse.org/repositories/home:/AndreasStieger:/branches:/Archiving/CentOS_CentOS-6/
       - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/ocb/
+    build_pkgs:
+      - libcurl-devel
+      - yum-plugin-downloadonly
+      - yum-plugin-priorities
+      - createrepo
+      - libxml2-devel
+      - zlib-devel
+      - tar
+    required_pkgs:
+      # ruby stuff
+      - ruby
+      - ruby-devel
+      - rubygems
+      # openssh stuff
+      - openssh-clients
+      - openssh-server
+      - openssl-devel
+      - gecode
+      - gecode-devel
+      - iproute
+      - squid
+    pkgs:
+      # openldap stuff
+      - openldap
+      - openldap-servers
+      - openldap-clients
+      - krb5-workstation
+      - vim-enhanced
+      # network
+      - vconfig
+      - iptables-ipv6
+      # provisioner
+      - rpcbind
+      - ipmitool
+      - dhclient
+      - nfs-utils
+      - tftp-server
+      # apache stuff
+      - httpd
+      - httpd-devel
+      - mod_fcgid
+      - mod_ssl
+  centos-7.0.1406:
+    raw_pkgs:
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
+    repos:
+      - rpm http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
     build_pkgs:
       - libcurl-devel
       - yum-plugin-downloadonly
