@@ -503,6 +503,7 @@ en:
       refresh: 'Reload Time'
       fast_refresh: 'Fast Reload'
       millis: 'milliseconds'
+    settingsCb:
       debug: 'Debug Hints'
       milestone_roles: 'System Roles Only'
       expand: 'Expand Error'

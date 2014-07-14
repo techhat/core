@@ -1,6 +1,5 @@
 %dt= t(".#{name}")
 %dd
-  =form_for name.to_sym, :'data-remote' => true, :url => utils_settings_put_path(), :method=>:put, :html => { :method=>:put, :'data-type' => 'html',  :class => "formtastic", :remote=>true } do |f|
-    = hidden_field_tag :id, name
-    = text_field_tag :value, value, :size => 10, :id=>name
-    %input.button{:type => "submit", :value => t('update')}
+  =# hidden_field_tag :id, name
+  = text_field_tag name, value, :size => 10, :id=>name
+  

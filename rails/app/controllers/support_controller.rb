@@ -135,27 +135,20 @@ class SupportController < ApplicationController
   
   def settings_put
   
-    case params[:id]
-    when 'refresh'
-      current_user.settings(:ui).refresh = params[:value]
-    when 'fast_refresh'
-      current_user.settings(:ui).fast_refresh = params[:value]
-    when 'edge'
-      current_user.settings(:ui).edge = ( params[:value].eql?('true') ? true : false )
-    when 'test'
-      current_user.settings(:ui).test = ( params[:value].eql?('true')  ? true : false )
-    when 'debug'
-      current_user.settings(:ui).debug = ( params[:value].eql?('true')  ? true : false )
-    when 'milestone_roles'
-      current_user.settings(:ui).milestone_roles = ( params[:value].eql?('true')  ? true : false )
-    when 'expand'
-      current_user.settings(:errors).expand = ( params[:value].eql?('true')  ? true : false )
-    when 'doc_sources'
-      current_user.settings(:docs).sources = ( params[:value].eql?('true')  ? true : false )
-    end
+    current_user.settings(:ui).refresh = params[:refresh].to_i
+    current_user.settings(:ui).fast_refresh = params[:fast_refresh].to_i
+    current_user.settings(:ui).edge = params[:edge].eql?('true') rescue false
+    current_user.settings(:ui).test = params[:test].eql?('true') rescue false
+    current_user.settings(:ui).debug = params[:debug].eql?('true') rescue false
+    current_user.settings(:ui).milestone_roles = params[:milestone_roles].eql?('true') rescue false
+    current_user.settings(:errors).expand = params[:expand].eql?('true') rescue false
+    current_user.settings(:docs).sources = params[:doc_sources].eql?('true') rescue false
     current_user.save!
+    #render :json=>true
+    redirect_to :action => :settings
 
   end
+
   
   def settings
     respond_to do |format|
