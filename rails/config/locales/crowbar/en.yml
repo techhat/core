@@ -226,7 +226,6 @@ en:
       alias: "Alias"
       description: "Description"
       deployment: "Deployment"
-      hint: "edit values then click save > "
       failed: "Edit failed for %{list}"
       updated: "Edit succeeded for %{list}"
     layercake:
@@ -241,6 +240,8 @@ en:
       apps: "Applications"
     getready:
       title: "Ready State Wizard"
+      selection: "Name"
+      selectionValue: "Default"
       deployment: "Deployment"
       default: "pilot"
       range: "Range Name"

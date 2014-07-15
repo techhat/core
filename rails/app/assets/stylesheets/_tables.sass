@@ -30,7 +30,8 @@ table.data
       background: $secondary_bg
   tfoot
     td
-      background: $secondary_bg
+      //background: $secondary_bg
+      +gradient($secondary_bg + #222,$secondary_bg)
 
 table.box
   padding: 0
@@ -102,6 +103,9 @@ table
       &.selected
         td
           background: mix($odd, $selected)
+      &:hover
+        td
+          background: mix($odd, $selected)
     &.even
       td
         background: $even
@@ -113,6 +117,9 @@ table
       &.selected
         td
           background: mix($even, $selected)
+      &:hover
+        td
+          background: mix($odd, $selected)
 
 table.plain
   background: none

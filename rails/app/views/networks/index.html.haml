@@ -24,8 +24,9 @@
         %td= (n.use_team ? n.team_mode : t('not_set') )
         %td= n.conduit
         %td= n.ranges.map{ |r| r.name }.join(', ')
+  %tfoot
     = form_for :network, :'data-remote' => true, :url => networks_path(), :html => { :method=>:post, :'data-type' => 'html',  :class => "formtastic" } do |f|
-      %tr.node{ :class => cycle(:odd, :even) }
+      %tr
         %td= text_field_tag :name, t('default'), :size=>6
         %td= text_field_tag :description, "", :size=>20
         %td= select_tag :deployment_id, options_from_collection_for_select(Deployment.all, :id, :name)

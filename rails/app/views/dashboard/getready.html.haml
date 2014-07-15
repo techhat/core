@@ -5,12 +5,27 @@
 
 = form_for :dashboard, :'data-remote' => true, :url => '/dashboard/getready', :html => { :method=>:post, :'data-type' => 'json',  :id => 'getready', :class => "formtastic" } do |f|
 
-  %dl
-    = dl_item t('.deployment'), text_field_tag(:deployment, t('.default'), :size => 15)
-    = dl_item t('.conduit'), text_field_tag(:conduit, Network::DEFAULTCONDUIT, :size => 15)
-    = dl_item t('.range'), text_field_tag(:range, t('.range_base'), :size => 15)
-    = dl_item t('.first_ip'), text_field_tag(:first_ip, "10.10.10.10/24", :size => 15)
-    = dl_item t('.last_ip'), text_field_tag(:last_ip, "10.10.10.250/24", :size => 15)
+  %table.data.box
+    %thead
+      %tr
+        %th{:width=>'10%'}= t('.selection')
+        %th= t('.selectionValue')
+    %tbody
+      %tr{:class => cycle(:odd,:even)}
+        %td= t('.deployment')
+        %td= text_field_tag(:deployment, t('.default'), :size => 15)
+      %tr{:class => cycle(:odd,:even)}
+        %td= t('.conduit')
+        %td= text_field_tag(:conduit, Network::DEFAULTCONDUIT, :size => 15)
+      %tr{:class => cycle(:odd,:even)}
+        %td= t('.range')
+        %td= text_field_tag(:range, t('.range_base'), :size => 15)
+      %tr{:class => cycle(:odd,:even)}
+        %td= t('.first_ip')
+        %td= text_field_tag(:first_ip, "10.10.10.10/24", :size => 15)
+      %tr{:class => cycle(:odd,:even)}
+        %td= t('.last_ip')
+        %td= text_field_tag(:last_ip, "10.10.10.250/24", :size => 15)
 
   %table.data.box
     %thead
