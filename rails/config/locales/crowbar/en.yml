@@ -499,10 +499,13 @@ en:
       ranges: "Ranges"
       start: "Start Server"
     settings:
+      name: "Name"
+      value: "Value"
       title: 'Session Settings'
       refresh: 'Reload Time'
       fast_refresh: 'Fast Reload'
       millis: 'milliseconds'
+    settingsCb:
       debug: 'Debug Hints'
       milestone_roles: 'System Roles Only'
       expand: 'Expand Error'
