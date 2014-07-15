@@ -29,7 +29,7 @@ VirtualBox
     * you need to select YES to continue (NO = return to selection)
   * Proxy depends on your environment (we'll install Squid later)
     1. No automatic updates
-  * Install OpenSHH & Samba (space toggles, enter continues)
+  * Install OpenSSH & Samba (space toggles, enter continues)
   * Install GRUB boot loader
 * When Installation completes, make sure the ISO is not attached and allow reboot
 * you may want to snapshot the machine in this state
@@ -42,6 +42,6 @@ VirtualBox
     * `  address 192.168.222.6`
     * `  netmask 255.255.255.0`
 
-  * `sudo service network restart`
+  * `sudo service networking restart`
 
   * validate network by using Putty to SSH into crowbar@192.168.222.6
