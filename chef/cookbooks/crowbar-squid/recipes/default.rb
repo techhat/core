@@ -33,7 +33,7 @@ upstream_proxy = ( node["crowbar"]["provisioner"]["server"]["upstream_proxy"] re
   ENV["http_proxy"]
 upstream_proxy_address = nil
 upstream_proxy_port = nil
-if upstream_proxy && upstream_proxy != "http://#{v4addr.addr}:8123"
+if upstream_proxy && !upstream_proxy.empty? && upstream_proxy != "http://#{v4addr.addr}:8123"
   matchers = /http:\/\/(?<address>(\[[0-9a-f:]+\])|([^:]+)):(?<port>[0-9]+)/.match(upstream_proxy)
   raise "Could not parse upstream proxy!" unless matchers["address"]
   upstream_proxy_address = matchers["address"]
