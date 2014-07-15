@@ -211,16 +211,6 @@ else
   raise "Don't know how to update repositories for #{node["platform"]}"
 end
 
-bash "Install required files" do
-  code case node["platform"]
-       when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       else raise "Don't know how to install required files for #{node["platform"]}'"
-       end
-  only_if do ::File.exists?("/tmp/install_pkgs") end
-end
-
 unless raw_pkgs.empty?
   dest = "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
   FileUtils.mkdir_p(dest)
@@ -271,6 +261,16 @@ EOC
   else
     raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
   end
+end
+
+bash "Install required files" do
+  code case node["platform"]
+       when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       else raise "Don't know how to install required files for #{node["platform"]}'"
+       end
+  only_if do ::File.exists?("/tmp/install_pkgs") end
 end
 
 extra_files.each do |f|
