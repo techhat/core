@@ -136,6 +136,7 @@ Feature: Nodes
       And REST removes the {object:deployment} "bdd_test1"
 
   Scenario: Node loads test data
+    Unless travis
     Given there is a {object:node} "bdd-discovery.data.edu"
       Given test loads the "node_discovery" data into {object:node} "bdd-discovery.data.edu"
     When REST gets the {object:node} "bdd-discovery.data.edu"
