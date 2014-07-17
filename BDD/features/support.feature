@@ -45,27 +45,31 @@ Feature: Support UI
       And there are no localization errors
     
   Scenario: Settings Change False
+    While travis
     Given I set {object:user} setting "doc_sources" to "false"
     When I go to the "utils/settings" page
     Then I should see an input box "doc_sources" with "false"
 
   Scenario: Settings Change True
+    While travis
     Given I set {object:user} setting "doc_sources" to "true"
     When I go to the "utils/settings" page
     Then I should see an input box "doc_sources" with "true"
 
   Scenario: Settings Change not True
+    While travis
     Given I set {object:user} setting "doc_sources" to "foo"
     When I go to the "utils/settings" page
     Then I should see an input box "doc_sources" with "false"
 
   Scenario: Settings Change Visible Off
+    While travis
     Given I set {object:user} setting "debug" to "false"
     When I go to the "docs/devguide/README.md" page
     Then I should not see heading {bdd:crowbar.i18n.debug}
 
   Scenario: Settings Change Visible On
-    Skip will not work until docs pages are working
+    While travis
     Given I set {object:user} setting "debug" to "true"
     When I go to the "docs/devguide/README.md" page
     Then I should see heading {bdd:crowbar.i18n.debug}
