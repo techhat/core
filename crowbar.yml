@@ -321,7 +321,7 @@ rpms:
       - rpm http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
       - bare bsdtar 20 http://download.opensuse.org/repositories/home:/AndreasStieger:/branches:/Archiving/CentOS_CentOS-6/
-      - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/ocb/
+      - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/el6
     build_pkgs:
       - libcurl-devel
       - yum-plugin-downloadonly
@@ -371,7 +371,7 @@ rpms:
       - rpm http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
       - bare bsdtar 20 http://download.opensuse.org/repositories/home:/AndreasStieger:/branches:/Archiving/CentOS_CentOS-6/
-      - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/ocb/
+      - bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/el6
     build_pkgs:
       - libcurl-devel
       - yum-plugin-downloadonly

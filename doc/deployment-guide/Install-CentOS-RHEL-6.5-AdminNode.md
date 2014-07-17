@@ -132,7 +132,7 @@ NOTE: This is preliminary information.  The specific steps outlined here will ch
 
     [dell-ocb]
     name=repo for opencrowbar rpms
-    baseurl=https://s3.amazonaws.com/opencrowbar/ocb
+    baseurl=http://opencrowbar.s3-website-us-east-1.amazonaws.com/el6
     enabled=1
     gpgcheck=0
     type=none
