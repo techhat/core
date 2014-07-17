@@ -147,7 +147,7 @@ Save the file and continue.
 Verify that you see dell-ocb in the list and its status is >0 (the number of packages that were found)
 
         yum -y install http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
-        yum -y install http://mirrors.servercentral.net/fedora/epel/6/i386/epel-release-6-8.noarch.rpm
+        yum -y install http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
 
          
 If you are using VMs, now would be a good time to make a snapshot.
