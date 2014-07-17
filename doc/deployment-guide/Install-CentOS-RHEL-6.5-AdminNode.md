@@ -20,9 +20,9 @@ Installation process:
 Before commencing installation and configuration processing ensure that everything needed is available and that all remote resources that must be accessed are capable of being reached.
 
 ##Pre-Requisites:
-   
-   * CentOS 6.5 x86_64 - download site: http://www.centos.org/download/ 
-   * You will need to know how to access the internet from your VM/Physical environment.  
+
+   * CentOS 6.5 x86_64 - download site: http://www.centos.org/download/
+   * You will need to know how to access the internet from your VM/Physical environment.
    * Proxy Services
        * Windows - Fiddler 2 is a good one
        * Linux - potential proxy services include: cntlm and squid.
@@ -96,20 +96,20 @@ Machine requirements are:
 Verify proxy operation before proceeding.  An example of how this validation may be completed is shown here:
 
     #> yum clean all
-    #> yum makecache 
+    #> yum makecache
 
 ### Proxy alternative for YUM only ####
 
 You can setup Yum to use a proxy and not have to add the proxy information to your bashrc script.  The benefit is that you will not have to unset the proxy when you doing local operations, but Gem will still require the above proxy information!
 
 Follow the instructions at  https://www.centos.org/docs/5/html/yum/sn-yum-proxy-server.html
- 
+
 
     # The proxy server - proxy server:port number
     proxy=http://mycache.mydomain.com:3128
-    # The account details for yum connections 
+    # The account details for yum connections
     proxy_username=yum-user
-    proxy_password=qwerty 
+    proxy_password=qwerty
 
 ### END Proxy alternative ####
 
@@ -120,11 +120,11 @@ NOTE: This is preliminary information.  The specific steps outlined here will ch
 
     Log into the CentOS 6.5 Admin node that was installed above, log in as the root user.
 
-    Turn off the linux firewall with these commands: 
+    Turn off the linux firewall with these commands:
         # chkconfig iptables off
         # service iptables stop
 
-    Create the dell-ocb yum repository file  
+    Create the dell-ocb yum repository file
 
         cd /etc/yum.repos.d
         Using your favorite editor create a new repo file called "dell-ocb.repo"
@@ -142,17 +142,17 @@ NOTE: This is preliminary information.  The specific steps outlined here will ch
 Save the file and continue.
 
     Verify that you can access the RPM repository
-        yum repolist   
+        yum repolist
 
 Verify that you see dell-ocb in the list and its status is >0 (the number of packages that were found)
 
         yum -y install http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
         yum -y install http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
 
-         
+
 If you are using VMs, now would be a good time to make a snapshot.
-Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.  
- 
+Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.
+
 ###Installing OpenCrowbar
 
         yum clean all; yum makecache
@@ -178,7 +178,7 @@ Another good reason to create a snapshot is the migration process doesn't at thi
 
     #> ./production/sh <FQDN>
 
- 
+
 
 Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
 
@@ -187,11 +187,11 @@ Launch your web browser and connect to the IP address of the Admin node on port 
 
 ##Known Issues:
 
-  There is one known issue where the provisioner-server was unable to restart httpd and crashed.  The root cause of the issue is being investigated.   If you see this issue, your best bet (assuming that you created the SnapShot advice) is to jump to the "Updating Crowbar" section below and follow those instructions.  
+  There is one known issue where the provisioner-server was unable to restart httpd and crashed.  The root cause of the issue is being investigated.   If you see this issue, your best bet (assuming that you created the SnapShot advice) is to jump to the "Updating Crowbar" section below and follow those instructions.
 
- 
 
-If the above was followed sequentually it is safe to assume that OpenCrowbar was found to be operational. 
+
+If the above was followed sequentually it is safe to assume that OpenCrowbar was found to be operational.
 a) Updating OpenCrowbar
 
 As of March 28, the instructions below should not be used as there are still many changes in the database schema occurring that prevent the RPM package from being up-gradable.  Until this churn quiets down your best bet is to follow these instructions:
