@@ -15,10 +15,19 @@ end
  "/var/log/crowbar",
  "/var/cache/yum",
  "/var/cache/apt/archives",
+ "/rpmbuild"
 ].each do |target|
   directory target do
     action :delete
     recursive true
+  end
+end
+
+# Clear out /tmp and /var/tmp
+["/tmp", "/var/tmp"].each do |target|
+  bash "Clean out #{target}" do
+    code "rm -rf *"
+    cwd target
   end
 end
 

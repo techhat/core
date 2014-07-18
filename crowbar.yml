@@ -332,8 +332,6 @@ rpms:
     required_pkgs:
       # ruby stuff
       - ruby
-      - ruby-devel
-      - rubygems
       # openssh stuff
       - openssh-clients
       - openssh-server
@@ -383,8 +381,6 @@ rpms:
     required_pkgs:
       # ruby stuff
       - ruby
-      - ruby-devel
-      - rubygems
       # openssh stuff
       - openssh-clients
       - openssh-server
