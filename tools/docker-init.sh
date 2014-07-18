@@ -14,12 +14,19 @@ if grep -q crowbar /etc/group; then
     groupmod -o -g "$OUTER_GID" crowbar
     usermod -g "$OUTER_GID" crowbar
 fi
+
+if [[ $1 = --no-shell ]]; then
+    shift
+    NO_SHELL=true
+fi
 mkdir -p /root/.ssh
 printf "%s\n" "$SSH_PUBKEY" >> /root/.ssh/authorized_keys
 
 if [[ $1 ]]; then
     "$@"
+    res=$?
 fi
+[[ $NO_SHELL = true ]] && exit ${res:=0}
 . /etc/profile
 export PATH=$PATH:/opt/opencrowbar/core/bin
 /bin/bash -i

@@ -186,4 +186,3 @@ if ! [[ $* = *--zombie* ]]; then
 else
   echo "To complete configuration, mark node alive using: crowbar nodes update 1 '{""alive"": true}'"
 fi
-[[ -f /.dockerenv ]] && /bin/bash -i || :
