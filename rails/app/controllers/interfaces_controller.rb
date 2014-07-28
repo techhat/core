@@ -49,7 +49,7 @@ class InterfacesController < ::ApplicationController
   
   def index
     r = Role.find_key 'network-server'
-    @interfaces = r.interfaces
+    @interfaces = r.interfaces rescue []
     respond_to do |format|
       format.html { }
       format.json { render api_index :interface, @interfaces }
