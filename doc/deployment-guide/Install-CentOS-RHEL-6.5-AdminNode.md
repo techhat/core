@@ -176,7 +176,7 @@ Another good reason to create a snapshot is the migration process doesn't at thi
 
     #> cd /opt/opencrowbar/core
 
-    #> ./production/sh <FQDN>
+    #> ./production.sh <FQDN>
 
 
 
