@@ -230,8 +230,8 @@ unless raw_pkgs.empty?
     code <<EOC
 [[ -f "#{dest}/canary" ]] || exit 0
 case #{os_pkg_type} in
-    debs) dpkg-scanpackages . |gzip -9 >Packages.gz;;
-    rpms) createrepo .;;
+    debs) apt-get -y install dpkg-dev; dpkg-scanpackages . |gzip -9 >Packages.gz;;
+    rpms) yum -y install createrepo; createrepo .;;
     *) echo "Cannot create package metadata for #{os_pkg_type}"
        exit 1;;
 esac
@@ -240,10 +240,6 @@ EOC
   end
   case node["platform"]
   when "centos","redhat","suse","opensuse","fedora"
-    bash "Create repodata for raw_pkgs" do
-      code "createrepo ."
-      cwd "/tftpboot/#{os_token}/crowbar-extra/raw_pkgs"
-    end
     template "#{repofile_path}/crowbar-raw_pkgs.repo" do
       source "crowbar.repo.erb"
       variables(
