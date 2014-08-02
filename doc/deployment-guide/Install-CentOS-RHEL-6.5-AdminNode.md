@@ -159,7 +159,7 @@ Another good reason to create a snapshot is the migration process doesn't at thi
         yum install -y opencrowbar-core
             this will install opencrowbar core and dependent rpm packages
          ls /opt/opencrowbar
-            verify that you have one directory (core) and one file (prep.sh)
+            verify that you have one directory (core)
             if so, then proceed to the following section.
 
 ###Enable WebUI / Connect via browser
