@@ -75,7 +75,7 @@ extra_files:
 debs:
   ubuntu-12.04:
     raw_pkgs:
-      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.1.1-1_amd64.deb
+      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.1.3-1_amd64.deb
       - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef_11.12.8-1_amd64.deb
     repos:
       - deb http://us.archive.ubuntu.com/ubuntu/ precise main restricted universe multiverse
@@ -194,8 +194,8 @@ debs:
     - ntp
   ubuntu-14.04:
     raw_pkgs:
-      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.1.1-1_amd64.deb
-      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef_11.12.8-1_amd64.deb
+      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef-server_11.1.3-1_amd64.deb
+      - http://opscode-omnibus-packages.s3.amazonaws.com/ubuntu/12.04/x86_64/chef_11.14.2-1_amd64.deb
     repos:
       - deb http://us.archive.ubuntu.com/ubuntu/ trusty main restricted universe multiverse
       - deb-src http://us.archive.ubuntu.com/ubuntu/ trusty main restricted universe multiverse
@@ -315,8 +315,8 @@ debs:
 rpms:
   redhat-6.5:
     raw_pkgs:
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.14.2-1.el6.x86_64.rpm
     repos:
       - rpm http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
@@ -363,8 +363,8 @@ rpms:
       - mod_wsgi
   centos-6.5:
     raw_pkgs:
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.14.2-1.el6.x86_64.rpm
     repos:
       - rpm http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
@@ -412,8 +412,8 @@ rpms:
       - mod_ssl
   centos-7.0.1406:
     raw_pkgs:
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.14.2-1.el6.x86_64.rpm
     repos:
       - rpm http://yum.postgresql.org/9.3/redhat/rhel-7-x86_64/pgdg-centos93-9.3-1.noarch.rpm
     build_pkgs:
@@ -460,8 +460,8 @@ rpms:
       - mod_ssl
   fedora-20:
     raw_pkgs:
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.14.2-1.el6.x86_64.rpm
     required_pkgs:
       # ruby stuff
       - ruby
@@ -502,8 +502,8 @@ rpms:
   opensuse-13.1:
     raw_pkgs:
       # openSUSE native packages would be nice
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.1-1.el6.x86_64.rpm
-      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
+      - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.14.2-1.el6.x86_64.rpm
     repos:
       - repo http://download.opensuse.org/repositories/server:/database:/postgresql/openSUSE_13.1/ postgresql
       - repo http://download.opensuse.org/repositories/devel:/tools/openSUSE_13.1/ devel-libs
