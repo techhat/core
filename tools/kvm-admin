@@ -34,6 +34,7 @@ TMPDIR=$(mktemp -d /tmp/ocb-kvm-admin-XXXXXX)
 myclean() {
     set +e
     rm -rf "$TMPDIR"
+    sudo iptables -t nat -D POSTROUTING -s 192.168.124.0/22 \! -d 192.168.124.0/22 -j MASQUERADE
     cleanup
     kill_ocb_bridge
 }
@@ -119,7 +120,13 @@ BOOTPROTO=none
 ONBOOT=yes
 NETMASK=255.255.252.0
 IPADDR=192.168.124.10
+GATEWAY=192.168.124.1
 TYPE=Ethernet
+EOQ
+
+cat <<EOQ > /etc/resolv.conf
+nameserver 8.8.8.8
+nameserver 8.8.4.4
 EOQ
 
 EOF
@@ -142,6 +149,8 @@ done
 make_ocb_bridge
 qemu-img create -f raw "$VM_DIR/$VMID.disk" 30G &>/dev/null
 makenics
+# Let the admin node talk to the outside world.
+sudo iptables -t nat -A POSTROUTING -s 192.168.124.0/22 \! -d 192.168.124.0/22 -j MASQUERADE
 
 # Kick off the installer
 run_kvm -kernel "$admin_server_loc/install/images/pxeboot/vmlinuz" \
