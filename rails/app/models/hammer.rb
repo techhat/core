@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 
-# Managers encapsulate the concept of being able to
+# Hammers encapsulate the concept of being able to
 # perform actions on a node outside the context of the noderole
 # graph.  Exmaples of these actions include:
 # * Copying files to and from the system.
@@ -24,9 +24,30 @@
 # * Any other node management task that does not belong on the
 #   node role graph.
 
-class NodeManager < ActiveRecord::Base
+class Hammer < ActiveRecord::Base
 
   belongs_to :node
+  belongs_to :available_hammer
+
+  def self.bind(args)
+    raise "Must pass a manager_name: arg" unless args[:manager_name]
+    Rails.logger.info("Hammer: Binding #{args[:manager_name]} to #{args[:node].name}")
+    anm = AvailableHammer.find_by!(name: args.delete(:manager_name))
+    Rails.logger.debug("Hammer: #{args.inspect}")
+    args[:available_hammer] = anm
+    args[:name] = anm.name
+    args[:type] = anm.klass
+    args[:priority] ||= anm.priority
+    Hammer.create!(args)
+  end
+
+  def as_json
+    super(methods: :actions)
+  end
+
+  def actions
+    {}
+  end
 
   def self.probe(node)
     false
@@ -34,7 +55,7 @@ class NodeManager < ActiveRecord::Base
 
   def self.gather(node)
     res = Hash.new
-    node.node_managers.order("priority DESC").each do |mgr|
+    node.hammers.order("priority DESC").each do |mgr|
       mgr.actions.each do |k,v|
         res[k] ||= Hash.new
         v.each do |meth|

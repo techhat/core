@@ -65,6 +65,11 @@ roles:
       - crowbar-managed-node
       - crowbar-installed-node
 
+hammers:
+  - name: 'ssh'
+    type: 'SecureShellHammer'
+    priority: 0
+
 attribs:
   # Crowbar Core
   - name: asset_tag

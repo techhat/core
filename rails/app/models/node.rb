@@ -50,7 +50,7 @@ class Node < ActiveRecord::Base
   has_many    :roles,              :through => :node_roles
   has_many    :deployments,        :through => :node_roles
   has_many    :network_allocations,:dependent => :destroy
-  has_many    :node_managers,      :dependent => :destroy
+  has_many    :hammers,      :dependent => :destroy
   belongs_to  :deployment
   belongs_to  :target_role,        :class_name => "Role", :foreign_key => "target_role_id"
 
@@ -184,7 +184,7 @@ class Node < ActiveRecord::Base
   end
 
   def actions
-    @nodemgr_actions = NodeManager.gather(self) unless @nodemgr_actions
+    @nodemgr_actions = Hammer.gather(self) unless @nodemgr_actions
     @nodemgr_actions
   end
 
@@ -197,7 +197,7 @@ class Node < ActiveRecord::Base
   end
 
   def run(cmd)
-    raise("No run actions for #{node.name}") unless actions[:run]
+    raise("No run actions for #{name}") unless actions[:run]
     actions[:run].run(cmd)
   end
 
@@ -425,7 +425,7 @@ class Node < ActiveRecord::Base
     # Call all role on_node_create hooks with ourself.
     # These should happen synchronously.
     # do the low cohorts first
-    node_managers << SecureShellManager.create!(username: "root", node: self)
+    Hammer.bind(manager_name: "ssh", username: "root", node: self)
     Rails.logger.info("Node: calling all role on_node_create hooks for #{name}")
     Role.all_cohorts.each do |r|
       Rails.logger.info("Node: Calling #{r.name} on_node_create for #{self.name}")

@@ -13,7 +13,7 @@
 # limitations under the License.
 #
 
-class SecureShellManager < NodeManager
+class SecureShellHammer < Hammer
 
   # For now, assume that the SSH power manager is always applicable.
   # This may change if we start having non-Linux nodes.

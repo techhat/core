@@ -70,6 +70,13 @@ class Barclamp < ActiveRecord::Base
                                   :commit      => gitcommit,
                                   :cfg_data    => bc)
 
+      # Load node maanger information, if any.
+      bc['hammers'].each do |nm|
+        AvailableHammer.find_or_create_by!(name: nm['name'],
+                                                klass: nm['type'],
+                                                priority: nm['priority'])
+      end if bc['hammers']
+
       # load the jig information.
       bc['jigs'].each do |jig|
         raise "Jigs must have a name" unless jig['name'] && !jig['name'].empty?
