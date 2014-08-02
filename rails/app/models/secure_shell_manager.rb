@@ -40,7 +40,7 @@ class SecureShellManager < NodeManager
   end
 
   # and it only allows you to reboot a node via its "reboot" command
-  def reboot(mgr)
+  def reboot
     node.update!(alive: false)
     run("reboot")
   end

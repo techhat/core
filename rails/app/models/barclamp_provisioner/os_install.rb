@@ -30,11 +30,7 @@ class BarclampProvisioner::OsInstall < Role
     NodeRole.transaction do
       node = nr.node
       return if ["local"].member? node.bootenv || (nr.run_count > 1)
-      if node.power.actions.member?(:reset)
-        node.power.reset
-      else
-        node.power.reboot
-      end
+      node.power[:reset] ? node.power.reset : node.power.reboot
     end
   end
 

@@ -278,7 +278,7 @@ class Node < ActiveRecord::Base
               bootenv: "sledgehammer",
               target: Role.find_by!(:name => "crowbar-managed-node"))
     end
-    reboot
+    power.reboot
   end
 
   def undebug
@@ -288,7 +288,7 @@ class Node < ActiveRecord::Base
               bootenv: "local",
               target: nil)
     end
-    reboot
+    power.reboot
   end
 
   def commit!
@@ -307,7 +307,7 @@ class Node < ActiveRecord::Base
       update!(bootenv: "sledgehammer")
       node_roles.update_all(run_count: 0, state: NodeRole::PROPOSED)
     end
-    reboot
+    power.reboot
     commit!
   end
 
