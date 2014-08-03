@@ -8,7 +8,7 @@
       %th= t '.admin'
       %th= t '.description'
       %th= t '.deployment'
-  %tbody
+  %tbody.nodelist
     -nodes.each do |n|
       - s = n.state
       - led = NodeRole::STATES[s]
@@ -16,9 +16,9 @@
         - led = (n.alive ? 'reserved' : 'idle')
       - elsif !n.alive
         - led = 'off'
-      %tr.node{ :class => cycle(:odd, :even) }
-        %td{ :width=>'10px'}
-          .led{:class => led, :title=>t(".#{led}")}
+      %tr.node{ :class => cycle(:odd, :even), :id => n.id}
+        %td.status{ :width=>'10px'}
+          .led{:class => led, :title=>t(".#{led}"), :raw => s}
         %td= link_to n.name, node_path(n.id)
         %td= n.alias
         %td

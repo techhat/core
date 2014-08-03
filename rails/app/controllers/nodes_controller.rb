@@ -33,6 +33,19 @@ class NodesController < ApplicationController
   
   def status
     # place holder
+    nodes = Node.all
+    status = {}
+    nodes.each do |n| 
+      status[n.id] = {
+        :name => n.name,
+        :state => n.state,
+        :status => NodeRole::STATES[n.state]
+      }
+    end
+
+
+     render api_array status.to_json
+    #render :text => status.to_json
   end
 
   def show
