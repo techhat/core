@@ -132,17 +132,20 @@ class SupportController < ApplicationController
       render
     end
   end
-  
+
+  # allows user to change UI behaviors  
   def settings_put
   
-    current_user.settings(:ui).refresh = params[:refresh].to_i
-    current_user.settings(:ui).fast_refresh = params[:fast_refresh].to_i
-    current_user.settings(:ui).edge = params[:edge].eql?('true') rescue false
-    current_user.settings(:ui).test = params[:test].eql?('true') rescue false
-    current_user.settings(:ui).debug = params[:debug].eql?('true') rescue false
-    current_user.settings(:ui).milestone_roles = params[:milestone_roles].eql?('true') rescue false
-    current_user.settings(:errors).expand = params[:expand].eql?('true') rescue false
-    current_user.settings(:docs).sources = params[:doc_sources].eql?('true') rescue false
+    # expected to set ALL values in one put
+    # however, the code will set to current values if items are missing
+    current_user.settings(:ui).refresh = params[:refresh].to_i rescue current_user.settings(:ui).refresh
+    current_user.settings(:ui).fast_refresh = params[:fast_refresh].to_i rescue current_user.settings(:ui).fast_refresh
+    current_user.settings(:ui).edge = params[:edge].eql?('true') rescue current_user.settings(:ui).edge
+    current_user.settings(:ui).test = params[:test].eql?('true') rescue current_user.settings(:ui).test
+    current_user.settings(:ui).debug = params[:debug].eql?('true') rescue current_user.settings(:ui).debug
+    current_user.settings(:ui).milestone_roles = params[:milestone_roles].eql?('true') rescue current_user.settings(:ui).milestone_roles
+    current_user.settings(:errors).expand = params[:expand].eql?('true') rescue current_user.settings(:errors).expand
+    current_user.settings(:docs).sources = params[:doc_sources].eql?('true') rescue current_user.settings(:docs).sources
     current_user.save!
     #render :json=>true
     redirect_to :action => :settings
