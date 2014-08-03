@@ -107,6 +107,22 @@ step(Result, {step_then, {_Scenario, _N}, ["I should not see", Text, "in section
 	bdd_utils:log(debug, "step_then result ~p should NOT have ~p on the page", [Result, Text]),
   step(Result, {step_then, {_Scenario, _N}, ["I should see", Text, "in section", Id]}) =:= false;
 
+step(Result, {step_then, {_Scenario, _N}, ["I should see a checked check box",Name]}) ->
+  try find_checkbox(Result, Name) of
+    {{match, _}, {match, _}} -> true;
+    _ -> false
+  catch
+    _ -> false
+  end;
+
+step(Result, {step_then, {_Scenario, _N}, ["I should see an unchecked check box",Name]}) ->
+  try find_checkbox(Result, Name) of
+    {nomatch, {match, _}} -> true;
+    _ -> false
+  catch
+    _ -> false
+  end;
+
 step(Result, {step_then, {_Scenario, _N}, ["I should see an input box with",Input]}) ->
   R = eurl:get_result(Result, http, "text/html"), 
   {ok, Rex} = re:compile("<input\ (.+?)value=\""++Input++"\"(.+?)>", [multiline, dotall, {newline , anycrlf}]),
@@ -210,3 +226,18 @@ step(Result, {step_then, _N, ["we should get a 404 return"]}) ->
 
 step(_Result, {_Type, _N, ["END OF WEBRAT"]}) ->
   false.
+
+% utilities
+
+% we need to check for BOTH checked and unchecked to make sure there IS a checkbox
+% returns the TWO regex results: checkbox checked and checkbox withotu checked
+find_checkbox(Result, Name) ->
+  R = eurl:get_result(Result, http, "text/html"), 
+  {ok, RexCheck} = re:compile("<input\ (.+?)checked=(.+?)(name|id)=\""++Name++"\"(.+?)type=\"checkbox\"(.+?)>", [multiline, dotall, {newline , anycrlf}]),
+  {ok, RexUnCheck} = re:compile("<input\ (.+?)(name|id)=\""++Name++"\"(.+?)type=\"checkbox\"(.+?)>", [multiline, dotall, {newline , anycrlf}]),
+  MCheck = re:run(R#http.data, RexCheck),
+  bdd_utils:log(debug, bdd_webrat, find_checkbox, "Checkbox checked? ~p", [MCheck]),
+  MUnCheck = re:run(R#http.data, RexUnCheck),
+  bdd_utils:log(debug, bdd_webrat, find_checkbox, "Checkbox UNchecked? ~p", [MUnCheck]),
+  {MCheck,MUnCheck}.
+
