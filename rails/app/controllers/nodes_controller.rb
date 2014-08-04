@@ -32,7 +32,6 @@ class NodesController < ApplicationController
   end
   
   def status
-    # place holder
     nodes = Node.all
     status = {}
     nodes.each do |n| 
