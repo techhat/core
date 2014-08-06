@@ -593,6 +593,25 @@ module OpenCrowbar
 
   end
 
+  class Hammer < CrowbarProxy
+    def self.path
+      "api/v2/hammers"
+    end
+
+    def do_perform_Json(data, *rest)
+      obj,res = REST.post("#{self.class.path}/#{id}/perform",data)
+      maybe_json_die(obj,res)
+      obj
+    end
+
+  end
+
+  class AvailableHammer < CrowbarProxy
+    def self.path
+      "api/v2/available_hammers"
+    end
+  end
+
   class Barclamp < CrowbarProxy; end
   class User < CrowbarProxy; end
   class Attrib < CrowbarProxy; end

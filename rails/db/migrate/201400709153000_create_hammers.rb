@@ -13,14 +13,24 @@
 # limitations under the License.
 #
 
-class CreateNodeManagers < ActiveRecord::Migration
+class CreateHammers < ActiveRecord::Migration
   def change
-    create_table :node_managers do |t|
+
+    create_table :available_hammers do |t|
+      t.string     :name,               null: false, index: :unique
+      t.string     :klass,              null: false, index: :unique
+      t.integer    :priority,           null: false
+      t.timestamps
+    end
+
+    create_table :hammers do |t|
       t.belongs_to :node,               null: false
+      t.belongs_to :available_hammer, null: false
       t.integer    :priority,           null: false, default: 0
-      t.string     :type,               null: false
+      t.string     :type,               null: false, foreign_key: { references: [:available_hammers, :klass] }
+      t.string     :name,               null: false, foreign_key: { references: [:available_hammers, :name] }
       # How the node manager should talk to the node being managed.
-      # How this is parsed is node_manager dependent.
+      # How this is parsed is hammer dependent.
       t.text       :endpoint,           null: true
       # The username that the manager should use for this node.
       t.string     :username,           null: false
@@ -30,6 +40,6 @@ class CreateNodeManagers < ActiveRecord::Migration
       t.text       :authenticator,      null: true
     end
     # Only one manager of a given type can be bound to a node.
-    add_index(:node_managers, [:node_id, :type], unique: true)
+    add_index(:hammers, [:node_id, :type], unique: true)
   end
 end

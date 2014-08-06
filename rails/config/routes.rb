@@ -83,6 +83,7 @@ Crowbar::Application.routes.draw do
     post "bootstrap"     => "support#bootstrap_post", :as => :bootstrap_post
     namespace :scaffolds do
       resources :attribs do as_routes end
+      resources :available_hammers do as_routes end
       resources :barclamps do as_routes end
       resources :docs do as_routes end
       resources :deployment_roles do as_routes end
@@ -95,6 +96,7 @@ Crowbar::Application.routes.draw do
       resources :network_routers do as_routes end
       resources :networks do as_routes end
       resources :nodes do as_routes end
+      resources :hammers do as_routes end
       resources :node_roles do as_routes end
       resources :roles do as_routes end
       resources :role_requires do as_routes end
@@ -130,6 +132,7 @@ Crowbar::Application.routes.draw do
           # These are not restful.  They poke the annealer and wait if you pass "sync=true".
           get "anneal", :to => "node_roles#anneal", :as => :anneal
           resources :attribs, :as=>:attribs_api
+          resources :available_hammers
           resources :barclamps
           resources :deployment_roles do
             resources :attribs
@@ -167,6 +170,7 @@ Crowbar::Application.routes.draw do
           resources :jigs
           resources :nodes do
             resources :node_roles
+            resources :hammers
             resources :attribs
             resources :roles
             put :power
@@ -176,6 +180,10 @@ Crowbar::Application.routes.draw do
             put :commit
             get 'addresses'
           end
+          resources :hammers do
+            post :perform
+          end
+
           resources :node_roles do
             resources :attribs
             put :retry
