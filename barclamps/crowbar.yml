@@ -20,7 +20,6 @@ roles:
     jig: noop
     flags:
       - milestone
-      - bootstrap
       - implicit
     requires:
       - network-server
@@ -35,7 +34,6 @@ roles:
     jig: noop
     flags:
       - milestone
-      - discovery
       - implicit
     requires:
       - deployer-client
@@ -56,7 +54,6 @@ roles:
     jig: noop
     flags:
       - milestone
-      - discovery
       - implicit
     requires:
       - provisioner-repos

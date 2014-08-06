@@ -430,6 +430,9 @@ class Node < ActiveRecord::Base
     Role.all_cohorts.each do |r|
       Rails.logger.info("Node: Calling #{r.name} on_node_create for #{self.name}")
       r.on_node_create(self)
+      if (admin && r.bootstrap) || (!admin && r.discovery)
+        r.add_to_node(self)
+      end
     end
   end
 
