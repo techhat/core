@@ -45,31 +45,33 @@ Feature: Support UI
       And there are no localization errors
     
   Scenario: Settings Change False
-    Unless travis
     Given I set {object:user} setting "doc_sources" to "false"
     When I go to the "utils/settings" page
-    Then I should see an input box "doc_sources" with "false"
+    Then I should see an unchecked check box "doc_sources"
 
   Scenario: Settings Change True
-    Unless travis
     Given I set {object:user} setting "doc_sources" to "true"
     When I go to the "utils/settings" page
-    Then I should see an input box "doc_sources" with "true"
+    Then I should see a checked check box "doc_sources"
 
   Scenario: Settings Change not True
-    Unless travis
     Given I set {object:user} setting "doc_sources" to "foo"
     When I go to the "utils/settings" page
-    Then I should see an input box "doc_sources" with "false"
+    Then I should see an unchecked check box "doc_sources"
+
+  Scenario: Settings Change omitted
+    Given I set {object:user} setting "anything_else" to "true"
+    When I go to the "utils/settings" page
+    Then I should see an unchecked check box "doc_sources"
 
   Scenario: Settings Change Visible Off
-    Unless travis
     Given I set {object:user} setting "debug" to "false"
-    When I go to the "docs/devguide/README.md" page
+    When I go to the "docs/development-guides/README.md" page
     Then I should not see heading {bdd:crowbar.i18n.debug}
+      And I should see heading "Development Guide"
 
   Scenario: Settings Change Visible On
-    Unless travis
     Given I set {object:user} setting "debug" to "true"
-    When I go to the "docs/devguide/README.md" page
+    When I go to the "docs/development-guides/README.md" page
     Then I should see heading {bdd:crowbar.i18n.debug}
+      And I should see heading "Development Guide"

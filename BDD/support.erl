@@ -21,13 +21,14 @@
 % Provide Feature scoped strings to DRY the code
 g(Item) ->
   case Item of
-    setting -> 'utils/settings';
+    setting -> "utils/settings";
     _ -> crowbar:g(Item)
   end.
 
 step(_Global, {step_given, {_Scenario, _N}, ["I set",user,"setting",Key,"to",Value]}) -> 
-  URI = eurl:path([g(setting), Key, Value]),
-  eurl:put_post(URI, "{}", put);
+  URI = eurl:uri(g(setting)),
+  JSON = json:output([{Key, Value}]),
+  eurl:put_post(URI, JSON, put);
 
 step(_Given, {step_when, {_Scenario, _N}, ["I inspect the logs for",Mark]}) -> 
   Path = bdd_utils:config(marker_log, "../rails/log/development.log"),
