@@ -1,3 +1,5 @@
+# THIS IS DEPRECATED.  Use the Docker based development environment instead [here](README.md)
+
 # OpenCrowbar Development Environment Based Upon Ubuntu
 
 ## Setting Up the Virtual Machine (VM)
