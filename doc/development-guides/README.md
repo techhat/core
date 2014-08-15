@@ -16,4 +16,4 @@ While we have invested in BDD and system tests to catch core logic errors, most 
 
 ## Let's get started!
 
-Follow the amazing [docs to setup your dev environment!](/development-guides/dev-systems/README.md)
+Follow the amazing [docs to setup your dev environment!](/doc/development-guides/dev-systems/README.md)
