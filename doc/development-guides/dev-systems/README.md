@@ -1,49 +1,43 @@
 # Dev System Configuration
 
-Engineers value documentation that explains how to get a development workstation configured quickly. It is human nature to customize and change things - we do this frequently, but sometimes we need to get back to first base.  This document will help to get you there.
+## Installation and Configuration Overview - What you'll be doing:
 
-##Installation and Configuration Information
+1. Install the base OS
+2. Configure base OS for running Crowbar
+3. git clone https://github.com/opencrowbar/core
+4. Start crowbar in a Docker container
+5. Deploy slave nodes and Hack away!
 
-> An attempt has been made to pre-stage downloads so several steps can be done in parallel.  The docker image pull also has a large download it's OK to read ahead and start that too.
+## Prereqs
 
-###Base OS Installed
+You'll need (or end up with after following these docs):
 
-  Go to [This tutorial](virtualbox.md), if you are setting Crowbar up with VirtualBox.
+* A Linux development environment (running on bare metal or VirtualBox)
+* Internet Access
+* Your own user (NOT ROOT)
+* Several Networks:
+  * Crowbar relies on a few private networks - they can all be on the same NIC, bridges, or whatever.
+* Recommended: a local caching proxy server - we download a lot.
 
-  1. Setup an .ssh keypair
-    1. use `ssh-keygen -t rsa`
-    2. if that fails, try `rssh-keygen`
-  1. Passwordless sudo: `sudo sed -ie "s/%sudo\tALL=(ALL:ALL) ALL/%sudo ALL=(ALL) NOPASSWD: ALL/g" /etc/sudoers`
-    1. additional information, see http://serverfault.com/questions/160581/how-to-setup-passwordless-sudo-on-linux
-  1. Optional, [SAMBA and CNTLM](samba_cntlm.md) if you are developing on Windows using VMs and/or behind corporate firewalls
-  1. Setup a [Squid Proxy](proxy-cache.md) to ensure downloads are fast (needed by Crowbar too)
-  1. Make sure your environment does not use proxy for local addresses: 
-    1. `export no_proxy="127.0.0.1,[::1],localhost,192.168.124.0/24,172.16.0.0/12"`
-    1. tip: add this to your login init
-  1. you need git and tmux: `sudo apt-get install git tmux`
+# OK, let's get started setting up the development environemnt:
 
-###Position Boot Assets
-  
-> We'll need this for later but it takes a while so we do it now in different window....
+## What's your platform?
 
-Copy the ISOs that you want for nodes to `$HOME/.cache/opencrowbar/tftpboot/isos`.  It's OK to have more than 1 but make sure you have the space!
+### Virtual Machine Setup
 
-Examples:
-  1. `mkdir -p $HOME/.cache/opencrowbar/tftpboot/isos`
-  1. `cd $HOME/.cache/opencrowbar/tftpboot/isos`
-  1. Centos: `wget http://centos.mirror.ndchost.com/6.5/isos/x86_64/CentOS-6.5-x86_64-bin-DVD1.iso`
-  1. Ubuntu: `wget http://releases.ubuntu.com/12.04.4/ubuntu-12.04.4-server-amd64.iso`
+* [VirtualBox](virtualbox.md) based installations - network configs and basic install info
+* [KVM](ubuntu-kvm.md)
 
-###Checkout Code 
-  1. get git
-    1. ubuntu: `sudo apt-get install git`
-  1. get the code: `git clone https://github.com/opencrowbar/core`
-  1. if you want to contribute
-    1. review [Contribute Guidelines](../contributing-code.md)
-    2. setup your [personal git fork](../contributing.md)
-  1. Advanced user optional [build Sledgehammer](build_sledgehammer)
+## O/S configs
 
-###Setup Docker Admin Node 
+Makes sure you have development O/S on the Virtual Machine or bare metal.  Also, get the docker stuff all configured properly:
+
+* [Ubuntu 12.04.03](dev-ubuntu-12.04.03.md)
+* [Fedora Core 19](dev-vm-Fedora.md)
+* [SUSE](dev-vm-SUSE.md)
+* [OpenSUSE Images](openSUSE-images.md)
+
+##Setup Docker Admin Node 
   1. follow steps in [docker-admin.md](docker-admin.md)
 
 ###Deploy Nodes!  
