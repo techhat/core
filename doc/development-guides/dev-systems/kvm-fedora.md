@@ -1,6 +1,4 @@
-# Crowbar Development Environment Using Fedora
-
-## Setting Up the Virtual Machine (VM)
+## Setting Up the Virtual Machine (VM) on a Fedora host O/S
 
 1. Create a new virtual network 192.168.124.0/24 (using virt-manager or virsh).
    Do not use DHCP for this network.
