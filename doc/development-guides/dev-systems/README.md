@@ -34,8 +34,8 @@ You'll need (or end up with after following these docs):
 Makes sure you have development O/S on the Virtual Machine or bare metal.  Also, get the docker stuff all configured properly:
 
 * [Ubuntu 12.04.03](dev-ubuntu-12.04.03.md)
-* [Fedora Core 19](dev-Fedora.md)
 * [CentOS 6.5](dev-centos-6.5.md)
+* [Fedora Core 19](dev-Fedora.md)
 * [SUSE](dev-vm-SUSE.md)
 * [OpenSUSE Images](openSUSE-images.md)
 
