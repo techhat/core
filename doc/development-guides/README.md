@@ -14,12 +14,6 @@ Our development environments include a _working_ administrative server for testi
 
 While we have invested in BDD and system tests to catch core logic errors, most changes require performing a deployment to test correctness!
 
-The following steps are focused on: 
+## Let's get started!
 
-1. [Ubuntu 12.04.03](./development/dev-ubuntu-12.04.03.md)
-1. [Ubuntu VM - General](./development/dev-vm-Ubuntu.md)
-1. [Fedora Core 19](./development/dev-vm-Fedora.md)
-1. [SUSE](./development/dev-vm-SUSE.md)
-1. [OpenSUSE Images](./development/openSUSE-images.md)
-
-Please extend for other platforms
+Follow the amazing [docs to setup your dev environment!](/development-guides/dev-systems/README.md)
