@@ -35,6 +35,7 @@ Makes sure you have development O/S on the Virtual Machine or bare metal.  Also,
 
 * [Ubuntu 12.04.03](dev-ubuntu-12.04.03.md)
 * [Fedora Core 19](dev-Fedora.md)
+* [CentOS 6.5][dev-centos-6.5.md)
 * [SUSE](dev-vm-SUSE.md)
 * [OpenSUSE Images](openSUSE-images.md)
 
