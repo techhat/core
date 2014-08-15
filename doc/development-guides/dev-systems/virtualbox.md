@@ -20,28 +20,5 @@ VirtualBox
     * Adapter 1 (default OK) - NAT
     * Adapter 2 - Host Only #1 (has no number)
     * Adapter 3 - Host Only #2
-* Start the server and answer the prompts
-  * English & Ubuntu Server
-    * Choose eth0 as your primary interface
-  * Name your machine and user accounts (we recommend "crowbar" as user) & time zone
-  * Partitioning: guided to use entire disk and LVM
-    * defaults are OK
-    * you need to select YES to continue (NO = return to selection)
-  * Proxy depends on your environment (we'll install Squid later)
-    1. No automatic updates
-  * Install OpenSSH & Samba (space toggles, enter continues)
-  * Install GRUB boot loader
-* When Installation completes, make sure the ISO is not attached and allow reboot
-* you may want to snapshot the machine in this state
- 
-* Add Network for SSH from Host
-  1. `sudo vi /etc/network/interfaces`
-  * add the following lines
-    * `auto eth1`
-    * `iface eth1 inet static`
-    * `  address 192.168.222.6`
-    * `  netmask 255.255.255.0`
 
-  * `sudo service networking restart`
-
-  * validate network by using Putty to SSH into crowbar@192.168.222.6
+Now, go [back](README.md) and find specifics for the O/S you're using.
