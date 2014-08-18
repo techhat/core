@@ -45,6 +45,8 @@ barclamps:
     description: "Log Centralization and Management"
   - name: puppet
     description: "Puppet Deployment Services"
+  - name: consul
+    description: "Consul Service Monitoring and Management"
 
 jigs:
   - name: script
