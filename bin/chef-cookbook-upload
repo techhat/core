@@ -16,6 +16,8 @@ if [[ $roles ]]; then
 fi
 
 data_bags=($(find /opt/opencrowbar -path '*/chef/data_bags/*' -type d))
-if [[ $data_bags ]]; then
-    knife data bag from file "${data_bags[@]}"
-fi
+for bag in "${data_bags[@]}"; do
+    knife data bags show "${bag##*/}" &>/dev/null || \
+        knife data bag create "${bag##*/}" -d
+    knife data bag from file "${bag##*/}"  "${bag}"
+done
