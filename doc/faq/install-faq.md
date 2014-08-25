@@ -1,4 +1,4 @@
-## Q: `crowbar converge` keeps failing with httpd installs when running `./tools/docker-admin centos ./production.sh my.domain.here`
+Q: `crowbar converge` keeps failing with httpd installs when running `./tools/docker-admin centos ./production.sh my.domain.here`
 
 Converge failed, so I checked the logs and saw Chef failing to install httpd.  So I ran it on the command line and got the full error:
 ```
@@ -15,5 +15,5 @@ SELinux status:                 disabled
 ```
 
 
-## A: Turns out it has nothing to do with SELinux.  Make sure your docker server is running with `-s devicemapper`.  On Ubuntu edit `/etc/default/docker` to include it.  On RedHat derived, edit `/etc/sysconfig/docker`.  All better!
+A: Turns out it has nothing to do with SELinux.  Make sure your docker server is running with `-s devicemapper`.  On Ubuntu edit `/etc/default/docker` to include it.  On RedHat derived, edit `/etc/sysconfig/docker`.  All better!
 
