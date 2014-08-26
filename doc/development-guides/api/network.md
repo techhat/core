@@ -11,8 +11,8 @@ Lists the current networks.
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
 | GET   | api/v2/networks | N/A | JSON array of network IDs | |
-| GET   | \api/v2/networks/[network] | id is the network ID or name. | Details of the network in JSON format | 
-| POST   | api/v2/networks |  json definition (see Node Show)  |  must be a legal object |
+| GET   | \api/v2/networks/[network] | id is the network ID or name. | Details of the network in JSON format | -|
+| POST   | api/v2/networks |  json definition (see Node Show)  |  must be a legal object | |
 | PUT   | api/v2/networks/[network] |  |  | |
 | DELETE   | api/v2/networks/[network] |  Database ID or name  | HTTP error code 200 on success | |
 

@@ -8,13 +8,13 @@
 | POST | /api/v2/deployments  | none   | New Deployment | - | 
 | GET  | /api/v2/deployments/[:id]  | none   | Existing Deployment Detail | - | 
 | PUT  | /api/v2/deployments/[:id]  | none   | Update Deployment Detail | - | 
-| GET  | /api/v2/deployments/[:id]  | none   | Existing Deployment Detail | - | q
+| GET  | /api/v2/deployments/[:id]  | none   | Existing Deployment Detail | - |
 | PUT  | /api/v2/deployments/[:id]/commit  | none   | Commit Proposed | - | 
 | PUT  | /api/v2/deployments/[:id]/propose | none   | Create an new Proposal based on Active| - | 
 | PUT  | /api/v2/deployments/[:id]/transition | none   | Send Transistion Data into the system| - | 
 | GET  | /api/v2/deployments/[:deployment_id]/attribs  | none   | List Attribs for a specific deployment| - | 
 | GET  | /api/v2/deployments/[:deployment_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Deployment| - | 
-| PUT  | /api/v2/deployments/[:deployment_id]/attribs/[:id]  | none   | Update Attrib |
+| PUT  | /api/v2/deployments/[:deployment_id]/attribs/[:id]  | none   | Update Attrib | - |
 
 
 ## JSON fields

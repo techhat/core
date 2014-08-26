@@ -1,3 +1,5 @@
+# Sledgehammer Hooks
+
 This file documents the hooks available in the Sledgehammer image that
 can be used to customize how Sledgehammer transitions through states.
 
@@ -50,6 +52,7 @@ functions:
 * post_state <node> <crowbar_state>
   post_state will attempt to transition <node> to <state>.  If
   successful, it will then update the same environment data that
+
   get_state does.
 
 * reboot_system

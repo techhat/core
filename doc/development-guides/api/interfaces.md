@@ -9,7 +9,7 @@ Lists the current networks.
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
 | GET   | api/v2/interfaces | N/A | JSON array of Interface Mappings | |
-| POST   | api/v2/interfaces |  Add new mapping  |  |
+| POST   | api/v2/interfaces |  - | - | Add new mapping  |
 | PUT   | api/v2/interfaces/[Node Type] |  |  | |
 
 Data:

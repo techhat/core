@@ -6,16 +6,17 @@ Create an OpenCrowbar admin node on a VM or physical machine to begin the proces
 
 The following steps will be completed:
 
-    Prepare a Virtual or Physical machine
-    Installation of CentOS 6.5 x86_64
-    Install OpenCrowbar
-    Start OpenCrowbar webUI
-    Connect to the webUI using a browser
+    * Prepare a Virtual or Physical machine
+    * Installation of CentOS 6.5 x86_64
+    * Install OpenCrowbar
+    * Start OpenCrowbar webUI
+    * Connect to the webUI using a browser
 
 An outline is provided as a foundation for QA validation requirements for OpenCrowbar RPM packages.
 
 Known limitations of the installation process, its sensitivities to updates and to upgrades is summarized.
-Installation process:
+
+## Installation process:
 
 Before commencing installation and configuration processing ensure that everything needed is available and that all remote resources that must be accessed are capable of being reached.
 
@@ -141,7 +142,8 @@ NOTE: This is preliminary information.  The specific steps outlined here will ch
 
 Save the file and continue.
 
-    Verify that you can access the RPM repository
+Verify that you can access the RPM repository
+
         yum repolist
 
 Verify that you see dell-ocb in the list and its status is >0 (the number of packages that were found)
@@ -151,7 +153,8 @@ Verify that you see dell-ocb in the list and its status is >0 (the number of pac
 
 
 If you are using VMs, now would be a good time to make a snapshot.
-Another good reason to create a snapshot is the migration process doesn't at this date (3/24/2014) support upgrades.
+Another good reason to create a snapshot is the migration process 
+doesn't at this date (3/24/2014) support upgrades.
 
 ###Installing OpenCrowbar
 
@@ -196,12 +199,12 @@ a) Updating OpenCrowbar
 
 As of March 28, the instructions below should not be used as there are still many changes in the database schema occurring that prevent the RPM package from being up-gradable.  Until this churn quiets down your best bet is to follow these instructions:
 
-  Revert your VM to the last Snapshot taken,  (You did follow the advice above to make a SnapShot, correct?)
-  yum clean all; yum makecache
-  yum install -y opencrowbar-core
-  cd /opt/opencrowbar/core
-  ./production.sh <FQDN>
-  Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
+  1. Revert your VM to the last Snapshot taken,  (You did follow the advice above to make a SnapShot, correct?)
+  1. yum clean all; yum makecache
+  1. yum install -y opencrowbar-core
+  1. cd /opt/opencrowbar/core
+  1. ./production.sh <FQDN>
+  1. Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
 
 ##Known Limitations:
 
@@ -209,8 +212,8 @@ Please document all limitations that are discovered into this document.
 
 RPM package installation/removal/update/upgrade processes confer many known limitations on third-party application-layer services such as OpenCrowbar, OpenStack, Hadoop. Here are a few issues that need to be defined and addressed:
 
-  There is a latent need to document update and upgrade requirements and dependencies so that packaging methods can fully accommodate the scope of these so far as possible.
-  The impact of RPM package updates on service continuity must be clearly defined. User-oriented documentation should set appropriate expectations for RPM update application.
-  Risks to continuity of service, potential for loss of critical operational data needs to be identifies and documented.
+  * There is a latent need to document update and upgrade requirements and dependencies so that packaging methods can fully accommodate the scope of these so far as possible.
+  * The impact of RPM package updates on service continuity must be clearly defined. User-oriented documentation should set appropriate expectations for RPM update application.
+  * Risks to continuity of service, potential for loss of critical operational data needs to be identifies and documented.
 
 Testing, validation and QA requirements for OpenCrowbar itself need to be documented separately and links to these documents should be inserted into this document.

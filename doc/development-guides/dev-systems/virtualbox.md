@@ -7,8 +7,8 @@ VirtualBox
 
 1. File...Preferences...Network
   1. you want at least two Host-Only Ethernet Adapters
-  * #1 should be IP 192.168.222.1 & DHCP should be off
-  * #2 should be IP 192.168.124.1 & DHCP should be off
+  * The first should be IP 192.168.222.1 & DHCP should be off
+  * The second should be IP 192.168.124.1 & DHCP should be off
 * Create new Linux Ubuntu 64 bit Virtual Machine
   1. RAM: 4096
   * Disk: VDI, Dynamically Allocated, at least 40 GB (80 recommended)

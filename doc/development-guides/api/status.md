@@ -29,6 +29,6 @@ Returns JSON for node status for AJAX calls.  Includes hash of all nodes to help
 
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
-| GET  |api/status/node |none |All nodes |Used by Dashboard |
-| GET  |api/status/node/[id] |id is the node ID or name. Used by Node details |- |
+| GET  | api/status/node | none | All nodes | Used by Dashboard |
+| GET  | api/status/node/[id] | none | id is the node ID or name. | Used by Node details |
 

@@ -13,19 +13,19 @@ Roles, Nodes, NodeRoles, and DeploymentRoles all work with Attribs.
 | GET  | /api/v2/attribs/[:id]  | none   | Show Attrib | - | 
 | GET  | /api/v2/nodes/[:node_id]/attribs  | none   | List Attribs for a specific node| - | 
 | GET  | /api/v2/nodes/[:node_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Node| - | 
-| PUT  | /api/v2/nodes/[:node_id]/attribs/[:id]  | none   | Update Attrib |
+| PUT  | /api/v2/nodes/[:node_id]/attribs/[:id]  | none   | Update Attrib | - |
 | GET  | /api/v2/roles/[:role_id]/attribs  | none   | List Attribs for a specific role| - | 
 | GET  | /api/v2/roles/[:role_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Role| - | 
-| PUT  | /api/v2/roles/[:role_id]/attribs/[:id]  | none   | Update Attrib |
+| PUT  | /api/v2/roles/[:role_id]/attribs/[:id]  | none   | Update Attrib | - |
 | GET  | /api/v2/deployments/[:deployment_id]/attribs  | none   | List Attribs for a specific deployment| - | 
 | GET  | /api/v2/deployments/[:deployment_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Deployment| - | 
-| PUT  | /api/v2/deployments/[:deployment_id]/attribs/[:id]  | none   | Update Attrib |
+| PUT  | /api/v2/deployments/[:deployment_id]/attribs/[:id]  | none   | Update Attrib | - |
 | GET  | /api/v2/deployment_roles/[:deployment_role_id]/attribs  | none   | List Attribs for a specific deployment_role| - | 
 | GET  | /api/v2/deployment_roles/[:deployment_role_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Deployment_Role| - | 
-| PUT  | /api/v2/deployment_roles/[:deployment_role_id]/attribs/[:id]  | none   | Update Attrib |
+| PUT  | /api/v2/deployment_roles/[:deployment_role_id]/attribs/[:id]  | none   | Update Attrib | - |
 | GET  | /api/v2/node_roles/[:node_role_id]/attribs  | none   | List Attribs for a specific node_role| - | 
 | GET  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Node_Role| - | 
-| PUT  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | none   | Update Attrib |
+| PUT  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | none   | Update Attrib | - |
 
 
 #### List Attribs
