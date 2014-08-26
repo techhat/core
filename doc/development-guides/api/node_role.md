@@ -24,14 +24,14 @@ by ID or under the relevant Nodes, Roles, or Deployment.
 
 | Verb | URL | Comments |
 |:------|:-----------------------|:----------------|
-| GET  |api/v2/node_roles |List |
-| GET  |api/v2/node_roles/:id |Specific Item |
-| PUT  |api/v2/node_roles/:id |Update Item |
-| POST  |api/v2/node_roles |Create Item |
-| GET  | /api/v2/node_roles/[:node_role_id]/attribs  | none   | List Attribs for a specific node_role| - | 
-| GET  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Node_Role| - | 
-| PUT  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | none   | Update Attrib |
-| DELETE  |- |NOT SUPPORTED |
+| GET  |api/v2/node_roles | List |
+| GET  |api/v2/node_roles/:id | Specific Item |
+| PUT  |api/v2/node_roles/:id | Update Item |
+| POST  |api/v2/node_roles | Create Item |
+| GET  | /api/v2/node_roles/[:node_role_id]/attribs  |  List Attribs for a specific node_role |
+| GET  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | Show Attrib (including value) for a specific Node_Role |
+| PUT  | /api/v2/node_roles/[:node_role_id]/attribs/[:id]  | Update Attrib |
+| DELETE  | - |NOT SUPPORTED |
 
 Helpers have been added to NodeRole create so that you do not need to
 provide IDs when creating a new NodeRole.  You can pass:

@@ -16,7 +16,7 @@ Returns list of group id:names in the system
 
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
-| GET  | /2.0/crowbar/2.0/group | - | - | |
+| GET  | /2.0/crowbar/2.0/group | - | - | - |
 
 
 **Output:**
@@ -38,7 +38,7 @@ Details:
 
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
-| GET  | /2.0/crowbar/2.0/group/[id] | id is the group ID or name. | -  |
+| GET  | /2.0/crowbar/2.0/group/[id] | id is the group ID or name. | -  | -|
 
 
 **Output:**
@@ -70,7 +70,7 @@ Creates a new group
 
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
-| POST  | /2.0/crowbar/2.0/node/ | json definition (see Node Show) | must be a legal object |
+| POST  | /2.0/crowbar/2.0/node/ | - | json definition (see Node Show) | must be a legal object |
 
 **Input:**
 
@@ -99,7 +99,7 @@ Deletes a group
 
 | Verb | URL | Options | Returns | Comments |
 |:------|:-----------------------|--------|--------|:----------------|
-| DELETE  | /2.0/crowbar/2.0/group/[id] | Database ID or name | must be an existing object ID |
+| DELETE  | /2.0/crowbar/2.0/group/[id] | Database ID or name | - | must be an existing object ID |
 
 No body.
 

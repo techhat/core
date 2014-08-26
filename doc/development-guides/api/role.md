@@ -39,9 +39,9 @@ without knowing the name of the roles in advance.
 |:-------|:-------------------|:----------------------|
 | GET  | api/v2/roles | List |
 | GET  | api/v2/roles/:id | Specific Item |
-| GET  | /api/v2/roles/[:role_id]/attribs  | none   | List Attribs for a specific role| - | 
-| GET  | /api/v2/roles/[:role_id]/attribs/[:id]  | none   | Show Attrib (including value) for a specific Role| - | 
-| PUT  | /api/v2/roles/[:role_id]/attribs/[:id]  | none   | Update Attrib |
+| GET  | /api/v2/roles/[:role_id]/attribs  |  List Attribs for a specific role|
+| GET  | /api/v2/roles/[:role_id]/attribs/[:id]  |  Show Attrib (including value) for a specific Role|
+| PUT  | /api/v2/roles/[:role_id]/attribs/[:id]  |  Update Attrib |
 | PUT | - | NOT SUPPORTED / managed during import only |
 | POST  | - | NOT SUPPORTED / roles are only created during import |
 | DELETE  | - | NOT SUPPORTED |
