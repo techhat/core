@@ -170,6 +170,23 @@ deployment at http://localhost:3000.  Once the admin node is finished
 deploying (or if anything goes wrong), you will be left at a running
 shell inside the container.
 
+You can ssh into the container from the host by finding its IP address
+through Docker, as below. The container should already have your ssh 
+keys copied into the proper place.
+
+
+```
+$ docker ps
+CONTAINER ID        IMAGE                       COMMAND                CREATED             STATUS              PORTS                                          NAMES
+0db77a80acd0        opencrowbar/centos:6.5-11   "/opt/opencrowbar/co   32 minutes ago      Up 32 minutes       0.0.0.0:443->443/tcp, 0.0.0.0:3000->3000/tcp   evil_bohr           
+$ docker inspect 0db77a80acd0 | grep IPAddress
+        "IPAddress": "172.17.0.7",
+$ ssh root@172.17.0.7
+Last login: Wed Aug 27 16:20:41 2014 from 172.17.42.1
+[root@0db77a80acd0 ~]# 
+```
+
+
 ### Booting slave VMs from the admin node
 
 Prereq : `sudo apt-get install bridge-utils`
