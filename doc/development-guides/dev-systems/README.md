@@ -29,6 +29,9 @@ You'll need (or end up with after following these docs):
 * [KVM on Ubuntu](kvm-ubuntu.md)
 * [KVM on Fedora Core 19](kvm-fedora.md)
 
+### Bare Metal O/S setup (must be Linux)
+ * Just start with the O/S configs below.
+
 ## O/S configs
 
 Makes sure you have development O/S on the Virtual Machine or bare metal.  Also, get the docker stuff all configured properly:
