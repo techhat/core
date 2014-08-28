@@ -167,6 +167,11 @@ class Node < ActiveRecord::Base
     Attrib.get(attrib, self, :discovery) rescue nil
   end
 
+  def merge_quirks(new_quirks)
+    self.quirks = (self.quirks + new_quirks).sort.uniq
+    save!
+  end
+
   def active_node_roles
     NodeRole.on_node(self).in_state(NodeRole::ACTIVE).committed.order("cohort ASC")
   end

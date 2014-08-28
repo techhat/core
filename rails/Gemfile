@@ -42,6 +42,7 @@ gem 'jquery-rails'
 gem 'net-ssh'
 gem 'chef', "11.6"
 gem 'open4'
+gem 'structurematch', '~> 0.1.1'
 
 group :development, :test do
   gem 'coveralls', :platforms => [:ruby_19,:ruby_20]

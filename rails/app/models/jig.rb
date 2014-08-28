@@ -124,6 +124,8 @@ class Jig < ActiveRecord::Base
       end
       # Add any hints.
       res["hints"] = nr.node.hint
+      # Add quirks
+      res["quirks"] = nr.node.quirks
       # And we are done.
     end
     res
