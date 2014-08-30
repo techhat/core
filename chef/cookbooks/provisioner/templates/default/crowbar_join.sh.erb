@@ -38,6 +38,8 @@ put_alive() {
     done
 }
 
+ntpdate <%=@admin_ip%>
+
 case $1 in
     stop) put_alive false;;
     status) echo "OK";;

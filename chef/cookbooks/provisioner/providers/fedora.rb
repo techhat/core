@@ -59,7 +59,7 @@ action :add do
     mode 0644
     owner "root"
     group "root"
-    source "crowbar_join.redhat.sh.erb"
+    source "crowbar_join.sh.erb"
     variables(:admin_ip => provisioner_addr)
   end
 
