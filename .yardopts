@@ -1,2 +1,4 @@
-rails/app - rails/config/routes.rb doc/README.md 
-
+rails/app/**/*.rb
+rails/lib/*.rb
+rails/config/routes.rb
+-o doc/internals
