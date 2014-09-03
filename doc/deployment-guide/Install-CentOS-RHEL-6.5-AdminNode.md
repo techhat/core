@@ -124,13 +124,13 @@ NOTE: This is preliminary information.  The specific steps outlined here will ch
         # chkconfig iptables off
         # service iptables stop
 
-    Create the dell-ocb yum repository file
+    Create the ocb yum repository file
 
         cd /etc/yum.repos.d
-        Using your favorite editor create a new repo file called "dell-ocb.repo"
+        Using your favorite editor create a new repo file called "ocb.repo"
         Add the following lines to the file
 
-    [dell-ocb]
+    [ocb]
     name=repo for opencrowbar rpms
     baseurl=http://opencrowbar.s3-website-us-east-1.amazonaws.com/el6
     enabled=1
@@ -144,7 +144,7 @@ Save the file and continue.
     Verify that you can access the RPM repository
         yum repolist
 
-Verify that you see dell-ocb in the list and its status is >0 (the number of packages that were found)
+Verify that you see ocb in the list and its status is >0 (the number of packages that were found)
 
         yum -y install http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-centos93-9.3-1.noarch.rpm
         yum -y install http://mirrors.kernel.org/fedora-epel/6/x86_64/epel-release-6-8.noarch.rpm
