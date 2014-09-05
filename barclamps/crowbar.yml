@@ -40,6 +40,14 @@ roles:
       - dns-client
       - logging-client
       - ntp-client
+  - name: crowbar-hardware-configured
+    description: "Crowbar Harware Configured Checkpoint"
+    jig: noop
+    flags:
+      - implicit
+      - milestone
+    requires:
+      - crowbar-managed-node
   - name: crowbar-installed-node
     description: "Crowbar Node Ready Checkpoint"
     jig: noop
@@ -47,7 +55,7 @@ roles:
       - milestone
       - implicit
     requires:
-      - crowbar-managed-node
+      - crowbar-hardware-configured
       - provisioner-os-install
   - name: crowbar-docker-node
     description: "Docker Node Ready Checkpoint"

@@ -103,7 +103,7 @@ roles:
   - name: provisioner-os-install
     jig: script
     requires:
-      - crowbar-managed-node
+      - crowbar-hardware-configured
       - provisioner-dhcp-server
     flags:
       - implicit
