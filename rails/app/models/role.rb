@@ -173,12 +173,11 @@ class Role < ActiveRecord::Base
       # If we are already bound to this node in a deployment, do nothing.
       res = NodeRole.find_by(node_id: node.id, role_id: self.id)
       return res if res
-
-      Rails.logger.info("Role: Trying to add #{name} to #{node.name}")
-      NodeRole.create!(node_id:       node.id,
-                       role_id:       id,
-                       deployment_id: dep.id)
     end
+    Rails.logger.info("Role: Trying to add #{name} to #{node.name}")
+    NodeRole.safe_create!(node_id:       node.id,
+                          role_id:       id,
+                          deployment_id: dep.id)
   end
 
   def jig
