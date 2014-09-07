@@ -18,8 +18,8 @@ class BarclampCrowbar::ManagedNode < Role
   # and crowbar-managed-node is not our target role,
   # then turn the node off for now.
   def on_active(nr)
-    nr.node.power.off if nr.children.empty? &&
-      nr.node.power[:on] &&
-      !(nr.node.target_role_id && nr.node.target_role_id == nr.role_id)
+    nr.node.power.off if nr.node.power[:on] &&
+      !(nr.node.target_role_id && nr.node.target_role_id == nr.role_id) &&
+      (nr.children.empty? || nr.all_children.not_in_state(NodeRole::PROPOSED).empty?)
   end
 end
