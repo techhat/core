@@ -19,6 +19,7 @@ require 'open4'
 class Node < ActiveRecord::Base
 
   before_validation :default_population
+  after_update :after_update_handler
   after_commit :on_create_hooks, on: :create
   after_commit :after_commit_handler, on: :update
   after_commit :on_destroy_hooks, on: :destroy
@@ -373,6 +374,35 @@ class Node < ActiveRecord::Base
   end
 
   private
+
+  def after_update_handler
+    Rails.logger.debug("Node: after_update hook called.")
+    return unless self.deployment_id_changed?
+    # If we change deployments from system to something else, then
+    # make proposed noderoles follow into the new deployment if they have no
+    # children that are not also proposed.
+    old_deployment = Deployment.find(self.changes["deployment_id"][0])
+    new_deployment = Deployment.find(self.changes["deployment_id"][1])
+    Rails.logger.info("Node: #{self.name} changed deployment_id from #{old_deployment.id} to #{new_deployment.id}")
+    node_roles.where(deployment_id: old_deployment.id, run_count: 0, state: NodeRole::PROPOSED).order("cohort ASC").each do |nr|
+      Rails.logger.info("Node: testing to see if #{nr.name} should move")
+      blocking_children = nr.all_children.where.not(["node_roles.run_count =0 AND node_roles.deployment_id = ? AND node_roles.state = ?",
+                                                     old_deployment.id,
+                                                     NodeRole::PROPOSED])
+      unless blocking_children.empty?
+        Rails.logger.info("Node: #{nr.name} cannot move even though it is a candidate.")
+        Rails.logger.info("Move is blocked by:")
+        blocking_chidlren.each do |c|
+          Rails.logger.info("  #{c.name}: #{c.deployment.name}, #{c.run_count}, #{c.state_name}")
+        end
+        next
+      end
+      Rails.logger.info("Node: #{nr.name} should change deployment")
+      nr.role.add_to_deployment(new_deployment)
+      nr.deployment_id = new_deployment.id
+      nr.save!
+    end
+  end
 
   def after_commit_handler
     Rails.logger.debug("Node: after_commit hook called")
