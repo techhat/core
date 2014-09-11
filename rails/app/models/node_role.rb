@@ -18,9 +18,12 @@ require 'json'
 class NodeRole < ActiveRecord::Base
 
   after_commit :run_hooks, on: [:update, :create]
-  validate :role_is_bindable, on: :create
-  validate :validate_conflicts, on: :create
+  after_commit :create_deployment_role, on: [:create]
   after_create :bind_needed_parents
+  validate :role_is_bindable, on: :create
+  validate :noderole_has_all_parents, on: :create
+  validate :validate_conflicts, on: :create
+
 
   belongs_to      :node
   belongs_to      :role
@@ -155,6 +158,58 @@ class NodeRole < ActiveRecord::Base
     I18n.t(STATES[state], :scope=>'node_role.state')
   end
 
+  def self.find_needed_parents(target_role,target_node,target_dep)
+    NodeRole.transaction do
+      res = []
+      target_role.parents.each do |parent|
+        tenative_parent = NodeRole.find_by(role_id: parent.id, node_id: target_node.id) ||
+          NodeRole.find_by("node_id = ? AND role_id in
+                                            (select id from roles where ? = ANY(provides))",
+                           target_node.id,
+                           parent.name)
+        unless parent.implicit?
+          cdep = target_dep
+          until tenative_parent || cdep.nil?
+            tenative_parent = NodeRole.find_by(deployment_id: cdep.id, role_id: parent.id)
+            tenative_parent ||= NodeRole.find_by("deployment_id = ? AND role_id in
+                                             (select id from roles where ? = ANY(provides))",
+                                                 cdep.id,
+                                                 parent.name)
+            cdep = (cdep.parent rescue nil)
+          end
+        end
+        if tenative_parent
+          res << {node_role_id: tenative_parent.id}
+        else
+          res << find_needed_parents(parent,target_node,target_dep)
+          res << {node_id: target_node.id, role_id: parent.id, deployment_id: target_dep.id}
+        end
+      end
+      return res
+    end
+  end
+
+  def self.bind_needed_parents(parents)
+    parents.each do |parent|
+      case
+      when parent.is_a?(Hash) && parent.has_key?(:node_role_id) then next
+      when parent.is_a?(Array) then bind_needed_parents(parent)
+      when parent.is_a?(Hash) && parent.has_key?(:role_id) then NodeRole.find_or_create_by!(parent)
+      else
+        raise "Cannot happen in bind_needed_parents!"
+      end
+    end
+  end
+
+  def self.safe_create!(args)
+    r = Role.find_by!(id: args[:role_id])
+    n = Node.find_by!(id: args[:node_id])
+    d = Deployment.find_by!(id: args[:deployment_id])
+    parent_list = find_needed_parents(r,n,d)
+    bind_needed_parents(parent_list)
+    find_or_create_by!(args)
+  end
+
   def error?
     state == ERROR
   end
@@ -216,16 +271,39 @@ class NodeRole < ActiveRecord::Base
     end
   end
 
-  def add_parent(new_parent)
+  def update_cohort
     NodeRole.transaction do
-      return if parents.any?{|p| p.id == new_parent.id}
-      if new_parent.cohort >= (self.cohort || 0)
-        self.cohort = new_parent.cohort + 1
-        save!
+      c = (parents.maximum("cohort") || -1)
+      if c >= cohort
+        update_column(:cohort,  c + 1)
       end
-      Rails.logger.info("Role: Binding parent #{new_parent.name} to #{self.name}")
-      parents << new_parent
+      children.where('cohort <= ?',cohort).each do |child|
+        child.update_cohort
+      end
     end
+  end
+
+  def add_child(new_child, cluster_recurse=false)
+    NodeRole.transaction do
+      if new_child.is_a?(String)
+        new_child = self.node.node_roles.find_by!(role_id: Role.find_by!(name: new_child))
+      end
+      unless children.any?{|c| c.id == new_child.id}
+        children << new_child
+        new_child.update_cohort
+      end
+      # If I am a cluster, then my peers are get my children.
+      if self.role.cluster? && cluster_recurse
+        NodeRole.peers_by_role(dep,role).each do |peer|
+          next if peer.id == self.id
+          peer.add_child(new_child,false)
+        end
+      end
+    end
+  end
+
+  def add_parent(new_parent)
+    new_parent.add_child(self)
   end
 
   def data
@@ -491,6 +569,21 @@ class NodeRole < ActiveRecord::Base
         errors.add(:role_id, "role '#{role.name}' cannot be bound without '#{role.jig_name}' being active!")
         end
     end
+    # Now that we have validated the role side of things, validate the noderole side of things
+  end
+
+  def noderole_has_all_parents
+    NodeRole.find_needed_parents(role,
+                                 Node.find(node_id),
+                                 Deployment.find(deployment_id)).each do |e|
+      next if e.is_a?(Hash) && e.has_key?(:node_role_id)
+      if e.is_a?(Array) && !e.empty?
+        errors[:base] << "Next tenative parent also missing prerequisites: #{e.inspect}"
+      end
+      if e.is_a?(Hash)
+        errors[:base] << "Tenative parent noderole #{e.inspect} is not bound!"
+      end
+    end
   end
 
   def validate_conflicts
@@ -515,67 +608,30 @@ class NodeRole < ActiveRecord::Base
     end
   end
 
-  def bind_needed_parents
-    # Bind to all the parents we need.
-    role = Role.find(role_id)
-    node = Node.find(node_id)
-    dep = Deployment.find(deployment_id)
-    role.add_to_deployment(dep)
-    parent_noderoles = []
-    role.parents.each do |parent|
-      # If the parent we need is bound directly to this node, use it.
-      tenative_parent = NodeRole.find_by(role_id: parent.id, node_id: node.id)
-      # If we have a noderole bound to us that provides the parent we are looking for, use it.
-      tenative_parent ||= NodeRole.find_by("node_id = ? AND role_id in
-                                            (select id from roles where ? = ANY(provides))",
-                                           node.id,
-                                           parent.name)
-      # If the parent is implicit, we must bind it now if it is not already bound
-      if parent.implicit?
-        tenative_parent ||= NodeRole.create!(role_id: parent.id,
-                                             node_id: node.id,
-                                             deployment_id: dep.id)
-        parent_noderoles << tenative_parent
-        next
-      end
-      # Otherwise, check to see if we can find an appropriate noderole in the current deployment hierarchy
-      cdep = dep
-      until tenative_parent || cdep.nil?
-        tenative_parent = NodeRole.find_by(deployment_id: cdep.id, role_id: parent.id)
-        tenative_parent ||= NodeRole.find_by("deployment_id = ? AND role_id in
-                                             (select id from roles where ? = ANY(provides))",
-                                             cdep.id,
-                                             parent.name)
-        cdep = (cdep.parent rescue nil)
-      end
-      # If we didn't find a tenative parent, bind it to ourselves
-      # in the current deployment
-      tenative_parent ||= NodeRole.create!(role_id: parent.id,
-                                           node_id: node.id,
-                                           deployment_id: dep.id)
-      parent_noderoles << tenative_parent
-    end
+  def create_deployment_role
+    self.role.add_to_deployment(self.deployment)
+  end
 
-    parent_noderoles.each do |parent_node_role|
-      parent = parent_node_role.role
-      if parent.cluster
-        # If the parent role has a cluster flag, then all of the found
-        # parent noderoles will be bound to this one.
-        NodeRole.where(deployment_id: parent_node_role.deployment_id,
-                       role_id: parent_node_role.role_id) do |pnr|
-          add_parent(pnr)
+  def bind_needed_parents
+    NodeRole.transaction do
+      NodeRole.find_needed_parents(Role.find(role_id),
+                                    Node.find(node_id),
+                                    Deployment.find(deployment_id)).each do |np|
+        unless np.is_a?(Hash) && np.has_key?(:node_role_id)
+          myname = self.name
+          self.destroy!
+          raise "NodeRole: #{myname} missing prequisite #{np.inspect}, despite passing validation!"
         end
+        parent = NodeRole.find_by!(id: np[:node_role_id])
+        parent.add_child(self)
       end
-      add_parent(parent_node_role)
-    end
-    # If I am a new noderole binding for a cluster node, find all the children of my peers
-    # and bind them too.
-    if role.cluster
-      NodeRole.peers_by_role(dep,role).each do |peer|
-        peer.children.each do |c|
-          c.add_parent(self)
-          c.deactivate
-          c.save!
+      if self.role.cluster?
+        # If I am a cluster role, I also get any children of my peers.
+        NodeRole.peers_by_role(dep,role).each do |peer|
+          next if peer.id == self.id
+          peer.children.each do |new_child|
+            self.add_child(new_child,false)
+          end
         end
       end
     end

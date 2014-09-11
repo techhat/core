@@ -60,9 +60,9 @@ class NodeRolesController < ApplicationController
     node = Node.find_key(params[:node] || params[:node_id])
     role = Role.find_key(params[:role] || params[:role_id] || nr_roles)
     depl ||= node.deployment
-    @node_role = NodeRole.create!(role_id: role.id,
-                                  node_id: node.id,
-                                  deployment_id: depl.id)
+    @node_role = NodeRole.safe_create!(role_id: role.id,
+                                       node_id: node.id,
+                                       deployment_id: depl.id)
     if params[:data]
       @node_role.data = params[:data]
       @node_role.save!
