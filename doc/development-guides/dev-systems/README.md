@@ -32,9 +32,9 @@ Before we begin, let's review what you'll need (or end up with after following t
 ### Bare Metal Platform Configs (must be Linux)
  * Just start with the O/S configs below for your favorite flavor.
 
-## Step 2: Development O/S Configuration.
+## Step 2: Now Let's Configure Your Development OS
 
-Makes sure you have development O/S on the Virtual Machine or bare metal.  Also, get the docker stuff all configured properly:
+Get the docker stuff all configured properly:
 
 * [Ubuntu 12.04.03](dev-ubuntu-12.04.03.md)
 * [CentOS 6.5](dev-centos-6.5.md)
@@ -42,14 +42,14 @@ Makes sure you have development O/S on the Virtual Machine or bare metal.  Also,
 * [SUSE](dev-vm-SUSE.md)
 * [OpenSUSE Images](openSUSE-images.md)
 
-## Step 3: Setup Docker Admin Node 
+## Step 3: Big important step - Setup Docker Admin Node 
   1. follow steps in [docker-admin.md](docker-admin.md)
 
 ## Step 4: Deploy Nodes!  
 
 Now that you've got Crowbar installed, it's time to look in the [Deployment Guide](../../deployment-guide/README.md) for instructions about provisioning nodes.
 
- Important - you need to change to Crowbar user
+ Important - once you're in the Docker container, you need to change to Crowbar user
   1. `su - crowbar` to gain ruby-2.0 and control Crowbar via the CLI!
   1. we've provided a handle `tools/rails-console` command if you want to reach deep into the bowels of the bunny.
 
