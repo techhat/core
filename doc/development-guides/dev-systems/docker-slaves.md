@@ -19,15 +19,18 @@ Not Currently Available (but expected):
 
 ### Using docker-slaves with _docker-slaves_ script
 
-1. Prereqs
+#### Prereqs
 
+   1. Make sure that your docker is updated to at least docker 1.2.  There are timing problems with previous versions and SSDs that cause the devicemapper or btrfs to not find volumes or mounts during the bring up process.  You can update here: https://docs.docker.com/installation/#installation
    1. Pull the slave container: `docker pull opencrowbar/ubuntu-slave`
 
 > The docker-slaves script uses the docker-slave script.  They are different!
 
 Wait until the admin node is up and admin node annealing is complete!
 
-1. From the dev system, `tools/docker-slaves <number of slaves>`
+#### Start Up
+
+From the dev system, `tools/docker-slaves <number of slaves>`
 
 This creates the number of Docker nodes requested using the Crowbar
 CLI on the Admin node.  This script relies on `ssh root@172.17.0.2` to 
