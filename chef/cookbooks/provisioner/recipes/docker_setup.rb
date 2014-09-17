@@ -22,6 +22,10 @@ node.normal["crowbar_wall"] ||= Mash.new
 node.normal["crowbar_wall"]["docker"] ||= Mash.new
 node.normal["crowbar_wall"]["docker"]["clients"] ||= Mash.new
 
+# Split out the v4 addresses
+v4dns, v6dns = node["crowbar"]["dns"]["nameservers"].collect{|a|IP.coerce(a)}.partition{|a|a.v4?}
+v4addresses = v4dns.collect{|a|a.addr}
+
 (node["crowbar"]["docker"]["clients"] || {} rescue {}).each do |name,info|
   # Generate an appropriate crowbar init for the system
   directory "#{node_dir}/#{name}" do
@@ -33,7 +37,7 @@ node.normal["crowbar_wall"]["docker"]["clients"] ||= Mash.new
     mode 0755
     variables(:addresses => info["addresses"],
               :image => info["image"],
-              :dns_servers => node["crowbar"]["dns"]["nameservers"],
+              :dns_servers => v4addresses,
               :name => name,
               :proxy => node["crowbar"]["provisioner"]["server"]["proxy"],
               :keys => (node["crowbar"]["provisioner"]["server"]["access_keys"] rescue Hash.new).values.sort.join($/),
