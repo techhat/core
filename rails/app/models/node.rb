@@ -300,14 +300,11 @@ class Node < ActiveRecord::Base
   def commit!
     is_docker_node = false
     node_roles.each do |nr|
-      Rails.logger.error("GREG: Testing nr: #{nr.name} for #{name}")
       if nr.role.name == "crowbar-docker-node"
         is_docker_node = true
         break
       end
     end
-
-    Rails.logger.error("GREG: Committing node: #{name} as #{admin} #{is_docker_node}")
 
     Role.all_cohorts.each do |r|
       if (!admin && !is_docker_node && r.discovery)
