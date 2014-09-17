@@ -298,6 +298,12 @@ class Node < ActiveRecord::Base
   end
 
   def commit!
+    #
+    # TODO: This code will need to be refactored once node types are added.
+    #
+    # the is_docker_node should be replaced with something related to type.
+    # Maybe something like quirks.  Matching role "quirks" with node "quirks"
+    #
     is_docker_node = false
     node_roles.each do |nr|
       if nr.role.name == "crowbar-docker-node"
