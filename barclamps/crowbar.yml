@@ -84,7 +84,7 @@ attribs:
     description: 'System Serial Number'
     map: 'ohai/dmi/base_board/asset_tag'
   - name: 'kernel'
-    description: 'Kermel Name'
+    description: 'Kernel Name'
     map: 'ohai/kernel/name'
   - name: 'kernel_version'
     description: 'Kernel Version'
