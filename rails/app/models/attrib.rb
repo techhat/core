@@ -211,8 +211,8 @@ class Attrib < ActiveRecord::Base
   # Set a new value for this attribute onto the passed object.
   # The last parameter is what area the new attribute should be placed on
   def __set(to_orig,value,target=:system)
-    raise AttribReadOnly.new(self) unless writable
-    kwalify_validate(value)
+    raise AttribReadOnly.new(self) unless writable || target != :user
+    kwalify_validate(value) if target == :user
     to_merge = template(value)
     to = __resolve(to_orig)
     Rails.logger.debug("Attrib: Attempting to update #{name} on #{to.class.name}:#{to.name} to #{value} with #{to_merge.inspect}")
