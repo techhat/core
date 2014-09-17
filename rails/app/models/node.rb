@@ -298,6 +298,23 @@ class Node < ActiveRecord::Base
   end
 
   def commit!
+    is_docker_node = false
+    node_roles.each do |nr|
+      Rails.logger.error("GREG: Testing nr: #{nr.name} for #{name}")
+      if nr.role.name == "crowbar-docker-node"
+        is_docker_node = true
+        break
+      end
+    end
+
+    Rails.logger.error("GREG: Committing node: #{name} as #{admin} #{is_docker_node}")
+
+    Role.all_cohorts.each do |r|
+      if (!admin && !is_docker_node && r.discovery)
+        r.add_to_node(self)
+      end
+    end
+
     Node.transaction do
       reload
       update!(available: true)
@@ -465,7 +482,7 @@ class Node < ActiveRecord::Base
     Role.all_cohorts.each do |r|
       Rails.logger.info("Node: Calling #{r.name} on_node_create for #{self.name}")
       r.on_node_create(self)
-      if (admin && r.bootstrap) || (!admin && r.discovery)
+      if (admin && r.bootstrap)
         r.add_to_node(self)
       end
     end
