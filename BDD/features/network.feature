@@ -67,6 +67,7 @@ Feature: Networks
     Finally REST removes the {object:network} "bdd_network"
 
  Scenario: Network List to Item
+    Unless travis
     Given I use the Network API to create "bdd_test12" with range "bdd12" from "10.10.12.100/24" to "10.10.12.200/24"
       And I am on the "networks" page
     When I click on the "bdd_test12" link
