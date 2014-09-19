@@ -151,11 +151,14 @@ end
 forcing_ents = Array.new
 node["crowbar"]["interface_map"].each do |ent|
   next unless node[:dmi][:system][:product_name] =~ /#{ent["pattern"]}/
+  Chef::Log.info("Using interface map override for #{ent["pattern"]}")
   ent["bus_order"].each do |i|
     forcing_ents << split_pci(i)
   end
   break
 end if (node["crowbar"]["interface_map"] rescue nil) && node[:dmi] && !node[:dmi].empty?
+
+Chef::Log.info("Not using any forcing entries") if forcing_ents.empty?
 
 bus_ents = nics.keys.sort
 Chef::Log.info("Found nics: #{nics.inspect}")
@@ -517,6 +520,7 @@ end
 
 # Wait for the networks to come back
 node["crowbar"]["network"].each do |netname,net|
+  next if net["conduit"] == "bmc"
   unless net["targets"]
     Chef::Log.info("Network #{netname} does not have any targets to ping.")
     next
