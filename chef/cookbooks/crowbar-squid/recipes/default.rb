@@ -29,8 +29,9 @@ localnets = ["127.0.0.1","localhost","::1"]
 end
 localnets.sort!
 
-upstream_proxy = ( node["crowbar"]["provisioner"]["server"]["upstream_proxy"] rescue nil) ||
-  ENV["http_proxy"]
+upstream_proxy = (node["crowbar"]["provisioner"]["server"]["upstream_proxy"] rescue nil)
+upstream_proxy ||= ENV["upstream_proxy"]
+upstream_proxy ||= ENV["http_proxy"]
 upstream_proxy_address = nil
 upstream_proxy_port = nil
 if upstream_proxy && !upstream_proxy.empty? && upstream_proxy != "http://#{v4addr.addr}:8123"
