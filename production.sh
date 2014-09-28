@@ -22,7 +22,7 @@ export RAILS_ENV=production
     exit 1
 }
 
-if [[ $http_proxy ]] && ! pidof squid; then
+if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
     export upstream_proxy=$http_proxy
 fi
 

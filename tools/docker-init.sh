@@ -15,6 +15,10 @@ if grep -q crowbar /etc/group; then
     usermod -g "$OUTER_GID" crowbar
 fi
 
+if [[ $http_proxy ]] && ! pidof squid; then
+    export upstream_proxy=$http_proxy
+fi
+
 if [[ $1 = --no-shell ]]; then
     shift
     NO_SHELL=true
