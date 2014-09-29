@@ -220,7 +220,7 @@ en:
       source_path: "Source Path"
       source_url: "Source URL"
       version: "Version"
-      rawconfig: "Raw Configuration YML"
+      rawconfig: "Raw Configuration"
   dashboard:
     list:
       title: "Bulk Edit Nodes"
