@@ -27,17 +27,31 @@ class BarclampProvisioner::DockerSetup < Role
     rerun_my_noderoles
   end
 
+  #
+  # XXX: let the created docker node pass in the image name, maybe?
+  #
   def rerun_my_noderoles
     to_enqueue = []
     hosts = {}
     ActiveRecord::Base.connection.execute("select * from docker_database order by name asc, address asc").each do |row|
-      name,address = row["name"], row["address"]
+      name,address,image = row["name"], row["address"]
       hosts[name] ||= Hash.new
       hosts[name]["addresses"] ||= Array.new
       hosts[name]["addresses"] << address
-      hosts[name]["image"] ||= "opencrowbar/ubuntu-slave"
+      hosts[name]["image_name"] ||= "default"
     end
     node_roles.each do |nr|
+      # Fix up the image for default
+      nr_image = (Attrib.get("provisioner-docker-image", nr) rescue nil)
+      nr_image ||= "opencrowbar/ubuntu-slave"
+      hosts.keys.each do |name|
+          if hosts[name]["image_name"] == "default"
+            hosts[name]["image"] = nr_image
+          else
+            hosts[name]["image"] = hosts[name]["image_name"]
+          end
+      end
+
       nr.with_lock('FOR NO KEY UPDATE') do
         old_hosts = (nr.sysdata["crowbar"]["docker"]["clients"] rescue {})
         next if old_hosts  == hosts
