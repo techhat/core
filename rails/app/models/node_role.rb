@@ -17,6 +17,7 @@ require 'json'
 
 class NodeRole < ActiveRecord::Base
 
+  after_commit :bind_cluster_children, on: [:create]
   after_commit :run_hooks, on: [:update, :create]
   after_commit :create_deployment_role, on: [:create]
   after_create :bind_needed_parents
@@ -283,7 +284,7 @@ class NodeRole < ActiveRecord::Base
     end
   end
 
-  def add_child(new_child, cluster_recurse=false)
+  def add_child(new_child, cluster_recurse=true)
     NodeRole.transaction do
       if new_child.is_a?(String)
         new_child = self.node.node_roles.find_by!(role_id: Role.find_by!(name: new_child))
@@ -294,7 +295,7 @@ class NodeRole < ActiveRecord::Base
       end
       # If I am a cluster, then my peers are get my children.
       if self.role.cluster? && cluster_recurse
-        NodeRole.peers_by_role(dep,role).each do |peer|
+        NodeRole.peers_by_role(deployment,role).each do |peer|
           next if peer.id == self.id
           peer.add_child(new_child,false)
         end
@@ -473,7 +474,7 @@ class NodeRole < ActiveRecord::Base
   def propose!
     # We can also pretty much always go into PROPOSED,
     # and it does not affect the state of our children until
-    # we go back out of PRPOPSED.
+    # we go back out of PROPOSED.
     NodeRole.transaction do
       reload
       update!(state: PROPOSED)
@@ -513,9 +514,7 @@ class NodeRole < ActiveRecord::Base
   private
 
   def block_or_todo
-    NodeRole.transaction do
-      update!(state: (activatable? ? TODO : BLOCKED))
-    end
+    (activatable? ? todo! : block!)
   end
 
   def run_hooks
@@ -614,9 +613,9 @@ class NodeRole < ActiveRecord::Base
 
   def bind_needed_parents
     NodeRole.transaction do
-      NodeRole.find_needed_parents(Role.find(role_id),
-                                    Node.find(node_id),
-                                    Deployment.find(deployment_id)).each do |np|
+      NodeRole.find_needed_parents(role,
+                                   Node.find(node_id),
+                                   deployment).each do |np|
         unless np.is_a?(Hash) && np.has_key?(:node_role_id)
           myname = self.name
           self.destroy!
@@ -625,9 +624,14 @@ class NodeRole < ActiveRecord::Base
         parent = NodeRole.find_by!(id: np[:node_role_id])
         parent.add_child(self)
       end
-      if self.role.cluster?
+    end
+  end
+
+  def bind_cluster_children
+    NodeRole.transaction do
+     if self.role.cluster?
         # If I am a cluster role, I also get any children of my peers.
-        NodeRole.peers_by_role(dep,role).each do |peer|
+        NodeRole.peers_by_role(deployment,role).each do |peer|
           next if peer.id == self.id
           peer.children.each do |new_child|
             self.add_child(new_child,false)
@@ -636,4 +640,6 @@ class NodeRole < ActiveRecord::Base
       end
     end
   end
+
 end
+
