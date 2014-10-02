@@ -61,9 +61,17 @@ elif [[ -f /etc/lsb-release ]]; then
 else
     echo "Cannot figure out what we are running on!"
 fi
+
 DISTRIB_ID="${DISTRIB_ID,,}"
 OS_TOKEN="$DISTRIB_ID-$DISTRIB_RELEASE"
 export OS_TOKEN DISTRIB_ID DISTRIB_RELEASE
+
+# Docker puts a policy-rc.d in place that gets in the way.
+case $DISTRIB_ID in
+  ubuntu) echo "#!/bin/sh" > /tmp/jj ; echo "exit 0" >> /tmp/jj ; cp /tmp/jj /usr/sbin/policy-rc.d ; rm /tmp/jj ;;
+  debian|redhat|centos) ;;
+esac
+
 if ! (which curl && which sshd) &>/dev/null; then
     case $DISTRIB_ID in
         ubuntu|debian) apt-get -y update && apt-get -y install openssh-client openssh-server curl;;
