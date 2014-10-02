@@ -514,7 +514,9 @@ class NodeRole < ActiveRecord::Base
   private
 
   def block_or_todo
-    (activatable? ? todo! : block!)
+    NodeRole.transaction do
+      (activatable? ? todo! : block!)
+    end
   end
 
   def run_hooks
