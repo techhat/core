@@ -17,15 +17,11 @@ roles:
   - name: saltstack-master
     jig: script
     description: 'Provides a saltstack-master instance.'
+    flags:
+      - cluster
     requires:
       - crowbar-installed-node
     attribs:
-      - name: saltstack-master_deploy
-        description: 'Whether to deploy our own salt master or not.'
-        map: 'saltstack/master/deploy'
-        schema:
-          type: bool
-          required: false
       - name: saltstack-master_ip
         description: 'IP that minions should use to talk to the salt master'
         map: 'saltstack/master/ip'
@@ -55,14 +51,8 @@ roles:
     flags:
       - implicit
     attribs:
-      - name: saltstack-minion_name
-        description: 'Minion name for this node'
-        map: 'saltstack/minion/name'
-        schema:
-          type: str
-          required: false
       - name: saltstack-minion_public_key
-        description: 'Private Key of Minioin'
+        description: 'Public Key of Minioin'
         map: 'saltstack/minion/public_key'
       - name: saltstack-minion_private_key
         description: 'Private Key of Minion'
