@@ -131,3 +131,5 @@ roles:
             - redhat-6.5
             - centos-6.5
             - fedora-20
+            - centos-7.0
+            - redhat-7.0

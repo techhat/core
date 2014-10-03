@@ -33,6 +33,19 @@
                         "iso_file": "CentOS-6.5-x86_64-bin-DVD1.iso",
                         "online_mirror": "http://mirrors.kernel.org/centos/6/"
                     },
+                    "redhat-7.0": {
+                        "initrd": "images/pxeboot/initrd.img",
+                        "kernel": "images/pxeboot/vmlinuz",
+                        "iso_file": "rhel-server-7.0-x86_64-dvd.iso",
+                        "append": "method=%os_install_site%"
+                    },
+                    "centos-7.0": {
+                        "initrd": "images/pxeboot/initrd.img",
+                        "kernel": "images/pxeboot/vmlinuz",
+                        "append": "method=%os_install_site%",
+                        "iso_file": "CentOS-7.0-1406-x86_64-DVD.iso",
+                        "online_mirror": "http://mirrors.kernel.org/centos/7/"
+                    },
                     "fedora-20": {
                         "initrd": "images/pxeboot/initrd.img",
                         "kernel": "images/pxeboot/vmlinuz",

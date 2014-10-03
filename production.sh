@@ -51,7 +51,7 @@ fi
 
 crowbar roles set provisioner-os-install \
     attrib provisioner-target_os \
-    to '{"value": "centos-6.5"}'
+    to '{"value": "centos-7.0"}'
 
 DOMAINNAME=${FQDN#*.}
 if [[ ! -f /.dockerenv ]]; then
