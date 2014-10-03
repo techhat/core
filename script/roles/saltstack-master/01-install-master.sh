@@ -27,13 +27,16 @@ fi
 if ! which salt-master; then
     if [[ -f /etc/redhat-release || -f /etc/centos-release ]]; then
         yum -y makecache
+        yum install -y GitPython
         yum install -y salt-master
         chkconfig salt-master on
         restart=1
     elif [[ -d /etc/apt ]]; then
         apt-get -y update
+        apt-get -y --force-yes install python-git
         apt-get -y --force-yes install salt-master
     elif [[ -f /etc/SuSE-release ]]; then
+        zypper install -y -l salt python-git
         zypper install -y -l salt salt-master
         systemctl enable salt-master.service
         restart=1
