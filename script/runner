@@ -35,6 +35,8 @@ read_attribute() {
 read_attribute_file_content() {
     local loc="$TMPDIR/attrs/$1"
     cp "$loc/attr" $2
+    # The write content stripped the newline - in rails
+    echo "" >> $2
 }
 
 write_attribute() {

@@ -15,13 +15,18 @@
 
 class BarclampSaltstack::Master < Role
 
-  def on_todo(nr)
-    ip = Attrib.get("saltstack-master_ip", nr)
-    return if ip
+  def on_proposed(nr)
+    node_roles.each do |the_master_nr|
+      next if the_master_nr.deployment != nr.deployment
 
-    addr = nr.node.addresses.detect{|a|a.v4?}.addr
-    Attrib.set("saltstack-master_ip", nr, addr, :system)
-    Attrib.set("saltstack-master_deploy", nr, true, :system)
+      m_pub = (Attrib.get("saltstack-master_public_key", the_master_nr) rescue nil)
+      m_priv = (Attrib.get("saltstack-master_private_key", the_master_nr) rescue nil)
+      if m_pub and m_priv
+        Attrib.set("saltstack-master_public_key", nr, m_pub, :system)
+        Attrib.set("saltstack-master_private_key", nr, m_priv, :system)
+        break
+      end
+    end
   end
 
   def on_node_delete(n)

@@ -5,7 +5,8 @@ set restart=0
 if has_attribute "saltstack/master/public_key"; then
     TMP_KEY_FILE="/tmp/tt.$$.pub.key"
     read_attribute_file_content "saltstack/master/public_key" "$TMP_KEY_FILE"
-    if diff -q "$TMP_KEY_FILE" /etc/salt/pki/master/master.pub 2>&1 >/dev/null; then
+
+    if ! diff -q "$TMP_KEY_FILE" /etc/salt/pki/master/master.pub 2>&1 >/dev/null; then
         restart=1
         mkdir -p /etc/salt/pki/master
         cp "$TMP_KEY_FILE" /etc/salt/pki/master/master.pub
@@ -16,7 +17,8 @@ fi
 if has_attribute "saltstack/master/private_key"; then
     TMP_KEY_FILE="/tmp/tt.$$.priv.key"
     read_attribute_file_content "saltstack/master/private_key" "$TMP_KEY_FILE"
-    if diff -q "$TMP_KEY_FILE" /etc/salt/pki/master/master.pem 2>&1 >/dev/null; then
+
+    if ! diff -q "$TMP_KEY_FILE" /etc/salt/pki/master/master.pem 2>&1 >/dev/null; then
         restart=1
         mkdir -p /etc/salt/pki/master
         cp "$TMP_KEY_FILE" /etc/salt/pki/master/master.pem
@@ -32,6 +34,8 @@ if ! which salt-master; then
         chkconfig salt-master on
         restart=1
     elif [[ -d /etc/apt ]]; then
+        apt-get -y --force-yes install software-properties-common
+        add-apt-repository ppa:saltstack/salt
         apt-get -y update
         apt-get -y --force-yes install python-git
         apt-get -y --force-yes install salt-master
@@ -80,7 +84,6 @@ if [[ "${key_names}" != "" ]]; then
     for name in $key_names
     do
       read_attribute_file_content "saltstack/master/keys/${name}" "/etc/salt/pki/master/minions/${name}"
-      echo "" >> "/etc/salt/pki/master/minions/${name}"
     done
 fi
 

@@ -1,12 +1,33 @@
 
 
 class BarclampSaltstack::Minion < Role
-  def on_todo(nr)
-    # return if we have data
-    n = Attrib.get("saltstack-minion_name", nr)
-    return if n
 
-    Attrib.set("saltstack-minion_name", nr, nr.node.name, :system)
+  def sysdata(nr)
+    # Find the_masters
+    the_masters = []
+    master_role = Role.find_by(name: 'saltstack-master')
+    master_role.node_roles.each do |mnr|
+      the_masters << mnr if (mnr.deployment == nr.deployment)
+    end
+
+    # get the_masters ips
+    addrs = ""
+    the_masters.each do |tnr|
+      addrs += "," if addrs != ""
+      tip = Attrib.get("saltstack-master_ip", tnr)
+      if tip
+        addrs += tip
+      else
+        addrs += tnr.node.addresses.detect{|a|a.v4?}.addr
+      end
+    end
+
+    {
+      "saltstack" => {
+        "minion" => { "name" => nr.node.name },
+        "master" => { "ip" => addrs }
+      }
+    }
   end
 
   #
@@ -43,13 +64,13 @@ class BarclampSaltstack::Minion < Role
       end 
 
       if queue_it
-        Rails.logger.info("saltstack-minion: update #{the_master_nr} with my key: #{the_name} #{the_key}")
+        Rails.logger.debug("saltstack-minion: update #{the_master_nr} with my key: #{the_name} #{the_key}")
       else
         Rails.logger.debug("saltstack-minion: already has key #{the_master_nr} for #{the_name}")
       end
 
       # Run the node role if we changed it
-      Run.enqueue(the_master_nr) if queue_it
+      the_master_nr.todo! if queue_it
     end
   end
 
