@@ -14,21 +14,6 @@
 #
 
 include_recipe "utils"
-package "bind9" do
-  case node[:platform]
-  when "centos","redhat", "suse","opensuse"
-    package_name "bind"
-  end
-  action :install
-end
-package "bind9utils" do
-  case node[:platform]
-  when "centos","redhat", "suse", "opensuse"
-    package_name "bind-utils"
-  end
-  action :install
-end
-
 directory "/etc/bind"
 
 

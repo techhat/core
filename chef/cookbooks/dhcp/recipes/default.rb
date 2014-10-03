@@ -15,19 +15,6 @@
 
 include_recipe "utils"
 
-pkg = ""
-case node[:platform]
-when "ubuntu","debian"
-  pkg = "dhcp3"
-  package "dhcp3-server"
-when "redhat","centos"
-  pkg = "dhcp"
-  package "dhcp"
-when "suse"
-  pkg = "dhcp-server"
-  package "dhcp-server"
-end
-
 provisioner_port = (node["crowbar"]["provisioner"]["server"]["web_port"] rescue 8091)
 
 directory "/etc/dhcp3"
