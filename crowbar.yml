@@ -93,7 +93,6 @@ debs:
       - deb http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
       - deb-src http://security.ubuntu.com/ubuntu precise-security main restricted universe multiverse
       - deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main
-      - deb http://get.docker.io/ubuntu docker main
       - deb http://ppa.launchpad.net/saltstack/salt/ubuntu precise main
     pkgs:
       - rpcbind
@@ -178,10 +177,6 @@ debs:
     - vim
     # for nokogiri
     - libxslt1.1
-    # docker support (Ubuntu only for now)
-    - linux-image-generic-lts-raring 
-    - linux-headers-generic-lts-raring
-    - lxc-docker
     # provisioner
     - dhcp3-server
     - nfs-common
