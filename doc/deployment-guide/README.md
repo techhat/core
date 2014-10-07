@@ -31,7 +31,23 @@ A node is completely discovered when all the system deployment steps (aka "node 
 
 It is acceptable to configure nodes (the next steps) even before the discovery is complete.  Crowbar will figure out the correct order of operations and perform actions in sequence.
 
+## Ready State Wizard
+
+The Ready State Wizard performs multiple steps for provisioning discovered nodes from a single screen. This convenience eliminates several steps that are commonly performed together.
+
+From the Ready State Wizard Screen,
+  1. name the deployment (network will be named the same as the deployment)
+  1. describe the network settings (you can change this later from the Networks page)
+  1. check the nodes that you want to provision
+  1. select the o/s that you want to be installed
+  1. accept the changes (this takes you to the deployment page)
+  1. commit the deployment to begin.
+
+## Step by Step Instructions
+
 ### Create a Deployment
+
+> These steps duplicate the Ready State wizard operations as individual steps
 
 To do additional operations on a node, it must be part of a deployment.
 
