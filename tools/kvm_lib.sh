@@ -41,6 +41,9 @@ done
 
 for gem in $NEEDED_GEMS; do
     gem list |grep -q $gem && continue
+    if [ -d /etc/apt ] ; then
+      dpkg --list | grep -q "ruby-${gem/_/-}" && continue
+    fi
     echo "Missing required gem $gem."
     echo "Please make sure the following gems are installed:"
     echo "$NEEDED_GEMS"
