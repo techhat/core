@@ -209,6 +209,10 @@ d-i partman/confirm_nooverwrite boolean true
 # kernel is to be installed.
 #d-i base-installer/kernel/image string linux-generic
 
+<% if @install_name =~ /^ubuntu-([0-9.]+)$/ && ($1 >= "12.10") -%> 
+d-i live-installer/net-image string <%=@os_install_site%>/install/filesystem.squashfs
+
+<% end -%>
 ### Account setup
 # Skip creation of a root account (normal user account will be able to
 # use sudo). The default is false; preseed this to true if you want to set
