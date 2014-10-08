@@ -297,7 +297,7 @@ class Node < ActiveRecord::Base
     power.reboot
   end
 
-  def commit!
+  def is_docker_node?
     #
     # TODO: This code will need to be refactored once node types are added.
     #
@@ -311,9 +311,12 @@ class Node < ActiveRecord::Base
         break
       end
     end
+    is_docker_node
+  end
 
+  def commit!
     Role.all_cohorts.each do |r|
-      if (!admin && !is_docker_node && r.discovery)
+      if (!admin && !is_docker_node? && r.discovery)
         r.add_to_node(self)
       end
     end
