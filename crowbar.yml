@@ -655,6 +655,7 @@ gems:
     - cstruct
     - builder
     - berkshelf
+    - yard
   pkgs:
     - active_scaffold
     - amqp
