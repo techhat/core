@@ -19,7 +19,8 @@ require 'open4'
 class Node < ActiveRecord::Base
 
   before_validation :default_population
-  after_update :after_update_handler
+  after_update :bootenv_change_handler
+  after_update :deployment_change_handler
   after_commit :on_create_hooks, on: :create
   after_commit :after_commit_handler, on: :update
   after_commit :on_destroy_hooks, on: :destroy
@@ -398,8 +399,18 @@ class Node < ActiveRecord::Base
 
   private
 
-  def after_update_handler
-    Rails.logger.debug("Node: after_update hook called.")
+  def bootenv_change_handler
+    return unless self.bootenv_changed?
+    return unless self.actions[:boot]
+    new_bootenv = self.changes["bootenv"]
+    if new_bootenv == "local"
+      self.actions.boot.disk
+    else
+      self.actions.boot.pxe
+    end
+  end
+
+  def deployment_change_handler
     return unless self.deployment_id_changed?
     # If we change deployments from system to something else, then
     # make proposed noderoles follow into the new deployment if they have no
