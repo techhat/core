@@ -55,3 +55,12 @@
 
 %h3= t '.runlog'
 %pre= @node_role.runlog
+
+- unless @node_role.state == NodeRole::ACTIVE
+  .clear
+  :javascript
+
+    function update() {
+      $.ajaxSetup({ timeout: #{current_user.settings(:ui).refresh} });
+      location.reload();
+    }
