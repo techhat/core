@@ -100,6 +100,9 @@ EOF
   <% end -%>
 <% end -%>
 
+# Install ntpdate
+yum -y install ntpdate
+
 # Make sure we can install gems
 cat >/etc/gemrc <<EOF
 :sources:
@@ -134,7 +137,7 @@ echo "PermitRootLogin without-password" >> /etc/ssh/sshd_config
 # Allow client to pass http proxy environment variables
 echo "AcceptEnv http_proxy https_proxy no_proxy" >> /etc/ssh/sshd_config
 
-
+# Set up the default crowbar service.
 curl -s -o /usr/sbin/crowbar "<%=@web_path%>/crowbar_join.sh"
 chmod +x /usr/sbin/crowbar
 
