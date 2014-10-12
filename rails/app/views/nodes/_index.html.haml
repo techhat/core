@@ -21,7 +21,7 @@
           .led{:class => led, :title=>t(".#{led}"), :raw => s}
         %td= link_to n.name, node_path(n.id)
         %td= n.alias
-        %td
+        %td.strStatus
           = t (n.alive ? ".alive" : ".dead")
           = t (n.available ? ".available" : ".reserved")
           = NodeRole.state_name(s)

@@ -34,11 +34,18 @@ class NodesController < ApplicationController
   def status
     nodes = Node.all
     status = {}
-    nodes.each do |n| 
+    nodes.each do |n|
+      state = n.state
+      str = [
+        t(n.alive ? "common.state.alive" : "common.state.dead"),
+        t(n.available ? "common.state.available" : "common.state.reserved"),
+        NodeRole.state_name(state)
+      ].join("\n")
       status[n.id] = {
         :name => n.name,
-        :state => n.state,
-        :status => NodeRole::STATES[n.state]
+        :state => state,
+        :status => NodeRole::STATES[state]
+        :strStatus => str
       }
     end
 
