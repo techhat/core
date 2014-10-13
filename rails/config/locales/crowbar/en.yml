@@ -416,6 +416,14 @@ en:
       save: "Save"
       saved: "Node Role Data Saved"
       default: "Default Render"
+      error_hint: "Suggestion:"
+      error_link: "[additional material]"
+      # allows adding hints when roles fail to help users resolve issues
+      # workload specific hints/links should be added in the workload, not in core
+      error_hints:
+        test-fails: "Take no action - this role is supposed to fail"
+      error_links:
+        test-fails: "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
     raw:
       attrib: "Available Attributes"
       ui_renderer: "Debug Info: Renderer"
