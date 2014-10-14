@@ -37,10 +37,10 @@ Before we begin, let's review what you'll need (or end up with after following t
 Get the docker stuff all configured properly:
 
 * [Ubuntu 12.04.03](dev-ubuntu-12.04.03.md)
-* [CentOS 6.5](dev-centos-6.5.md)
-* [Fedora Core 19](dev-Fedora.md)
+* [CentOS 6.5]
+* [Fedora Core 19]
 * [SUSE](dev-vm-SUSE.md)
-* [OpenSUSE Images](openSUSE-images.md)
+* [OpenSUSE Images](dev-openSUSE-images.md)
 
 ## Step 3: Big important step - Setup Docker Admin Node 
   1. follow steps in [docker-admin.md](docker-admin.md)
