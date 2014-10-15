@@ -87,6 +87,10 @@ class NodeRole < ActiveRecord::Base
                           :association_foreign_key => "child_id",
                           :delete_sql => "SELECT 1") # TODO: Figure out how to remove
 
+  # Parent and child links based on noderole -> noderole attribute dependency.
+  has_many        :parent_attrib_links, class_name: "NodeRoleAttribLink", foreign_key: "child_id"
+  has_many        :child_attrib_links,  class_name: "NodeRoleAttribLink", foreign_key: "parent_id"
+
   # State transitions:
   # All node roles start life in the PROPOSED state.
   # At deployment commit time, all node roles in PROPOSED that:
@@ -445,8 +449,10 @@ class NodeRole < ActiveRecord::Base
       reload
       raise InvalidTransition.new(self,state,TODO,"Not all parents are ACTIVE") unless activatable?
       update!(state: TODO)
-      # Going into TODO transitions all our children into BLOCKED.
-      all_children.where(["state NOT IN(?,?)",PROPOSED,TRANSITION]).update_all(state: BLOCKED)
+      # Going into TODO transitions any children in ERROR or TODO into BLOCKED
+      children.where(["state IN(?,?)",ERROR,TODO]).each do |c|
+        c.block!
+      end
     end
   end
 
@@ -467,7 +473,10 @@ class NodeRole < ActiveRecord::Base
     NodeRole.transaction do
       reload
       update!(state: BLOCKED)
-      all_children.where(["state NOT IN(?,?)",PROPOSED,TRANSITION]).update_all(state: BLOCKED)
+      # Going into BLOCKED transitions any children in ERROR or TODO into BLOCKED.
+      children.where(["state IN(?,?)",ERROR,TODO]).each do |c|
+        c.block!
+      end
     end
   end
 
@@ -482,7 +491,7 @@ class NodeRole < ActiveRecord::Base
   end
 
   def name
-   "#{deployment.name}: #{node.name}: #{role.name}" rescue I18n.t('unknown')
+    "#{deployment.name}: #{node.name}: #{role.name}" rescue I18n.t('unknown')
   end
 
   # Commit takes us back to TODO or BLOCKED, depending
@@ -509,6 +518,21 @@ class NodeRole < ActiveRecord::Base
 
   def jig
     role.jig
+  end
+
+  def rebind_attrib_parents
+    NodeRole.transaction do
+      role.wanted_attribs.each do |a|
+        next unless a.role_id
+        target = all_parents.where(role_id: a.role_id).first!
+        nra = parent_attrib_links.find_by(attrib: a)
+        if nra.nil?
+          NodeRoleAttribLink.find_or_create_by!(parent: target, child: self, attrib: a)
+        elsif nra.parent != target
+          nra.update!(parent: target)
+        end
+      end
+    end
   end
 
   private
@@ -538,8 +562,8 @@ class NodeRole < ActiveRecord::Base
       Run.run!
     end
     if active?
-      # Immediate children of an ACTIVE node go to TODO
       NodeRole.transaction do
+        # Immediate children of an ACTIVE node go to TODO
         children.where(state: BLOCKED).each do |c|
           Rails.logger.debug("NodeRole #{name}: testing to see if #{c.name} is runnable")
           next unless c.activatable?
@@ -568,7 +592,7 @@ class NodeRole < ActiveRecord::Base
         role.save
       else
         errors.add(:role_id, "role '#{role.name}' cannot be bound without '#{role.jig_name}' being active!")
-        end
+      end
     end
     # Now that we have validated the role side of things, validate the noderole side of things
   end
@@ -613,6 +637,10 @@ class NodeRole < ActiveRecord::Base
     self.role.add_to_deployment(self.deployment)
   end
 
+  def maybe_rebind_attrib_links
+    rebind_attrib_parents if deployment_id_changed?
+  end
+
   def bind_needed_parents
     NodeRole.transaction do
       NodeRole.find_needed_parents(role,
@@ -626,12 +654,13 @@ class NodeRole < ActiveRecord::Base
         parent = NodeRole.find_by!(id: np[:node_role_id])
         parent.add_child(self)
       end
+      rebind_attrib_parents
     end
   end
 
   def bind_cluster_children
     NodeRole.transaction do
-     if self.role.cluster?
+      if self.role.cluster?
         # If I am a cluster role, I also get any children of my peers.
         NodeRole.peers_by_role(deployment,role).each do |peer|
           next if peer.id == self.id
@@ -642,6 +671,5 @@ class NodeRole < ActiveRecord::Base
       end
     end
   end
-
 end
 
