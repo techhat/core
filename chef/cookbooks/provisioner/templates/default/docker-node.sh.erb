@@ -48,7 +48,7 @@ export CROWBAR_URL="<%=@admin_url%>"
 ip addr add <%=addr%> dev eth0
 <% end -%>
 mkdir -p /root/.ssh
-printf '%s' '<%=@keys%>' >/root/.ssh/authorized_keys
+printf '%s\n' '<%=@keys%>' >/root/.ssh/authorized_keys
 # Figure out what we are running on.
 if [[ -f /etc/system-release ]]; then
     read DISTRIB_ID _t DISTRIB_RELEASE rest < /etc/system-release
