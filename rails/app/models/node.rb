@@ -403,10 +403,10 @@ class Node < ActiveRecord::Base
     return unless self.bootenv_changed?
     return unless self.actions[:boot]
     new_bootenv = self.changes["bootenv"]
-    if new_bootenv == "local"
-      self.actions.boot.disk
+    if new_bootenv == "local" && !self.hint[:always_pxe]
+      self.actions[:boot].disk
     else
-      self.actions.boot.pxe
+      self.actions[:boot].pxe
     end
   end
 
