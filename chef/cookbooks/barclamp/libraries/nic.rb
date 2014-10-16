@@ -33,6 +33,10 @@ class ::Nic
     ::Kernel.system("ip #{arg}")
   end
 
+  def enable_ipv6
+    ::Kernel.system("sysctl net.ipv6.conf.#{@nic}.disable_ipv6=0")
+  end
+
   # Return an unsorted array of all nics on the system.
   def self.__nics
     res = []
@@ -126,6 +130,7 @@ class ::Nic
   def add_address(addr)
     addr = ::IP.coerce(addr).dup.freeze
     return self if @addresses.include?(addr)
+    enable_ipv6 if addr.v6?
     if run_ip("addr add #{addr.to_s} dev #{@nic}")
       @addresses << addr
       self
