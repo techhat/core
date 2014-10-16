@@ -145,14 +145,30 @@ class ::Nic
     self
   end
 
+  # Check for the PID of the dhcp agent managing this interface, if any.
+  def dhcp_pid
+    res = %x{pgrep -f 'dh(client|cpcd).*#{@nic}'}.strip
+    res.empty? ? nil : res.to_i
+  end
+
   # This kills all IP addresses and routes set to go through a nic.
   # Use with caution.
   def flush
+    self.dhcp_pid && kill_dhcp
     run_ip("-4 route flush dev #{@nic}")
     run_ip("-6 route flush dev #{@nic}")
     run_ip("addr flush dev #{@nic}")
     @addresses = ::Array.new
     self
+  end
+
+  # Kill any attached DHCP agent attached to this nic.
+  # If a PID is killed, the interface is also flushed to
+  # get rid of stale addresses and routes.
+  def kill_dhcp
+    pid = dhcp_pid
+    return unless pid
+    system("kill #{pid}")
   end
 
   # Several helper routines for querying the state of a nic.
