@@ -14,7 +14,7 @@ if ! which yardoc &>/dev/null; then
 fi
 
 cd /opt/opencrowbar
-for d in **/.yardoc; do
+for d in **/.yardopts; do
     (   cd "${d%/*}" || continue
         yardoc && git add doc/internals
         rm -rf .yardoc
