@@ -488,6 +488,7 @@ en:
       title: "Initial System Configuration"
       admin_server: "Assign Admin Node"
       admin_net: "Create Admin Network"
+      bmc_net: "Create BMC Network"
       bind_admin_server: "Bind Roles"
       attribs: "Review Key Attributes"
       start_server: "Activate Admin Node"
