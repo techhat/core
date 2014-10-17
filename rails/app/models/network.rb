@@ -15,8 +15,10 @@
 class Network < ActiveRecord::Base
 
   ADMIN_NET      = "admin"
+  BMC_NET        = "bmc"
   V6AUTO         = "auto"   # if this changes, update the :v6prefix validator too!
   DEFAULTCONDUIT = '1g1'
+  BMCCONDUIT     = 'bmc'
 
   validate        :check_network_sanity
   after_commit    :add_role, on: :create
