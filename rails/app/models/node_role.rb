@@ -555,7 +555,7 @@ class NodeRole < ActiveRecord::Base
     role = Role.find(role_id)
     unresolved = role.unresolved_requires
     unless unresolved.empty?
-      errors.add(:role_id, "role #{role.name} is missing prerequisites: #{unresolved.map{|rr|rr.require}}")
+      errors.add(:role_id, "role #{role.name} is missing prerequisites: #{unresolved.map{|rr|rr.requires}}")
     end
     # Abstract roles cannot be bound.
     errors.add(:role_id,"role #{role.name} is abstract and cannot be bound to a node") if role.abstract
