@@ -202,6 +202,11 @@ admin node.
 
 To boot Real Hardware, bind a physical interface to docker0 with brctl, make sure that interface is up and does not have an address, and plug it in to a switch that has the physical boxes you want to boot.
 
+Example Commands:
+  1. slave the eth2 to the docker bridge, `sudo brctl addif docker0 eth2`
+  1. turn on eth2 for the bridge, `sudo ip link set eth2 up`
+  1. boot the physical nodes from a switch connected to eth2
+
 #### Virtual Box (the corporate way)
 
 > This approach expects that you've added an ethernet device (not up'd) to your VM that will be the admin network for slave VMs. Also, if using vmware, you'll need to use E1000 Nics and make sure your network settings are set to "Allow" promiscuous mode. 
