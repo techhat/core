@@ -109,15 +109,18 @@ to your UID and GID in your development environment.
 When deploying an admin node in production mode, you will want to be
 able to install operating systems on slave nodes.  By default, the
 `provisioner-base-images` role will look for OS install ISO images in
-`/tftpboot/isos`.  Currently, the provisioner knows how to install the
-following operating systems from the following ISO images:
+`/tftpboot/isos`.  The provisioner knows how to install several operating systems 
+(partial list below) from the ISO images:
 
-* `ubuntu-12.04`: `ubuntu-12.04.4-server-amd64.iso`
-* `centos-6.5`: `CentOS-6.5-x86_64-bin-DVD1.iso`
+ * `ubuntu-14.04`: `ubuntu-14.04.1-server-amd64.iso`
+ * `centos-6.5`: `CentOS-6.5-x86_64-bin-DVD1.iso`
+ * `centos-7.0`: `CentOS-7.0-1406-x86_64-DVD.iso`
+
+> This list is subject to change!  For the latest list, consult [Provisioner Base Images](https://github.com/opencrowbar/core/blob/master/chef/roles/provisioner-base-images/role-template.json) template file.
 
 To enable the provisioner to install from those images, place them in
 `$HOME/.cache/opencrowbar/tftpboot/isos`, either directly or via a
-hard link.  These images will then be available inside the Docker
+hard link (soft links do not work for Docker).  These images will then be available inside the Docker
 container at `/tftpboot/isos`, and the provisioner will be able to use
 them to install operating systems on slave nodes.
 
