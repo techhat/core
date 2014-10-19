@@ -28,7 +28,7 @@ class Jig < ActiveRecord::Base
 
   # 
   # Validate the name should unique 
-  # and that it starts with an alph and only contains alpha,digist,hyphen,underscore
+  # and that it starts with an alpha and only contains alpha,digits,hyphen,underscore
   #
   validates_uniqueness_of :name, :case_sensitive => false, :message => I18n.t("db.notunique", :default=>"Name item must be unique")
   validates_format_of     :name, :with=> /\A[a-zA-Z][-_a-zA-Z0-9]*\z/, :message => I18n.t("db.lettersnumbers", :default=>"Name limited to [-_a-zA-Z0-9]")
@@ -95,7 +95,7 @@ class Jig < ActiveRecord::Base
       end
       # Next, build up the node specific part of the attrib blob.
       # All parent noderoles that are on the same node get their attribs pulled
-    # in by default.
+      # in by default.
       nr.all_parents.on_node(nr.node).order("cohort ASC").each do |parent_nr|
         res.deep_merge!(parent_nr.deployment_data)
         res.deep_merge!(parent_nr.all_my_data)

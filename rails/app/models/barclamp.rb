@@ -30,7 +30,7 @@ class Barclamp < ActiveRecord::Base
   alias_attribute   :parent,    :barclamp
   serialize         :cfg_data
 
-  scope :roots,     where(["barclamp_id = id"])
+  scope :roots,     -> { where(["barclamp_id = id"]) }
 
   #
   # Human printable random password generator
