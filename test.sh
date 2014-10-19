@@ -37,12 +37,18 @@ chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes
 
 . /etc/profile
 
-# Setup tests
-cd rails
-bundle exec rake db:create
+./setup/00-crowbar-rake-tests.install && \
+  ./setup/01-run-tests.install || {
+  echo "Failed to bootstrap and run tests"
+}
 
-# Run the tests once.
-bundle exec rspec
-bundle exec test
+# Talk about tests
+echo
+echo "To run tests:"
+echo "su - crowbar"
+echo "cd rails"
+echo "bundle exec rake test"
+echo "bundle exec rspec"
+echo
 
 /bin/bash -i

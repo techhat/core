@@ -7,3 +7,4 @@ SimpleCov.formatter = SimpleCov::Formatter::MultiFormatter[
 SimpleCov.start 'rails' do
   use_merging true
 end
+SimpleCov.command_name 'Base'
