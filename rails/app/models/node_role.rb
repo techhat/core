@@ -20,6 +20,7 @@ class NodeRole < ActiveRecord::Base
   after_commit :bind_cluster_children, on: [:create]
   after_commit :run_hooks, on: [:update, :create]
   after_commit :create_deployment_role, on: [:create]
+  after_commit :poke_attr_dependent_noderoles, on: [:update]
   after_create :bind_needed_parents
   validate :role_is_bindable, on: :create
   validate :noderole_has_all_parents, on: :create
@@ -363,6 +364,14 @@ class NodeRole < ActiveRecord::Base
     deployment_data.deep_merge(all_my_data)
   end
 
+  def all_committed_data
+    res = deployment_data
+    res.deep_merge!(wall)
+    res.deep_merge!(sysdata)
+    res.deep_merge!(committed_data)
+    res
+  end
+
   def all_deployment_data
     res = {}
     all_parents.each {|parent| res.deep_merge!(parent.deployment_data)}
@@ -568,6 +577,28 @@ class NodeRole < ActiveRecord::Base
           Rails.logger.debug("NodeRole #{name}: testing to see if #{c.name} is runnable")
           next unless c.activatable?
           c.todo!
+        end
+      end
+    end
+  end
+
+  def poke_attr_dependent_noderoles
+    NodeRole.transaction do
+      current_data = {}
+      previous_data = {}
+      [:wall,:sysdata,:committed_data].each do |key|
+        current_data.deep_merge!(self.send(key))
+        previous_data.deep_merge!(previous_changes[key] ? previous_changes[key][0] : self.send(key))
+      end
+      # The data we were providing changed, poke any downstream noderoles
+      # that get specific data from us.
+      if current_data != previous_data
+        child_attrib_links.each do |al|
+          cnr = al.child
+          next unless cnr.runnable? && (cnr.transition? || cnr.active?)
+          attr = al.attrib
+          next if attr.extract(current_data) == attr.extract(previous_data)
+          cnr.send(:block_or_todo)
         end
       end
     end

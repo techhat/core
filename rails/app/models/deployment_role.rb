@@ -57,13 +57,15 @@ class DeploymentRole < ActiveRecord::Base
   def commit
     return if committed?
     DeploymentRole.transaction do
-      committed_data = proposed_data
+      if committed_data != proposed_data
+        committed_data = proposed_data
+        # Have any runnable noderoles that use this deployment role rerun.
+        deployment.node_roles.where(role_id: role.id).each do |nr|
+          nr.todo! if nr.runnable?
+        end
+      end
       self[:proposed_data] = nil
       save!
-      # Have any runnable noderoles that use this deployment role rerun.
-      deployment.node_roles.where(role_id: role.id).each do |nr|
-        nr.todo! if nr.runnable?
-      end
     end
   end
 
@@ -73,7 +75,7 @@ class DeploymentRole < ActiveRecord::Base
   end
 
   def all_data
-    role.template.deep_merge(self.committed_data)
+    role.template.deep_merge(self.committed_data).deep_merge(self.wall)
   end
 
   def data_update(val)

@@ -92,6 +92,7 @@ class Attrib < ActiveRecord::Base
   def get(from_orig,source=:all)
     from = __resolve(from_orig)
     d = case
+        when from.is_a?(Hash) then from
         when from.is_a?(Node)
           case source
           when :all then from.discovery.deep_merge(from.hint)
@@ -203,7 +204,7 @@ class Attrib < ActiveRecord::Base
     case
     when (to.is_a?(Node) && self.role_id) then to.node_roles.find_by!(:role_id => self.role_id)
     when to.is_a?(Deployment) then to.deployment_roles.find_by!(:role_id => self.role_id)
-    when [Node,Role,DeploymentRole,NodeRole].any?{|klass|to.is_a?(klass)} then to
+    when [Node,Role,DeploymentRole,NodeRole,Hash].any?{|klass|to.is_a?(klass)} then to
     else raise "#{to.class.name} is not something that we can use Attribs with!"
     end
   end
@@ -211,12 +212,13 @@ class Attrib < ActiveRecord::Base
   # Set a new value for this attribute onto the passed object.
   # The last parameter is what area the new attribute should be placed on
   def __set(to_orig,value,target=:system)
-    raise AttribReadOnly.new(self) unless writable || target != :user
+    raise AttribReadOnly.new(self) unless writable || target != :user || to_orig.is_a?(Hash)
     kwalify_validate(value) if target == :user
     to_merge = template(value)
     to = __resolve(to_orig)
     Rails.logger.debug("Attrib: Attempting to update #{name} on #{to.class.name}:#{to.name} to #{value} with #{to_merge.inspect}")
     case
+    when to.is_a?(Hash) then to.deep_merge(to_merge)
     when to.is_a?(Node)
       case target
       when :discovery then to.discovery_update(to_merge)

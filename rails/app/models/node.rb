@@ -454,15 +454,34 @@ class Node < ActiveRecord::Base
       Rails.logger.debug("Node: Calling #{r.name} on_node_change for #{self.name}")
       r.on_node_change(self)
     end if available?
-    if alive && available && node_roles.runnable.count > 0
-      Rails.logger.info("Node: #{name} is alive and available, kicking the annealer.")
-      Run.run!
+    if (previous_changes[:alive] || previous_changes[:available])
+      if alive && available && node_roles.runnable.count > 0
+        Rails.logger.info("Node: #{name} is alive and available, kicking the annealer.")
+        Run.run!
+      elsif previous_changes[:alive] && !alive?
+        Rails.logger.info("Node: #{name} is not alive, deactivating noderoles on this node.")
+        NodeRole.transaction do
+          node_roles.order("cohort ASC").each do |nr|
+            nr.deactivate
+          end
+        end
+      end
     end
-    unless alive?
-      Rails.logger.info("Node: #{name} is not alive, deactivating noderoles on this node.")
+    # Find noderoles bound to this node that want an attrib that would be directly provided
+    # by this node, and poke that noderole if the attrib it wants has changed.
+    if available? && alive? && (previous_changes[:hint] || previous_changes[:discovery])
       NodeRole.transaction do
-        node_roles.order("cohort ASC").each do |nr|
-          nr.deactivate
+        current_info = {}
+        old_info = {}
+        [:hint,:discovery].each do |key|
+          current_info.deep_merge!(self[key])
+          old_info.deep_merge!(previous_changes[key] ? previous_changes[key][0] : self[key])
+        end
+        node_roles.each do |nr|
+          next unless nr.role.wanted_attribs.count > 0 &&
+            nr.role.wanted_attribs.where('"attribs"."role_id" IS NULL').any?{|a|a.get(current_info) == a.get(old_info)}
+          next unless nr.runnable? && (nr.transition? || nr.active?)
+          nr.send(:block_or_todo)
         end
       end
     end
