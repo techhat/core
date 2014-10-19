@@ -14,7 +14,7 @@
 
 
 
-# This context establsihes a base Crowbar deployment.
+# This context establishes a base Crowbar deployment.
 # it should be included in all tests that manipulate node attributes
 shared_context "crowbar test deployment" do
   
