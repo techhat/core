@@ -84,6 +84,7 @@ en:
       crowbar-installed-node: 'OS Installed'
       crowbar-docker-node: "Docker Container"
       crowbar-admin-node: 'Crowbar Admin'
+      crowbar-hardware-configured: "Hardware Configured"
     attribs:
       asset_tag: "Asset Tag"
   # Layout
