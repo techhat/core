@@ -44,7 +44,7 @@ class NodesController < ApplicationController
       status[n.id] = {
         :name => n.name,
         :state => state,
-        :status => NodeRole::STATES[state]
+        :status => NodeRole::STATES[state],
         :strStatus => str
       }
     end
