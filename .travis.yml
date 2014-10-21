@@ -33,7 +33,7 @@ script:
   - bundle exec rake db:migrate
   - bundle exec rake db:seed
   - bundle exec script/delayed_job --queue=NodeRoleRunner -n 2 start
-  - bundle exec rails server -d
+  - bundle exec puma -d -C puma-dev.cfg
   - curl -I --fail http://127.0.0.1:3000/docs?id=framework%2Flicenses 
   - cd ../BDD 
   - erlc +debug_info *.erl
