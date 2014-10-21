@@ -150,7 +150,7 @@ class Jig < ActiveRecord::Base
   # The noderole must be in TRANSITION state.
   # This function is intended to be overridden by the jig subclasses,
   # and only used for debugging purposes.
-  # Runs will be run in the background by the dalayed_job information.
+  # Runs will be run in the background by the delayed_job information.
   def run(nr,data)
     raise "Cannot call run on the top-level Jig!"
   end

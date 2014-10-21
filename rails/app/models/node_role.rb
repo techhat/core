@@ -58,34 +58,34 @@ class NodeRole < ActiveRecord::Base
   # validate        :deployable,        :if => :deployable?
   # node_role_pcms maps parent noderoles to child noderoles.
   has_and_belongs_to_many(:parents,
+                          -> { reorder('cohort ASC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_pcms",
                           :foreign_key => "child_id",
-                          :association_foreign_key => "parent_id",
-                          :order => "cohort DESC")
+                          :association_foreign_key => "parent_id")
   has_and_belongs_to_many(:children,
+                          -> { reorder('cohort ASC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_pcms",
                           :foreign_key => "parent_id",
-                          :association_foreign_key => "child_id",
-                          :order => "cohort ASC")
+                          :association_foreign_key => "child_id")
   # node_role_all_pcms is a view that expands node_role_pcms
   # to include all of the parents and children of a noderole,
   # recursively.
   has_and_belongs_to_many(:all_parents,
+                          -> { reorder('cohort DESC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_all_pcms",
                           :foreign_key => "child_id",
                           :association_foreign_key => "parent_id",
-                          :order => "cohort DESC",
-                          :delete_sql => "SELECT 1")
+                          :delete_sql => "SELECT 1") # TODO: Figure out how to remove
   has_and_belongs_to_many(:all_children,
+                          -> { reorder('cohort ASC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_all_pcms",
                           :foreign_key => "parent_id",
                           :association_foreign_key => "child_id",
-                          :order => "cohort ASC",
-                          :delete_sql => "SELECT 1")
+                          :delete_sql => "SELECT 1") # TODO: Figure out how to remove
 
   # State transitions:
   # All node roles start life in the PROPOSED state.

@@ -18,7 +18,7 @@ require 'spec_helper'
 describe CrowbarUtils do
   describe "Locking functions" do
     it "should raise an exception if file create fails" do
-      File.stub(:new) {nil}
+      allow(File).to receive_messages(:new => nil)
       expect {
         CrowbarUtils.lock_held?("fred")
       }.to raise_error(IOError, "File not available: tmp/fred.lock")
@@ -26,35 +26,37 @@ describe CrowbarUtils do
 
     it "lock_held? should return true iff the lock is held" do
       f1 = double('fred')
-      f1.should_receive(:flock).and_return(false)
-      File.stub(:new) {f1}
-      f1.stub(:close)
-      CrowbarUtils.lock_held?("fred").should be_true
+      expect(f1).to receive(:flock).and_return(false)
+      allow(File).to receive_messages(:new => f1)
+      allow(f1).to receive(:close)
+      expect(CrowbarUtils.lock_held?("fred")).to be true
     end
+
     it "lock_held? should return false iff the lock is not held" do
       f1 = double('fred')
-      f1.should_receive(:flock).exactly(2).and_return(true,true)
-      File.stub(:new) {f1}
-      f1.stub(:close)
-      CrowbarUtils.lock_held?("fred").should be_false
+      expect(f1).to receive(:flock).exactly(2).and_return(true, true)
+      allow(File).to receive_messages(:new => f1)
+      allow(f1).to receive(:close)
+      expect(CrowbarUtils.lock_held?("fred")).to be false
     end
 
     it "with_lock should yield when lock grabbed" do
       f1 = double('fred')
-      f1.should_receive(:flock).exactly(2).and_return(true,true)
-      File.stub(:new) {f1}
-      f1.stub(:close)
-      CrowbarUtils.with_lock("fred") do
+      expect(f1).to receive(:flock).exactly(2).and_return(true,true)
+      allow(File).to receive_messages(:new => f1)
+      allow(f1).to receive(:close)
+      answer = CrowbarUtils.with_lock("fred") do
         "fred"
-      end.should == "fred"
+      end
+      expect(answer).to eq("fred")
     end
 
     it "with_lock should die if it cannot grab lock" do
       f1 = double('fred')
-      f1.should_receive(:flock).exactly(32).and_return(false)
-      File.stub(:new) {f1}
-      Kernel.stub(:sleep)
-      f1.stub(:close)
+      expect(f1).to receive(:flock).exactly(32).and_return(false)
+      allow(File).to receive_messages(:new => f1)
+      allow(Kernel).to receive(:sleep)
+      allow(f1).to receive(:close)
       expect {
         CrowbarUtils.with_lock("fred") do
           "fred"

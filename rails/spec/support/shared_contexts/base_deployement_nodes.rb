@@ -21,6 +21,62 @@ shared_context "crowbar test deployment" do
   before(:all) do
     # we need this to ensure that we have the crowbar barclamp
     bc = Barclamp.find_by_name('crowbar') || Barclamp.import('crowbar')
+
+    sd = Deployment.find_by_name 'system'
+
+    admin_net= {
+      "name" => "admin",
+      "deployment" => sd,
+      "conduit" => "1g0"
+    }
+    admin_ranges = [
+        {
+          "name" => "admin",
+          "first" => "192.168.124.10/22",
+          "last" => "192.168.124.11/22"
+        },
+        {
+          "name" => "host",
+          "first" => "192.168.124.81/22",
+          "last" => "192.168.127.254/22"
+        },
+        {
+          "name" => "dhcp",
+          "first" => "192.168.124.21/22",
+          "last" => "192.168.124.80/22"
+        }
+    ]
+
+    network = Network.find_or_create_by! admin_net
+    admin_ranges.each do |r|
+      r[:network_id] = network.id
+      NetworkRange.find_or_create_by! r
+    end
+
+    bmc_net = {
+      "name" => "bmc",
+      "deployment" => sd,
+      "conduit" => "1g0"
+    }
+    bmc_ranges = [
+      {
+        "name" => "admin",
+        "first" => "192.168.128.10/22",
+        "last" => "192.168.128.20/22"
+      },
+      {
+        "name" => "host",
+        "first" => "192.168.128.21/22",
+        "last" => "192.168.131.254/22"
+      }
+    ]
+
+    network = Network.find_or_create_by! bmc_net
+    bmc_ranges.each do |r|
+      r[:network_id] = network.id
+      NetworkRange.find_or_create_by! r
+    end
+
   end
 
   let(:deployment) { Deployment.find_by_name 'system' }
@@ -29,11 +85,11 @@ shared_context "crowbar test deployment" do
   describe Deployment do
 
     it "is a system deployment" do
-      expect(deployment.system).to be_true
+      expect(deployment.system?).to be true
     end
 
     it "is committed" do
-      expect(deployment.committed?).to be_true
+      expect(deployment.committed?).to be true
     end
 
   end
@@ -42,6 +98,6 @@ end
 
 # Just 2 dummy nodes
 shared_context "2 dummy nodes" do
-  let(:node1) { Node.create :name=>"unit1.test.com", :admin=>true }
-  let(:node2) { Node.create :name=>"unit2.test.com" }
+  let(:node1) { Node.create! :name=>"unit1.test.com", :alias=>"unit1", :admin=>true }
+  let(:node2) { Node.create! :name=>"unit2.test.com", :alias=>"unit2" }
 end
