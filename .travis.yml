@@ -33,13 +33,13 @@ script:
   - bundle exec rake db:migrate
   - bundle exec rake db:seed
   - bundle exec script/delayed_job --queue=NodeRoleRunner -n 2 start
-  - bundle exec puma -d -C puma-dev.cfg
+  - bundle exec rails server -d
   - curl -I --fail http://127.0.0.1:3000/docs?id=framework%2Flicenses 
   - cd ../BDD 
   - erlc +debug_info *.erl
   - erl -s bdd test travis -s init stop -noshell
   - cd ../rails
-  - bundle exec pumactl -F puma-dev.cfg stop
+  - kill `cat tmp/pids/server.pid`
   - bundle exec script/delayed_job stop
   - RAILS_ENV=test bundle exec rake db:migrate
   - RAILS_ENV=test bundle exec rake db:seed
