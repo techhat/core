@@ -22,16 +22,3 @@ for task in "${tasks[@]}"; do
     exit 1
 done
 
-[[ -f /etc/init.d/crowbar ]] || \
-    cp ../etc/init.d/crowbar /etc/init.d/crowbar
-
-if [[ $OS != suse ]]; then
-    for i in 3 5 2; do
-        [[ -d /etc/rc$i.d ]] || continue
-        ln -sf /etc/init.d/crowbar "/etc/rc$i.d/S99crowbar"
-    done
-else
-    chkconfig crowbar on
-fi
-
-/etc/init.d/crowbar start

@@ -86,7 +86,7 @@ class User < ActiveRecord::Base
       # ignore, keep going
     end
     
-    # now the compromise, fall back to MD5 emthod as backup
+    # now the compromise, fall back to MD5 method as backup
     return digester(password).eql?(encrypted_password)
   end
 

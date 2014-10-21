@@ -42,7 +42,7 @@ class Node < ActiveRecord::Base
 
   # TODO: 'alias' will move to DNS BARCLAMP someday, but will prob hang around here a while
   validates_uniqueness_of :alias, :case_sensitive => false, :message => I18n.t("db.notunique", :default=>"Name item must be unique")
-  validates_format_of :alias, :with=>/\A[A-Za-z0-9\-]*[A-Za-z0-9]\z/, :message => I18n.t("db.fqdn", :default=>"Alias is not valid.")
+  validates_format_of :alias, :with=>/\A[A-Za-z0-9\-]*[A-Za-z0-9]\z/, :message => I18n.t("db.alias", :default=>"Alias is not valid.")
   validates_length_of :alias, :maximum => 100
 
   has_and_belongs_to_many :groups, :join_table => "node_groups", :foreign_key => "node_id"
@@ -52,11 +52,11 @@ class Node < ActiveRecord::Base
   has_many    :roles,              :through => :node_roles
   has_many    :deployments,        :through => :node_roles
   has_many    :network_allocations,:dependent => :destroy
-  has_many    :hammers,      :dependent => :destroy
+  has_many    :hammers,            :dependent => :destroy
   belongs_to  :deployment
   belongs_to  :target_role,        :class_name => "Role", :foreign_key => "target_role_id"
 
-  alias_attribute :ips,                :network_allocations
+  alias_attribute :ips,            :network_allocations
 
   scope    :admin,              -> { where(:admin => true) }
   scope    :alive,              -> { where(:alive => true) }
@@ -491,7 +491,7 @@ class Node < ActiveRecord::Base
   end
 
   def on_create_hooks
-    # Call all role on_node_create hooks with ourself.
+    # Call all role on_node_create hooks with self.
     # These should happen synchronously.
     # do the low cohorts first
     Hammer.bind(manager_name: "ssh", username: "root", node: self)

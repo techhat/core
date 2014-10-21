@@ -26,14 +26,5 @@ class DeploymentModelTest < ActiveSupport::TestCase
     e = assert_raise(ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique) { Deployment.create!(:name => "nodup") }
   end
   
-  test "Check protections on illegal names" do
-    assert_raise(ActiveRecord::RecordInvalid) { Deployment.create!(:name => "1123") }
-    assert_raise(ActiveRecord::RecordInvalid) { Deployment.create!(:name => "1foo") }
-    assert_raise(ActiveRecord::RecordInvalid) { Deployment.create!(:name => "Ille!gal") }
-    assert_raise(ActiveRecord::RecordInvalid) { Deployment.create!(:name => " nospaces") }
-    assert_raise(ActiveRecord::RecordInvalid) { Deployment.create!(:name => "no spaces") }
-    assert_raise(ActiveRecord::RecordInvalid) { Deployment.create!(:name => "nospacesatall ") }
-  end
-  
 end
 

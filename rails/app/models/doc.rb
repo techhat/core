@@ -23,7 +23,7 @@ class Doc < ActiveRecord::Base
 
   validates_uniqueness_of :name, :scope=>:barclamp_id, :on => :create, :case_sensitive => false, :message => I18n.t("db.notunique", :default=>"Doc handle must be unique")
 
-  scope :roots, where(:parent_id=>nil)
+  scope :roots, -> { where(:parent_id=>nil) }
   scope :roots_by_barclamp, lambda { |barclamp_id| where(:parent_id=>nil, :barclamp_id=>barclamp_id) }
 
   def <=>(b)
