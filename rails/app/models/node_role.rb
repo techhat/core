@@ -58,7 +58,7 @@ class NodeRole < ActiveRecord::Base
   # validate        :deployable,        :if => :deployable?
   # node_role_pcms maps parent noderoles to child noderoles.
   has_and_belongs_to_many(:parents,
-                          -> { reorder('cohort ASC') },
+                          -> { reorder('cohort DESC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_pcms",
                           :foreign_key => "child_id",
