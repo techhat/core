@@ -1087,17 +1087,17 @@ for converging.</p>
       <pre class="lines">
 
 
-230
 231
 232
 233
 234
 235
 236
-237</pre>
+237
+238</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 230</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 231</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_method_missing'>method_missing</span><span class='lparen'>(</span><span class='id identifier rubyid_m'>m</span><span class='comma'>,</span><span class='op'>*</span><span class='id identifier rubyid_args'>args</span><span class='comma'>,</span><span class='op'>&amp;</span><span class='id identifier rubyid_block'>block</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_method'>method</span> <span class='op'>=</span> <span class='id identifier rubyid_m'>m</span><span class='period'>.</span><span class='id identifier rubyid_to_s'>to_s</span>
@@ -1134,7 +1134,6 @@ for converging.</p>
       <pre class="lines">
 
 
-73
 74
 75
 76
@@ -1150,10 +1149,11 @@ for converging.</p>
 86
 87
 88
-89</pre>
+89
+90</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 73</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 74</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_find_key'>find_key</span><span class='lparen'>(</span><span class='id identifier rubyid_key'>key</span><span class='rparen'>)</span>
     <span class='id identifier rubyid_col'>col</span><span class='comma'>,</span><span class='id identifier rubyid_key'>key</span> <span class='op'>=</span> <span class='kw'>case</span>
@@ -1192,12 +1192,12 @@ for converging.</p>
       <pre class="lines">
 
 
-225
 226
-227</pre>
+227
+228</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 225</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 226</span>
 
 <span class='kw'>def</span> <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name_hash'>name_hash</span>
   <span class='const'>Digest</span><span class='op'>::</span><span class='const'>SHA1</span><span class='period'>.</span><span class='id identifier rubyid_hexdigest'>hexdigest</span><span class='lparen'>(</span><span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_select'>select</span><span class='lparen'>(</span><span class='symbol'>:name</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_order'>order</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>name ASC</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_map'>map</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='op'>|</span><span class='id identifier rubyid_n'>n</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='rbrace'>}</span><span class='period'>.</span><span class='id identifier rubyid_join'>join</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_to_i'>to_i</span><span class='lparen'>(</span><span class='int'>16</span><span class='rparen'>)</span>
@@ -1228,12 +1228,12 @@ for converging.</p>
       <pre class="lines">
 
 
-91
 92
-93</pre>
+93
+94</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 91</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 92</span>
 
 <span class='kw'>def</span> <span class='op'>&lt;=&gt;</span><span class='lparen'>(</span><span class='id identifier rubyid_other'>other</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span> <span class='op'>&lt;=&gt;</span> <span class='id identifier rubyid_other'>other</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span>
@@ -1258,13 +1258,13 @@ for converging.</p>
       <pre class="lines">
 
 
-192
 193
 194
-195</pre>
+195
+196</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 192</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 193</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_actions'>actions</span>
   <span class='ivar'>@nodemgr_actions</span> <span class='op'>=</span> <span class='const'>Hammer</span><span class='period'>.</span><span class='id identifier rubyid_gather'>gather</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='ivar'>@nodemgr_actions</span>
@@ -1290,12 +1290,12 @@ for converging.</p>
       <pre class="lines">
 
 
-176
 177
-178</pre>
+178
+179</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 176</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 177</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_active_node_roles'>active_node_roles</span>
   <span class='const'>NodeRole</span><span class='period'>.</span><span class='id identifier rubyid_on_node'>on_node</span><span class='lparen'>(</span><span class='kw'>self</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_in_state'>in_state</span><span class='lparen'>(</span><span class='const'>NodeRole</span><span class='op'>::</span><span class='const'>ACTIVE</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_committed'>committed</span><span class='period'>.</span><span class='id identifier rubyid_order'>order</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>cohort ASC</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1320,12 +1320,12 @@ for converging.</p>
       <pre class="lines">
 
 
-145
 146
-147</pre>
+147
+148</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 145</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 146</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_address'>address</span>
   <span class='id identifier rubyid_addresses'>addresses</span><span class='period'>.</span><span class='id identifier rubyid_detect'>detect</span><span class='lbrace'>{</span><span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='op'>|</span><span class='id identifier rubyid_a'>a</span><span class='period'>.</span><span class='id identifier rubyid_reachable?'>reachable?</span><span class='rbrace'>}</span>
@@ -1350,16 +1350,16 @@ for converging.</p>
       <pre class="lines">
 
 
-137
 138
 139
 140
 141
 142
-143</pre>
+143
+144</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 137</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 138</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_addresses'>addresses</span>
   <span class='id identifier rubyid_net'>net</span> <span class='op'>=</span> <span class='const'>Network</span><span class='period'>.</span><span class='id identifier rubyid_find_by!'>find_by!</span><span class='lparen'>(</span><span class='symbol'>:name</span> <span class='op'>=&gt;</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>admin</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -1410,7 +1410,6 @@ for converging.</p>
       <pre class="lines">
 
 
-387
 388
 389
 390
@@ -1420,10 +1419,11 @@ for converging.</p>
 394
 395
 396
-397</pre>
+397
+398</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 387</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 388</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_alive?'>alive?</span>
   <span class='kw'>return</span> <span class='kw'>false</span> <span class='kw'>if</span> <span class='id identifier rubyid_alive'>alive</span> <span class='op'>==</span> <span class='kw'>false</span>
@@ -1456,7 +1456,6 @@ for converging.</p>
       <pre class="lines">
 
 
-180
 181
 182
 183
@@ -1466,10 +1465,11 @@ for converging.</p>
 187
 188
 189
-190</pre>
+190
+191</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 180</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 181</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_all_active_data'>all_active_data</span>
   <span class='id identifier rubyid_dres'>dres</span> <span class='op'>=</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -1519,12 +1519,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-69
 70
-71</pre>
+71
+72</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 69</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 70</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_attribs'>attribs</span>
   <span class='const'>Attrib</span><span class='period'>.</span><span class='id identifier rubyid_where'>where</span><span class='lparen'>(</span><span class='lbracket'>[</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>attribs.role_id IS NULL OR attribs.role_id in (select role_id from node_roles where node_id = ?)</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_id'>id</span><span class='rbracket'>]</span><span class='rparen'>)</span>
@@ -1549,13 +1549,13 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-132
 133
 134
-135</pre>
+135
+136</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 132</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 133</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_auto_v6_address'>auto_v6_address</span><span class='lparen'>(</span><span class='id identifier rubyid_net'>net</span><span class='rparen'>)</span>
   <span class='kw'>return</span> <span class='kw'>nil</span> <span class='kw'>if</span> <span class='id identifier rubyid_net'>net</span><span class='period'>.</span><span class='id identifier rubyid_v6prefix'>v6prefix</span><span class='period'>.</span><span class='id identifier rubyid_nil?'>nil?</span>
@@ -1581,7 +1581,6 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-317
 318
 319
 320
@@ -1595,10 +1594,11 @@ defined as part of the role that the node role is bound to, and</p>
 328
 329
 330
-331</pre>
+331
+332</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 317</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 318</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_commit!'>commit!</span>
   <span class='const'>Role</span><span class='period'>.</span><span class='id identifier rubyid_all_cohorts'>all_cohorts</span><span class='period'>.</span><span class='id identifier rubyid_each'>each</span> <span class='kw'>do</span> <span class='op'>|</span><span class='id identifier rubyid_r'>r</span><span class='op'>|</span>
@@ -1635,7 +1635,6 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-280
 281
 282
 283
@@ -1643,10 +1642,11 @@ defined as part of the role that the node role is bound to, and</p>
 285
 286
 287
-288</pre>
+288
+289</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 280</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 281</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_debug'>debug</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -1677,15 +1677,15 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-266
 267
 268
 269
 270
-271</pre>
+271
+272</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 266</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 267</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_discovery_merge'>discovery_merge</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -1713,15 +1713,15 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-273
 274
 275
 276
 277
-278</pre>
+278
+279</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 273</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 274</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_discovery_update'>discovery_update</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -1760,12 +1760,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-167
 168
-169</pre>
+169
+170</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 167</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 168</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_get_attrib'>get_attrib</span><span class='lparen'>(</span><span class='id identifier rubyid_attrib'>attrib</span><span class='rparen'>)</span>
   <span class='const'>Attrib</span><span class='period'>.</span><span class='id identifier rubyid_get'>get</span><span class='lparen'>(</span><span class='id identifier rubyid_attrib'>attrib</span><span class='comma'>,</span> <span class='kw'>self</span><span class='comma'>,</span> <span class='symbol'>:discovery</span><span class='rparen'>)</span> <span class='kw'>rescue</span> <span class='kw'>nil</span>
@@ -1790,12 +1790,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-244
 245
-246</pre>
+246
+247</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 244</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 245</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_group'>group</span>
   <span class='id identifier rubyid_groups'>groups</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -1820,7 +1820,6 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-248
 249
 250
 251
@@ -1829,10 +1828,11 @@ defined as part of the role that the node role is bound to, and</p>
 254
 255
 256
-257</pre>
+257
+258</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 248</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 249</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_group='>group=</span><span class='lparen'>(</span><span class='id identifier rubyid_group'>group</span><span class='rparen'>)</span>
   <span class='const'>Group</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -1864,15 +1864,15 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-259
 260
 261
 262
 263
-264</pre>
+264
+265</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 259</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 260</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_hint_update'>hint_update</span><span class='lparen'>(</span><span class='id identifier rubyid_val'>val</span><span class='rparen'>)</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -1924,12 +1924,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-157
 158
-159</pre>
+159
+160</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 157</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 158</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_is_admin?'>is_admin?</span>
   <span class='id identifier rubyid_admin'>admin</span>
@@ -1976,7 +1976,6 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-300
 301
 302
 303
@@ -1991,10 +1990,11 @@ defined as part of the role that the node role is bound to, and</p>
 312
 313
 314
-315</pre>
+315
+316</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 300</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 301</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_is_docker_node?'>is_docker_node?</span>
   <span class='comment'>#
@@ -2032,12 +2032,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-123
 124
-125</pre>
+125
+126</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 123</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 124</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_login'>login</span>
   <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>root@</span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_shortname'>shortname</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span>
@@ -2062,13 +2062,13 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-171
 172
 173
-174</pre>
+174
+175</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 171</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 172</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_merge_quirks'>merge_quirks</span><span class='lparen'>(</span><span class='id identifier rubyid_new_quirks'>new_quirks</span><span class='rparen'>)</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_quirks'>quirks</span> <span class='op'>=</span> <span class='lparen'>(</span><span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_quirks'>quirks</span> <span class='op'>+</span> <span class='id identifier rubyid_new_quirks'>new_quirks</span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_sort'>sort</span><span class='period'>.</span><span class='id identifier rubyid_uniq'>uniq</span>
@@ -2094,12 +2094,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-197
 198
-199</pre>
+199
+200</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 197</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 198</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_power'>power</span>
   <span class='id identifier rubyid_actions'>actions</span><span class='lbracket'>[</span><span class='symbol'>:power</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -2124,7 +2124,6 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-333
 334
 335
 336
@@ -2132,10 +2131,11 @@ defined as part of the role that the node role is bound to, and</p>
 338
 339
 340
-341</pre>
+341
+342</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 333</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 334</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_redeploy!'>redeploy!</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -2166,13 +2166,13 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-205
 206
 207
-208</pre>
+208
+209</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 205</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 206</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_run'>run</span><span class='lparen'>(</span><span class='id identifier rubyid_cmd'>cmd</span><span class='rparen'>)</span>
   <span class='id identifier rubyid_raise'>raise</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>No run actions for </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_name'>name</span><span class='embexpr_end'>}</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span> <span class='kw'>unless</span> <span class='id identifier rubyid_actions'>actions</span><span class='lbracket'>[</span><span class='symbol'>:run</span><span class='rbracket'>]</span>
@@ -2198,13 +2198,13 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-215
 216
 217
-218</pre>
+218
+219</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 215</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 216</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scp_from'>scp_from</span><span class='lparen'>(</span><span class='id identifier rubyid_remote_src'>remote_src</span><span class='comma'>,</span> <span class='id identifier rubyid_local_dest'>local_dest</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span><span class='op'>=</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Node.scp_from outdated, please update </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_caller'>caller</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> to use Node.transfer.copy_from instead!</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -2230,13 +2230,13 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-220
 221
 222
-223</pre>
+223
+224</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 220</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 221</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_scp_to'>scp_to</span><span class='lparen'>(</span><span class='id identifier rubyid_local_src'>local_src</span><span class='comma'>,</span> <span class='id identifier rubyid_remote_dest'>remote_dest</span><span class='comma'>,</span> <span class='id identifier rubyid_opts'>opts</span><span class='op'>=</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
   <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Node.scp_to outdated, please update </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_caller'>caller</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> to use Node.transfer.copy_to instead!</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -2262,12 +2262,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-119
 120
-121</pre>
+121
+122</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 119</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 120</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_shortname'>shortname</span>
   <span class='kw'>self</span><span class='period'>.</span><span class='id identifier rubyid_name'>name</span><span class='period'>.</span><span class='id identifier rubyid_split'>split</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&#39;</span><span class='tstring_content'>.</span><span class='tstring_end'>&#39;</span></span><span class='rparen'>)</span><span class='period'>.</span><span class='id identifier rubyid_first'>first</span>
@@ -2292,13 +2292,13 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-210
 211
 212
-213</pre>
+213
+214</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 210</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 211</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_ssh'>ssh</span><span class='lparen'>(</span><span class='id identifier rubyid_cmd'>cmd</span><span class='rparen'>)</span>
   <span class='const'>Rails</span><span class='period'>.</span><span class='id identifier rubyid_logger'>logger</span><span class='period'>.</span><span class='id identifier rubyid_warn'>warn</span><span class='lparen'>(</span><span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>Node.ssh outdated, please update </span><span class='embexpr_beg'>#{</span><span class='id identifier rubyid_caller'>caller</span><span class='lbracket'>[</span><span class='int'>0</span><span class='rbracket'>]</span><span class='embexpr_end'>}</span><span class='tstring_content'> to use Node.run instead!</span><span class='tstring_end'>&quot;</span></span><span class='rparen'>)</span>
@@ -2335,7 +2335,6 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-96
 97
 98
 99
@@ -2348,10 +2347,11 @@ defined as part of the role that the node role is bound to, and</p>
 106
 107
 108
-109</pre>
+109
+110</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 96</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 97</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_state'>state</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -2398,15 +2398,15 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-112
 113
 114
 115
 116
-117</pre>
+117
+118</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 112</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 113</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_status'>status</span>
   <span class='id identifier rubyid_s'>s</span> <span class='op'>=</span> <span class='lbracket'>[</span><span class='rbracket'>]</span>
@@ -2434,12 +2434,12 @@ defined as part of the role that the node role is bound to, and</p>
       <pre class="lines">
 
 
-343
 344
-345</pre>
+345
+346</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 343</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 344</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_target'>target</span>
   <span class='kw'>return</span> <span class='id identifier rubyid_target_role'>target_role</span>
@@ -2478,7 +2478,6 @@ available.</p>
       <pre class="lines">
 
 
-349
 350
 351
 352
@@ -2514,10 +2513,11 @@ available.</p>
 382
 383
 384
-385</pre>
+385
+386</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 349</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 350</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_target='>target=</span><span class='lparen'>(</span><span class='id identifier rubyid_r'>r</span><span class='rparen'>)</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -2576,12 +2576,12 @@ available.</p>
       <pre class="lines">
 
 
-201
 202
-203</pre>
+203
+204</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 201</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 202</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_transfer'>transfer</span>
   <span class='id identifier rubyid_actions'>actions</span><span class='lbracket'>[</span><span class='symbol'>:xfer</span><span class='rbracket'>]</span> <span class='op'>||</span> <span class='lbrace'>{</span><span class='rbrace'>}</span>
@@ -2606,7 +2606,6 @@ available.</p>
       <pre class="lines">
 
 
-290
 291
 292
 293
@@ -2614,10 +2613,11 @@ available.</p>
 295
 296
 297
-298</pre>
+298
+299</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 290</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 291</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_undebug'>undebug</span>
   <span class='const'>Node</span><span class='period'>.</span><span class='id identifier rubyid_transaction'>transaction</span> <span class='kw'>do</span>
@@ -2648,13 +2648,13 @@ available.</p>
       <pre class="lines">
 
 
-149
 150
 151
-152</pre>
+152
+153</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 149</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 150</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_url_address'>url_address</span>
   <span class='id identifier rubyid_res'>res</span> <span class='op'>=</span> <span class='id identifier rubyid_address'>address</span>
@@ -2680,13 +2680,13 @@ available.</p>
       <pre class="lines">
 
 
-127
 128
 129
-130</pre>
+130
+131</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 127</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 128</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_v6_hostpart'>v6_hostpart</span>
   <span class='id identifier rubyid_d'>d</span> <span class='op'>=</span> <span class='const'>Digest</span><span class='op'>::</span><span class='const'>MD5</span><span class='period'>.</span><span class='id identifier rubyid_hexdigest'>hexdigest</span><span class='lparen'>(</span><span class='id identifier rubyid_name'>name</span><span class='rparen'>)</span>
@@ -2734,13 +2734,13 @@ available.</p>
       <pre class="lines">
 
 
-161
 162
 163
-164</pre>
+164
+165</pre>
     </td>
     <td>
-      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 161</span>
+      <pre class="code"><span class="info file"># File 'rails/app/models/node.rb', line 162</span>
 
 <span class='kw'>def</span> <span class='id identifier rubyid_virtual?'>virtual?</span>
   <span class='id identifier rubyid_virtual'>virtual</span> <span class='op'>=</span> <span class='lbracket'>[</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>KVM</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VMware Virtual Platform</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VMWare Virtual Platform</span><span class='tstring_end'>&quot;</span></span><span class='comma'>,</span> <span class='tstring'><span class='tstring_beg'>&quot;</span><span class='tstring_content'>VirtualBox</span><span class='tstring_end'>&quot;</span></span> <span class='rbracket'>]</span>
@@ -2756,7 +2756,7 @@ available.</p>
 </div>
 
     <div id="footer">
-  Generated on Thu Oct  9 20:28:02 2014 by
+  Generated on Wed Oct 22 14:55:43 2014 by
   <a href="http://yardoc.org" title="Yay! A Ruby Documentation Tool" target="_parent">yard</a>
   0.8.7.4 (ruby-2.1.2).
 </div>
