@@ -167,7 +167,9 @@ class Jig < ActiveRecord::Base
         else
           Rails.logger.info("Run: Skipping run for job #{job.id} for #{nr.name} due to destructiveness")
         end
-        nr.active!
+        # Only go to active if the node is still alive -- the jig may
+        # have marked it as not alive.
+        nr.active! if nr.node.alive? && nr.node.available?
       rescue Exception => e
         NodeRole.transaction do
           nr.update!(runlog: "#{e.class.name}: #{e.message}\nBacktrace:\n#{e.backtrace.join("\n")}")
