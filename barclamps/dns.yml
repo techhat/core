@@ -22,6 +22,12 @@ roles:
       - name: dns_servers
         description: 'DNS servers that all Crowbar clients should use'
         map: 'crowbar/dns/nameservers'
+      - name: dns-domain
+        description: 'DNS domain name for the cluster'
+        map: 'crowbar/dns/domain'
+      - name: dns-all
+        description: 'All the DNS attributes in one internally useful block'
+        map: 'crowbar/dns'
       - name: dns-forwarders
         description: 'DNS servers that Crowbar will use for recursive queries'
         map: 'crowbar/dns/forwarders'
@@ -35,6 +41,8 @@ roles:
     flags:
     requires:
       - dns-server
+    wants-attribs:
+      - dns-all
   - name: dns-client
     jig: chef
     flags:

@@ -65,6 +65,9 @@ roles:
         ui_renderer: 'barclamp_provisioner/attribs/available_oses'
     requires:
       - provisioner-server
+    wants-attribs:
+      - dns-domain
+      - dns_servers
   - name: provisioner-repos
     jig: chef
     requires:
