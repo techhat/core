@@ -127,10 +127,8 @@ class Attrib < ActiveRecord::Base
 
   # Gets the requested value from the passed data, but returns it wrapped in template()
   # unless this attribute is not in the passed blob, in which case it returns nil.
-  def extract(from)
-    r = get(from)
-    return r unless r
-    template(r)
+  def extract(from,hint=:all)
+    template(get(from,hint))
   end
 
   def hint_set(to,value)
