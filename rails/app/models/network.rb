@@ -15,8 +15,10 @@
 class Network < ActiveRecord::Base
 
   ADMIN_NET      = "admin"
+  BMC_NET        = "bmc"
   V6AUTO         = "auto"   # if this changes, update the :v6prefix validator too!
   DEFAULTCONDUIT = '1g1'
+  BMCCONDUIT     = 'bmc'
 
   validate        :check_network_sanity
   after_commit    :add_role, on: :create
@@ -185,16 +187,16 @@ class Network < ActiveRecord::Base
                              first: "#{v6prefix}::1/64",
                              last:  ((IP.coerce("#{v6prefix}::/64").broadcast) - 1).to_s,
                              network_id: id) if v6prefix
-        r = Role.find_or_create_by_name!(:name => role_name,
-                                        :type => "BarclampNetwork::Role",   # force
-                                        :jig_name => Rails.env.production? ? "chef" : "test",
-                                        :barclamp_id => bc.id,
-                                        :description => I18n.t('automatic_by', :name=>name),
-                                        :library => false,
-                                        :implicit => true,
-                                        :milestone => true,    # may need more logic later, this is safest for first pass
-                                        :bootstrap => (self.name.eql? ADMIN_NET),
-                                        :discovery => (self.name.eql? ADMIN_NET)  )
+        r = Role.find_or_create_by!(name: role_name,
+                                    type: "BarclampNetwork::Role",   # force
+                                    jig_name: Rails.env.production? ? "chef" : "test",
+                                    barclamp_id: bc.id,
+                                    description: I18n.t('automatic_by', :name=>name),
+                                    library: false,
+                                    implicit: true,
+                                    milestone: true,    # may need more logic later, this is safest for first pass
+                                    bootstrap: (self.name.eql? ADMIN_NET),
+                                    discovery: (self.name.eql? ADMIN_NET)  )
         RoleRequire.create!(:role_id => r.id, :requires => "network-server")
         # The admin net must be bound before any other network can be bound.
         RoleRequire.create!(:role_id => r.id, :requires => "network-admin") unless name.eql? ADMIN_NET

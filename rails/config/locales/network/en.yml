@@ -53,6 +53,7 @@ en:
       network-private: "Private Network"
       network-storage: "Storage Network"
       network-bmc: "Managment Network"
+      network-pilot: "Pilot Network"
   networks:
     index:
       title: "Installed Networks"

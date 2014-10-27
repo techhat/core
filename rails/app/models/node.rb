@@ -42,7 +42,7 @@ class Node < ActiveRecord::Base
 
   # TODO: 'alias' will move to DNS BARCLAMP someday, but will prob hang around here a while
   validates_uniqueness_of :alias, :case_sensitive => false, :message => I18n.t("db.notunique", :default=>"Name item must be unique")
-  validates_format_of :alias, :with=>/\A[A-Za-z0-9\-]*[A-Za-z0-9]\z/, :message => I18n.t("db.fqdn", :default=>"Alias is not valid.")
+  validates_format_of :alias, :with=>/\A[A-Za-z0-9\-]*[A-Za-z0-9]\z/, :message => I18n.t("db.alias", :default=>"Alias is not valid.")
   validates_length_of :alias, :maximum => 100
 
   has_and_belongs_to_many :groups, :join_table => "node_groups", :foreign_key => "node_id"
@@ -52,11 +52,11 @@ class Node < ActiveRecord::Base
   has_many    :roles,              :through => :node_roles
   has_many    :deployments,        :through => :node_roles
   has_many    :network_allocations,:dependent => :destroy
-  has_many    :hammers,      :dependent => :destroy
+  has_many    :hammers,            :dependent => :destroy
   belongs_to  :deployment
   belongs_to  :target_role,        :class_name => "Role", :foreign_key => "target_role_id"
 
-  alias_attribute :ips,                :network_allocations
+  alias_attribute :ips,            :network_allocations
 
   scope    :admin,              -> { where(:admin => true) }
   scope    :alive,              -> { where(:alive => true) }
@@ -403,10 +403,10 @@ class Node < ActiveRecord::Base
     return unless self.bootenv_changed?
     return unless self.actions[:boot]
     new_bootenv = self.changes["bootenv"]
-    if new_bootenv == "local"
-      self.actions.boot.disk
+    if new_bootenv == "local" && !self.hint[:always_pxe]
+      self.actions[:boot].disk
     else
-      self.actions.boot.pxe
+      self.actions[:boot].pxe
     end
   end
 
@@ -454,15 +454,34 @@ class Node < ActiveRecord::Base
       Rails.logger.debug("Node: Calling #{r.name} on_node_change for #{self.name}")
       r.on_node_change(self)
     end if available?
-    if alive && available && node_roles.runnable.count > 0
-      Rails.logger.info("Node: #{name} is alive and available, kicking the annealer.")
-      Run.run!
+    if (previous_changes[:alive] || previous_changes[:available])
+      if alive && available && node_roles.runnable.count > 0
+        Rails.logger.info("Node: #{name} is alive and available, kicking the annealer.")
+        Run.run!
+      elsif previous_changes[:alive] && !alive?
+        Rails.logger.info("Node: #{name} is not alive, deactivating noderoles on this node.")
+        NodeRole.transaction do
+          node_roles.order("cohort ASC").each do |nr|
+            nr.deactivate
+          end
+        end
+      end
     end
-    unless alive?
-      Rails.logger.info("Node: #{name} is not alive, deactivating noderoles on this node.")
+    # Find noderoles bound to this node that want an attrib that would be directly provided
+    # by this node, and poke that noderole if the attrib it wants has changed.
+    if available? && alive? && (previous_changes[:hint] || previous_changes[:discovery])
       NodeRole.transaction do
-        node_roles.order("cohort ASC").each do |nr|
-          nr.deactivate
+        current_info = {}
+        old_info = {}
+        [:hint,:discovery].each do |key|
+          current_info.deep_merge!(self[key])
+          old_info.deep_merge!(previous_changes[key] ? previous_changes[key][0] : self[key])
+        end
+        node_roles.each do |nr|
+          next unless nr.role.wanted_attribs.count > 0 &&
+            nr.role.wanted_attribs.where('"attribs"."role_id" IS NULL').any?{|a|a.get(current_info) == a.get(old_info)}
+          next unless nr.runnable? && (nr.transition? || nr.active?)
+          nr.send(:block_or_todo)
         end
       end
     end
@@ -491,7 +510,7 @@ class Node < ActiveRecord::Base
   end
 
   def on_create_hooks
-    # Call all role on_node_create hooks with ourself.
+    # Call all role on_node_create hooks with self.
     # These should happen synchronously.
     # do the low cohorts first
     Hammer.bind(manager_name: "ssh", username: "root", node: self)

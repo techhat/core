@@ -45,13 +45,14 @@ gem 'open4'
 gem 'structurematch', '~> 0.1.1'
 
 group :development, :test do
-  gem 'coveralls', :platforms => [:ruby_19,:ruby_20]
+  gem 'coveralls'
   gem "factory_girl", "<3.0"
   gem "factory_girl_rails", "< 3.0"
-  gem 'rspec-rails'
+  gem 'rspec-rails', '~> 3.0.0'
   gem "email_spec", ">= 1.2.1"
   gem "database_cleaner", ">= 0.7.2"
   gem "launchy", ">= 2.1.0"
+  gem "simplecov"
 end
 
 

@@ -15,7 +15,7 @@
 # SimpleCov supports only Ruby 1.9. It must be required and started before the
 # application code loads, so keep this block at the top.
 require 'simplecov'
-SimpleCov.root("/var/run/crowbar/coverage")
+SimpleCov.command_name 'Test'
 
 ENV["RAILS_ENV"] = "test"
 require File.expand_path("../../config/environment", __FILE__)
@@ -58,10 +58,10 @@ class ActiveSupport::TestCase
   # Add more helper methods to be used by all tests here...
   
   # base objects that are required!
-  BarclampCrowbar::Jig.find_or_create_by_name :name=>'script'
-  BarclampTest::Jig.find_or_create_by_name :name=>'test'
+  BarclampCrowbar::Jig.find_or_create_by(name: 'script')
+  BarclampTest::Jig.find_or_create_by(name: 'test')
   Barclamp.import 'crowbar'
-  Deployment.find_or_create_by_name :name=>I18n.t('default'), :description=>I18n.t('automatic')
+  Deployment.find_or_create_by(name: I18n.t('default'), description: I18n.t('automatic'))
   raise "you must have at least 1 deployment" unless Deployment.count > 0
 
 end

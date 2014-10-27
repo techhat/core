@@ -22,8 +22,8 @@ bootloader --location=mbr --driveorder=sda --append="rhgb quiet"
 zerombr
 ignoredisk --only-use=sda
 clearpart --all --drives=sda
-part /boot --fstype ext4 --size=100 --ondisk=sda
-part /boot/efi --fstype vfat --size=100 --ondisk=sda
+part /boot --fstype ext4 --size=512 --ondisk=sda
+part /boot/efi --fstype vfat --size=512 --ondisk=sda
 part swap --recommended
 part pv.6 --size=1 --grow --ondisk=sda
 volgroup <%=@name.split('.')[0]%> --pesize=32768 pv.6
@@ -43,6 +43,7 @@ curl.x86_64
 tcpdump
 efibootmgr
 tar
+psmisc
 %end
 
 %post
@@ -100,6 +101,9 @@ EOF
   <% end -%>
 <% end -%>
 
+# Install ntpdate
+yum -y install ntpdate
+
 # Make sure we can install gems
 cat >/etc/gemrc <<EOF
 :sources:
@@ -134,7 +138,7 @@ echo "PermitRootLogin without-password" >> /etc/ssh/sshd_config
 # Allow client to pass http proxy environment variables
 echo "AcceptEnv http_proxy https_proxy no_proxy" >> /etc/ssh/sshd_config
 
-
+# Set up the default crowbar service.
 curl -s -o /usr/sbin/crowbar "<%=@web_path%>/crowbar_join.sh"
 chmod +x /usr/sbin/crowbar
 

@@ -19,7 +19,11 @@ class JigModelTest < ActiveSupport::TestCase
 
 
   test "Unique Name" do
-    Jig.create! :name=>"nodups", :type=>"BarclampCrowbar::Jig", :description=>"unit tests"
+    Deployment.find_or_create_by!(name:        "system",
+                                  description: I18n.t('automatic', :default=>"Created Automatically by System"),
+                                  system:      true,
+                                  state:       Deployment::COMMITTED)
+    j = Jig.create! :name=>"nodups", :type=>"BarclampCrowbar::Jig", :description=>"unit tests"
     e = assert_raise(ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique) { Jig.create!(:name => "nodups") }
     assert_equal "Validation failed: Name Item must be un...", e.message.truncate(42)
     assert_raise(ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique) { b = Node.create! :name => "nodups" }
@@ -35,9 +39,8 @@ class JigModelTest < ActiveSupport::TestCase
   end
 
   test "Must have override object-missing" do
-     Jig.create!(:name=>"foo", :type=>"JigFoo")
-     e = assert_raise(ActiveRecord::SubclassNotFound) { Jig.find_by_name "foo" }
-     assert_equal "The single-table inheritance mechanism failed...", e.message.truncate(48)
+     e = assert_raise(ActiveRecord::SubclassNotFound) { Jig.create!(:name=>"foo", :type=>"JigFoo") }
+     assert_equal "Invalid single-table inheritance type: JigFoo...", e.message.truncate(48)
   end
 
   test "Must have override object - present" do

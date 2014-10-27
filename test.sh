@@ -1,5 +1,6 @@
 #!/bin/bash
 # Copyright 2014, Dell
+# Copyright 2014, Greg Althaus
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,8 +15,9 @@
 # limitations under the License.
 
 set -e
-date 
-export RAILS_ENV=development
+date
+
+export RAILS_ENV=test
 
 # use the host proxy 
 if [[ $http_proxy ]] && ! pidof squid; then
@@ -28,17 +30,25 @@ if [[ $TMUX ]]; then
 fi
 
 # setup & load env info
-. ./bootstrap.sh 
+. ./bootstrap.sh
 
 # install the database
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
 
-./setup/00-crowbar-rake-tasks.install && \
-    ./setup/01-crowbar-start.install && \
-    ./setup/02-make-machine-key.install || {
-    echo "Failed to bootstrap the Crowbar UI"
-    exit 1
+. /etc/profile
+
+./setup/00-crowbar-rake-tests.install && \
+  ./setup/01-run-tests.install || {
+  echo "Failed to bootstrap and run tests"
 }
 
-. /etc/profile
+# Talk about tests
+echo
+echo "To run tests:"
+echo "su - crowbar"
+echo "cd rails"
+echo "bundle exec rake test"
+echo "bundle exec rspec"
+echo
+
 /bin/bash -i

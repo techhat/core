@@ -71,6 +71,9 @@ jigs:
   - name: puppet-sa
     class: 'BarclampPuppet::SaJig'
     description: "Puppet jig for using standalone puppet agent"
+  - name: role-provided
+    class: 'BarclampCrowbar::RoleProvidedJig'
+    description: "Jig that delegates back to a role-provided do_transition method"
 
 extra_files:
   - http://downloads.sourceforge.net/project/elilo/elilo/elilo-3.16/elilo-3.16-all.tar.gz

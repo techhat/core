@@ -84,6 +84,7 @@ en:
       crowbar-installed-node: 'OS Installed'
       crowbar-docker-node: "Docker Container"
       crowbar-admin-node: 'Crowbar Admin'
+      crowbar-hardware-configured: "Hardware Configured"
     attribs:
       asset_tag: "Asset Tag"
   # Layout
@@ -416,6 +417,14 @@ en:
       save: "Save"
       saved: "Node Role Data Saved"
       default: "Default Render"
+      error_hint: "Suggestion:"
+      error_link: "[additional material]"
+      # allows adding hints when roles fail to help users resolve issues
+      # workload specific hints/links should be added in the workload, not in core
+      error_hints:
+        test-fails: "Take no action - this role is supposed to fail"
+      error_links:
+        test-fails: "http://www.youtube.com/watch?v=dQw4w9WgXcQ"
     raw:
       attrib: "Available Attributes"
       ui_renderer: "Debug Info: Renderer"
@@ -480,6 +489,7 @@ en:
       title: "Initial System Configuration"
       admin_server: "Assign Admin Node"
       admin_net: "Create Admin Network"
+      bmc_net: "Create BMC Network"
       bind_admin_server: "Bind Roles"
       attribs: "Review Key Attributes"
       start_server: "Activate Admin Node"
