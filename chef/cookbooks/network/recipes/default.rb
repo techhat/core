@@ -285,9 +285,6 @@ unless node["crowbar"]["network"]["addresses"].values.any?{|v|v["network"] == "a
   return
 end
 
-# dhclient running?  Not for long.
-::Kernel.system("killall -w -q -r '^dhclient'")
-
 # Dynamically create our new local interfaces.
 node["crowbar"]["network"]["addresses"].keys.sort{|a,b|
   net_weight(node["crowbar"]["network"]["addresses"][a]) <=> net_weight(node["crowbar"]["network"]["addresses"][b])
@@ -478,6 +475,7 @@ Nic.nics.each do |nic|
     end
   end
   nic.up
+  nic.flush if nic.dhcp_pid
   Chef::Log.info("#{nic.name}: current addresses: #{nic.addresses.map{|a|a.to_s}.sort.inspect}") unless nic.addresses.empty?
   Chef::Log.info("#{nic.name}: required addresses: #{iface["addresses"].map{|a|a.to_s}.sort.inspect}") unless iface["addresses"].empty?
   # Ditch old addresses, add new ones.

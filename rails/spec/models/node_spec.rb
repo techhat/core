@@ -17,13 +17,16 @@ require 'spec_helper'
 describe "admin create" do
 
   include_context "crowbar test deployment"
-  subject { Node.create :name=>'rspec_admin.crowbar.com', :admin => true   }
+  subject { Node.create! :name=>'rspec-admin.crowbar.com', :alias=>'rspec-admin', :admin => true, :deployment => deployment }
 
   it {should be_is_admin} 
 
   it "must have bootstrap and implicit roles" do
-    expect {node_roles.any?{ |e| e.role.bootstrap }}.to be_true
-    expect {node_roles.any?{ |e| e.role.implicit }}.to be_true
+    rr = Role.find_by_name('crowbar-admin-node')
+    rr.add_to_node(subject)
+    subject.commit!
+    expect( subject.node_roles.any?{ |e| e.role.bootstrap } ).to be_truthy
+    expect( subject.node_roles.any?{ |e| e.role.implicit } ).to be_truthy
   end
 
 end
@@ -31,16 +34,20 @@ end
 describe "node create" do
 
   include_context "crowbar test deployment"
-  subject { Node.create :name=>'rspec_node.crowbar.com', :admin => false  }
+  subject { Node.create! :name=>'rspec-node.crowbar.com', :alias=>'rspec-node', :admin => false, :deployment => deployment }
 
 
-  it "must have inplicit roles" do
-    expect {its.node_roles.any?{ |e| e.role.implicit }}.to be_true
-    expect {its.node_roles.any?{ |e| e.role.discovery }}.to be_true
+  it "must have implicit roles" do
+    rr = Role.find_by_name('crowbar-managed-node')
+    rr.add_to_node(subject)
+    subject.commit!
+    expect( subject.node_roles.any?{ |e| e.role.implicit } ).to be_truthy
+    expect( subject.node_roles.any?{ |e| e.role.discovery } ).to be_truthy
   end
 
   it "must be added to the deployment" do
-    expect {deployment.active.node_roles.any?{ |e| e.node.id == its.id }}.to be_true
+    subject.commit!
+    expect( deployment.nodes.any?{ |e| e.id == subject.id } ).to be_truthy
   end
 
 end

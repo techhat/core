@@ -1,4 +1,4 @@
-# Copyright 2013, Dell
+# Copyright 2014, Rob Hirschfeld
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,10 @@
 # limitations under the License.
 # 
 en:
-  barclamp_chef:
+  barclamp_saltstack:
     node_roles:
-      chef-server:
-        deploy: "Deploy"
   common:
     roles:
-      chef-solo: "Chef Agent"
-      chef-server: "Chef Server"
-      chef-client: "Chef Client"
+      saltstack-master: "Saltstack Master"
+      saltstack-minion: "Saltstack Minion"
     attribs:

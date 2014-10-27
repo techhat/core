@@ -28,7 +28,11 @@ Crowbar::Application.routes.draw do
   get "annealer", :to => "node_roles#anneal", :as => :annealer
   resources :attribs
   resources :barclamps
-  resources :deployment_roles
+  resources :deployment_roles do
+    resources :node_roles
+    put :propose
+    put :commit
+  end
   resources :deployments do
     resources :roles
     resources :node_roles
@@ -135,7 +139,10 @@ Crowbar::Application.routes.draw do
           resources :available_hammers
           resources :barclamps
           resources :deployment_roles do
+            resources :roles
             resources :attribs
+            put :propose
+            put :commit
           end
           resources :deployments do
             resources :node_roles

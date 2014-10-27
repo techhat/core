@@ -1,4 +1,4 @@
-# Copyright 2013, Dell
+# Copyright 2014, Victor Lowther
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -11,15 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-# 
-en:
-  barclamp_chef:
-    node_roles:
-      chef-server:
-        deploy: "Deploy"
-  common:
-    roles:
-      chef-solo: "Chef Agent"
-      chef-server: "Chef Server"
-      chef-client: "Chef Client"
-    attribs:
+#
+
+class NodeRoleAttribLink < ActiveRecord::Base
+
+  belongs_to  :parent, class_name: "NodeRole"
+  belongs_to  :child,  class_name: "NodeRole"
+  belongs_to  :attrib
+
+end

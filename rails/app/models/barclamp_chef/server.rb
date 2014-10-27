@@ -33,7 +33,7 @@ class BarclampChef::Server < Role
     j = BarclampChef::Jig.where(:name => "chef").first
     j.server = Attrib.get("chef-server_url",nr)
     j.client_name = Attrib.get("chef-server_admin_client_name",nr)
-    j.active = true
+    j.active = (Rails.env.development? ? false : true )
     j.key = "/home/crowbar/.chef/#{j.client_name}.pem"
     j.save!
   end

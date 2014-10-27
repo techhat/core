@@ -104,6 +104,7 @@ class Deployment < ActiveRecord::Base
 
   def commit
     Deployment.transaction do
+      deployment_roles.all.each{|dr|dr.commit if dr.proposed?}
       node_roles.in_state(NodeRole::PROPOSED).each { |nr| nr.commit! }
       if proposed?
         write_attribute("state",COMMITTED)
@@ -118,7 +119,7 @@ class Deployment < ActiveRecord::Base
   # Do this by changing its state from COMMITTED to PROPOSED.
   def propose
     Deployment.transaction do
-      raise "Cannot recall a system deployment" if system?
+      raise "Cannot propose  a system deployment" if system?
       write_attribute("state",PROPOSED)
       save!
     end

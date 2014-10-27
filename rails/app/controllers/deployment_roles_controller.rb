@@ -55,7 +55,7 @@ class DeploymentRolesController < ApplicationController
   def update
     @deployment_role = DeploymentRole.find_key(params[:id])
     params.require(:data)
-    @deployment_role.update_attributes!(params.permit!(:data))
+    @deployment_role.data = params[:data]
     render api_show @deployment_role
   end
 
@@ -65,5 +65,22 @@ class DeploymentRolesController < ApplicationController
     render api_delete @deployment_role
   end
 
-end
+   def propose
+    @deployment_role = DeploymentRole.find_key params[:deployment_role_id]
+    @deployment_role.propose
+    respond_to do |format|
+      format.html { redirect_to deployment_role_path(@deployment_role.id) }
+      format.json { render api_show @deployment_role }
+    end
+  end
 
+  def commit
+    @deployment_role = DeploymentRole.find_key params[:deployment_role_id]
+    @deployment_role.commit
+    respond_to do |format|
+      format.html { redirect_to deployment_role_path(@deployment_role.id) }
+      format.json { render api_show @deployment_role }
+    end
+  end
+
+end

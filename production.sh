@@ -31,7 +31,8 @@ fi
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${proxy_recipes}"
 . /etc/profile
-./setup/01-crowbar-rake-tasks.install && \
+./setup/00-crowbar-rake-tasks.install && \
+    ./setup/01-crowbar-start.install && \
     ./setup/02-make-machine-key.install || {
     echo "Failed to bootstrap the Crowbar UI"
     exit 1

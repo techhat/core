@@ -584,6 +584,21 @@ module OpenCrowbar
     def self.path
       "api/v2/deployment_roles"
     end
+
+    def do_propose(*rest)
+      obj,res = REST.put("#{self.class.path}/#{id}/propose")
+      maybe_json_die(obj,res)
+      @blob = obj
+      self
+    end
+
+    def do_commit(*rest)
+      obj,res = REST.put("#{self.class.path}/#{id}/commit")
+      maybe_json_die(obj,res)
+      @blob = obj
+      self
+    end
+
   end
 
   class NodeRole < ProxyWithAttribs

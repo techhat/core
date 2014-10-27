@@ -28,7 +28,7 @@ class Jig < ActiveRecord::Base
 
   # 
   # Validate the name should unique 
-  # and that it starts with an alph and only contains alpha,digist,hyphen,underscore
+  # and that it starts with an alpha and only contains alpha,digits,hyphen,underscore
   #
   validates_uniqueness_of :name, :case_sensitive => false, :message => I18n.t("db.notunique", :default=>"Name item must be unique")
   validates_format_of     :name, :with=> /\A[a-zA-Z][-_a-zA-Z0-9]*\z/, :message => I18n.t("db.lettersnumbers", :default=>"Name limited to [-_a-zA-Z0-9]")
@@ -82,7 +82,7 @@ class Jig < ActiveRecord::Base
     # Figure out which attribs will be satisfied from node data vs.
     # which will be satisfied from noderoles.
     NodeRole.transaction do
-      node_req_attrs,role_req_attrs = nr.role.role_require_attribs.partition do |rrr|
+      node_req_attrs = nr.role.role_require_attribs.select do |rrr|
         attr = rrr.attrib
         raise("RoleRequiresAttrib: Cannot find required attrib #{rrr.attrib_name}") if attr.nil?
         attr.role_id.nil?
@@ -93,30 +93,19 @@ class Jig < ActiveRecord::Base
         Rails.logger.info("Jig: Adding node attribute #{req_attr.attrib_name} to attribute blob for #{nr.name} run")
         res.deep_merge!(req_attr.get(nr.node))
       end
-      # Next, build up the node specific part of the attrib blob.
-      # All parent noderoles that are on the same node get their attribs pulled
-    # in by default.
-      nr.all_parents.on_node(nr.node).order("cohort ASC").each do |parent_nr|
-        res.deep_merge!(parent_nr.deployment_data)
-        res.deep_merge!(parent_nr.all_my_data)
-      end
       # Next, do the same for the attribs we want from a noderole.
-      role_req_attrs.each do |req_attr|
-        source = if req_attr.attrib.role.implicit
-                   # If we are requesting an attribute provided by an implicit role, then
-                   # that attribute must come from a noderole bound to the same node as we are.
-                   nr.all_parents.where(:role_id => req_attr.attrib.role_id, :node_id => nr.node_id).first
-                 else
-                   # Otherwise, it can come from any parent noderole.
-                 nr.all_parents.where(:role_id => req_attr.attrib.role_id).first
-                 end
-        raise("Cannot find source for wanted attrib #{req_attr.attrib_name}") unless source
-        Rails.logger.info("Jig: Adding role attribute #{req_attr.attrib_name} from #{source.name} to attribute blob for #{nr.name} run")
-        res.deep_merge!(req_attr.get(source))
+      nr.parent_attrib_links.each do |al|
+        res.deep_merge!(al.attrib.extract(al.parent.all_committed_data))
+      end
+      # And all the noderole data from the parent noderoles on this node.
+      # This needs to eventaully go away once I figure ot the best way to pull
+      # attrib data that hsould always be present on a node.
+      nr.all_parents.where(node_id: nr.node.id).each do |pnr|
+        res.deep_merge!(pnr.all_committed_data)
       end
       # Add this noderole's attrib data.
       Rails.logger.info("Jig: Merging attribute data from #{nr.name} for jig run.")
-      res.deep_merge!(nr.attrib_data)
+      res.deep_merge!(nr.all_committed_data)
       # Add information about the resource reservations this node has in place
       unless nr.node.discovery["reservations"]
       res["crowbar_wall"] ||= Hash.new
@@ -150,7 +139,7 @@ class Jig < ActiveRecord::Base
   # The noderole must be in TRANSITION state.
   # This function is intended to be overridden by the jig subclasses,
   # and only used for debugging purposes.
-  # Runs will be run in the background by the dalayed_job information.
+  # Runs will be run in the background by the delayed_job information.
   def run(nr,data)
     raise "Cannot call run on the top-level Jig!"
   end
@@ -167,7 +156,9 @@ class Jig < ActiveRecord::Base
         else
           Rails.logger.info("Run: Skipping run for job #{job.id} for #{nr.name} due to destructiveness")
         end
-        nr.active!
+        # Only go to active if the node is still alive -- the jig may
+        # have marked it as not alive.
+        nr.active! if nr.node.alive? && nr.node.available?
       rescue Exception => e
         NodeRole.transaction do
           nr.update!(runlog: "#{e.class.name}: #{e.message}\nBacktrace:\n#{e.backtrace.join("\n")}")

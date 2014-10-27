@@ -19,7 +19,7 @@ class NodeModelTest < ActiveSupport::TestCase
   def setup
     @crowbar = Barclamp.find_by_name("crowbar") 
     assert_not_nil @crowbar
-    d = Deployment.find_or_create_by_name :name=>'system', :description=>'automatic'
+    d = Deployment.find_or_create_by(name: 'system', description: 'automatic')
     assert_not_nil d, 'we need at least 1 Deployment'
     #  We need a system deployment to create default proposals in.
     d.send(:write_attribute,"system",true)
@@ -32,9 +32,6 @@ class NodeModelTest < ActiveSupport::TestCase
   
   test "Naming Conventions" do
     assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>"fqdnrequired") }
-    assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>"1no.legal.domain") }
-    assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>"1123.foo.com") }
-    assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>"1foo.bar.net") }
     assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>"Ille!gal.foo.org") }
     assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>" nospaces.bar.it") }
     assert_raise(ActiveRecord::RecordInvalid) { Node.create!(:name=>"no spaces.dell.com") }

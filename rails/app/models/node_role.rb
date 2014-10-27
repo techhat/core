@@ -20,6 +20,7 @@ class NodeRole < ActiveRecord::Base
   after_commit :bind_cluster_children, on: [:create]
   after_commit :run_hooks, on: [:update, :create]
   after_commit :create_deployment_role, on: [:create]
+  after_commit :poke_attr_dependent_noderoles, on: [:update]
   after_create :bind_needed_parents
   validate :role_is_bindable, on: :create
   validate :noderole_has_all_parents, on: :create
@@ -58,34 +59,38 @@ class NodeRole < ActiveRecord::Base
   # validate        :deployable,        :if => :deployable?
   # node_role_pcms maps parent noderoles to child noderoles.
   has_and_belongs_to_many(:parents,
+                          -> { reorder('cohort DESC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_pcms",
                           :foreign_key => "child_id",
-                          :association_foreign_key => "parent_id",
-                          :order => "cohort DESC")
+                          :association_foreign_key => "parent_id")
   has_and_belongs_to_many(:children,
+                          -> { reorder('cohort ASC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_pcms",
                           :foreign_key => "parent_id",
-                          :association_foreign_key => "child_id",
-                          :order => "cohort ASC")
+                          :association_foreign_key => "child_id")
   # node_role_all_pcms is a view that expands node_role_pcms
   # to include all of the parents and children of a noderole,
   # recursively.
   has_and_belongs_to_many(:all_parents,
+                          -> { reorder('cohort DESC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_all_pcms",
                           :foreign_key => "child_id",
                           :association_foreign_key => "parent_id",
-                          :order => "cohort DESC",
-                          :delete_sql => "SELECT 1")
+                          :delete_sql => "SELECT 1") # TODO: Figure out how to remove
   has_and_belongs_to_many(:all_children,
+                          -> { reorder('cohort ASC') },
                           :class_name => "NodeRole",
                           :join_table => "node_role_all_pcms",
                           :foreign_key => "parent_id",
                           :association_foreign_key => "child_id",
-                          :order => "cohort ASC",
-                          :delete_sql => "SELECT 1")
+                          :delete_sql => "SELECT 1") # TODO: Figure out how to remove
+
+  # Parent and child links based on noderole -> noderole attribute dependency.
+  has_many        :parent_attrib_links, class_name: "NodeRoleAttribLink", foreign_key: "child_id"
+  has_many        :child_attrib_links,  class_name: "NodeRoleAttribLink", foreign_key: "parent_id"
 
   # State transitions:
   # All node roles start life in the PROPOSED state.
@@ -359,6 +364,14 @@ class NodeRole < ActiveRecord::Base
     deployment_data.deep_merge(all_my_data)
   end
 
+  def all_committed_data
+    res = deployment_data
+    res.deep_merge!(wall)
+    res.deep_merge!(sysdata)
+    res.deep_merge!(committed_data)
+    res
+  end
+
   def all_deployment_data
     res = {}
     all_parents.each {|parent| res.deep_merge!(parent.deployment_data)}
@@ -445,8 +458,10 @@ class NodeRole < ActiveRecord::Base
       reload
       raise InvalidTransition.new(self,state,TODO,"Not all parents are ACTIVE") unless activatable?
       update!(state: TODO)
-      # Going into TODO transitions all our children into BLOCKED.
-      all_children.where(["state NOT IN(?,?)",PROPOSED,TRANSITION]).update_all(state: BLOCKED)
+      # Going into TODO transitions any children in ERROR or TODO into BLOCKED
+      children.where(["state IN(?,?)",ERROR,TODO]).each do |c|
+        c.block!
+      end
     end
   end
 
@@ -467,7 +482,10 @@ class NodeRole < ActiveRecord::Base
     NodeRole.transaction do
       reload
       update!(state: BLOCKED)
-      all_children.where(["state NOT IN(?,?)",PROPOSED,TRANSITION]).update_all(state: BLOCKED)
+      # Going into BLOCKED transitions any children in ERROR or TODO into BLOCKED.
+      children.where(["state IN(?,?)",ERROR,TODO]).each do |c|
+        c.block!
+      end
     end
   end
 
@@ -482,7 +500,7 @@ class NodeRole < ActiveRecord::Base
   end
 
   def name
-   "#{deployment.name}: #{node.name}: #{role.name}" rescue I18n.t('unknown')
+    "#{deployment.name}: #{node.name}: #{role.name}" rescue I18n.t('unknown')
   end
 
   # Commit takes us back to TODO or BLOCKED, depending
@@ -509,6 +527,21 @@ class NodeRole < ActiveRecord::Base
 
   def jig
     role.jig
+  end
+
+  def rebind_attrib_parents
+    NodeRole.transaction do
+      role.wanted_attribs.each do |a|
+        next unless a.role_id
+        target = all_parents.where(role_id: a.role_id).first!
+        nra = parent_attrib_links.find_by(attrib: a)
+        if nra.nil?
+          NodeRoleAttribLink.find_or_create_by!(parent: target, child: self, attrib: a)
+        elsif nra.parent != target
+          nra.update!(parent: target)
+        end
+      end
+    end
   end
 
   private
@@ -538,12 +571,34 @@ class NodeRole < ActiveRecord::Base
       Run.run!
     end
     if active?
-      # Immediate children of an ACTIVE node go to TODO
       NodeRole.transaction do
+        # Immediate children of an ACTIVE node go to TODO
         children.where(state: BLOCKED).each do |c|
           Rails.logger.debug("NodeRole #{name}: testing to see if #{c.name} is runnable")
           next unless c.activatable?
           c.todo!
+        end
+      end
+    end
+  end
+
+  def poke_attr_dependent_noderoles
+    NodeRole.transaction do
+      current_data = {}
+      previous_data = {}
+      [:wall,:sysdata,:committed_data].each do |key|
+        current_data.deep_merge!(self.send(key))
+        previous_data.deep_merge!(previous_changes[key] ? previous_changes[key][0] : self.send(key))
+      end
+      # The data we were providing changed, poke any downstream noderoles
+      # that get specific data from us.
+      if current_data != previous_data
+        child_attrib_links.each do |al|
+          cnr = al.child
+          next unless cnr.runnable? && (cnr.transition? || cnr.active?)
+          attr = al.attrib
+          next if attr.extract(current_data) == attr.extract(previous_data)
+          cnr.send(:block_or_todo)
         end
       end
     end
@@ -555,7 +610,7 @@ class NodeRole < ActiveRecord::Base
     role = Role.find(role_id)
     unresolved = role.unresolved_requires
     unless unresolved.empty?
-      errors.add(:role_id, "role #{role.name} is missing prerequisites: #{unresolved.map{|rr|rr.require}}")
+      errors.add(:role_id, "role #{role.name} is missing prerequisites: #{unresolved.map{|rr|rr.requires}}")
     end
     # Abstract roles cannot be bound.
     errors.add(:role_id,"role #{role.name} is abstract and cannot be bound to a node") if role.abstract
@@ -568,7 +623,7 @@ class NodeRole < ActiveRecord::Base
         role.save
       else
         errors.add(:role_id, "role '#{role.name}' cannot be bound without '#{role.jig_name}' being active!")
-        end
+      end
     end
     # Now that we have validated the role side of things, validate the noderole side of things
   end
@@ -613,6 +668,10 @@ class NodeRole < ActiveRecord::Base
     self.role.add_to_deployment(self.deployment)
   end
 
+  def maybe_rebind_attrib_links
+    rebind_attrib_parents if deployment_id_changed?
+  end
+
   def bind_needed_parents
     NodeRole.transaction do
       NodeRole.find_needed_parents(role,
@@ -626,12 +685,13 @@ class NodeRole < ActiveRecord::Base
         parent = NodeRole.find_by!(id: np[:node_role_id])
         parent.add_child(self)
       end
+      rebind_attrib_parents
     end
   end
 
   def bind_cluster_children
     NodeRole.transaction do
-     if self.role.cluster?
+      if self.role.cluster?
         # If I am a cluster role, I also get any children of my peers.
         NodeRole.peers_by_role(deployment,role).each do |peer|
           next if peer.id == self.id
@@ -642,6 +702,5 @@ class NodeRole < ActiveRecord::Base
       end
     end
   end
-
 end
 
