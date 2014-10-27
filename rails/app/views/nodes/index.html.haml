@@ -38,6 +38,12 @@
             td.effect("highlight", {color: '#666666'}, 2000);
             led.attr('title', node['status']);
           }
+          var status = tr.children('.strStatus');
+          if(status.html() != node['strStatus']) {
+            status.destroy();
+            status.html(node['strStatus']);
+            status.effect("highlight", {color: '#666666'}, 2000);
+          }
         });
       });
     }
