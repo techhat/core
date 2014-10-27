@@ -21,7 +21,7 @@
             = f.collection_select :role_id, aroles, :id, :name_i18n
             %input.button{:type => "submit", :name => "add", :value => t('.add_role')}
       %td= link_to t('.pick'), bulk_edit_path(), :title=>t('.pick_hint'), :class=>'button'
-    - else
+    - elsif current_user and current_user.settings(:ui).edge
       %td= link_to t('.graph'), deployment_graph_path(@deployment.id), :class => 'button', :method=>:get
     %td= render :partial => 'deployments/buttons', :locals => { :state=>state, :deployment=>@deployment }
  
