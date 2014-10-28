@@ -57,7 +57,7 @@
 
 :javascript
 
-  function update() {
+  function heartbeat() {
     $.ajaxSetup({ timeout: 2500 });
 
     $.getJSON("#{heartbeat_status_path()}", function(data) {
@@ -80,3 +80,5 @@
 
     });
   }
+
+  heartbeat(); 
