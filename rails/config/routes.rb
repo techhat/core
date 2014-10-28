@@ -128,6 +128,7 @@ Crowbar::Application.routes.draw do
           get "nodes(/:id)" => "nodes#status", :as => :nodes_status
           get "deployments(/:id)" => "deployments#status", :as => :deployments_status
           get "queue" => "support#queue", :as => :queue_status
+          get "heartbeat" => "support#heartbeat", :as => :heartbeat_status
         end
         scope 'test' do
           put "nodes(/:id)" => "nodes#test_load_data"

@@ -25,12 +25,18 @@
             (
             = link_to t('user.sign_out'), main_app.destroy_user_session_path(), :method=>'delete' rescue t('error')
             )
+            %a{:href=>annealer_path}
+              = image_tag('/images/icons/led/active.png', :id=>"active_led")
+              %span#active_heartbeat= "?"
+              = image_tag('/images/icons/led/todo.png', :id=>"todo_led", :style=>"display:none")
+              %span#todo_heartbeat= ""
+              = image_tag('/images/icons/led/error.png', :id=>"error_led", :style=>"display:none") 
+              %span#error_heartbeat= ""
           %nav
             = render_navigation :expand_all => true, :skip_if_empty => true
         - else
           %nav
             = link_to t('user.sign_in'),  main_app.new_user_session_path
-    
     - if flash[:notice]
       .notice#flash
         .container
@@ -48,3 +54,29 @@
       %a{:href=>"https://github.com/orgs/opencrowbar/members", :target=>"_new", :alt=>"Dell, Inc."}
         OpenCrowbar Project team
       =t 'version', :version=>(Rails.env.development? ? "Development" : Barclamp.where( :name => "crowbar").first.commit)
+
+:javascript
+
+  function update() {
+    $.ajaxSetup({ timeout: 2500 });
+
+    $.getJSON("#{heartbeat_status_path()}", function(data) {
+
+      $('span#active_heartbeat').text(data['active']);
+      if (data["todo"]==0) {
+        $('span#todo_heartbeat').text("");
+        $('img#todo_led').attr('style', 'display:none');
+      } else {      
+        $('span#todo_heartbeat').text(data['todo']);
+        $('img#todo_led').attr('style', 'display:inline');
+      }
+      if (data["error"]==0) {
+        $('span#error_heartbeat').text("");
+        $('img#error_led').attr('style', 'display:none');
+      } else {
+        $('span#error_heartbeat').text(data['error']);
+        $('img#error_led').attr('style', 'display:inline');
+      }
+
+    });
+  }
