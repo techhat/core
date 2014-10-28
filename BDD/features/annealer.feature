@@ -22,3 +22,13 @@ Feature: Crowbar Engine
     Finally there are no pending Crowbar runs for {o:node} "bdd-add-me.cr0wbar.com"
       And REST deletes the {o:deployment} "bdd_add_node"
       And REST deletes the {o:node} "bdd-add-me.cr0wbar.com"
+
+  Scenario: Heartbeat works
+    When REST requests the "api/status/heartbeat" page
+    Then I get a {integer:200} result
+
+  Scenario: Heartbeat Format
+    When REST requests the "api/status/heartbeat" page
+    Then there should be a key "active"
+    Then there should be a key "todo"
+    Then there should be a key "error"

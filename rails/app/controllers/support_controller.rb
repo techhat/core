@@ -172,6 +172,22 @@ class SupportController < ApplicationController
     render :json=>j
   end
 
+  # supplies UI heartbeat information
+  def heartbeat
+    j = { :active=>0, :todo=>0, :error=>0 } 
+    # not very efficient, but OK for now
+    NodeRole.all.each do |nr|
+      if nr.state == NodeRole::ERROR 
+        j[:error]+=1 
+      elsif nr.state == NodeRole::ACTIVE
+        j[:active]+=1
+      else
+        j[:todo]+=1
+      end
+    end
+    render :json=>j
+  end
+
   private 
   
   def ctime
