@@ -75,6 +75,7 @@ jQuery(document).ready(function($) {
     setInterval(function() {
       update();
       animate();
+      heartbeat();
     }, 10000);
   }
 
