@@ -301,6 +301,8 @@ en:
       attrib: "Attribute"
       value: "Value"
       save: "Update"
+      propose: "Propose"
+      commit: "Commit"
   docs:
     missing: "Topics"
     index:
