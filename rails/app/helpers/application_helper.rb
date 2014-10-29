@@ -67,30 +67,5 @@ module ApplicationHelper
       end
       result << "</ul>"
   end
-
- def build_scaffold_nav(subnav,item,level=0,sub_num=0)
-    ul_class="nav_#{level}-#{sub_num}"
-    subnav.dom_class = ul_class
-    # puts "build_scaffold_nav  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! item.name: #{item.name}"
-    # puts "build_scaffold_nav  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! subnav.dom_class: #{subnav.dom_class}"
-    tmp_sub_num = 0
-    level += 1
-    item.children.each do |nav|
-     # puts "children: #{nav.children}"
-      #puts "nav.children.is_a? Nav #{nav.children.is_a? Nav}"
-     # puts "children empty? #{nav.children.empty?}"
-      has_children = (nav.children.is_a? Nav or !nav.children.empty?)
-    #  puts "has_children #{has_children}"
-      options = {:title=>t(nav.description, :default=>t(nav.name))}
-      options[:class] = "has_children" unless !has_children
-      subnav.item nav.item.to_sym, "[#{t(nav.name)}]", eval(nav.path), options do |nextnav|
-        if (has_children)
-        # puts "build_scaffold_nav  !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! nav.name: #{nav.name}"
-          tmp_sub_num += 1
-          self.build_scaffold_nav(nextnav,nav,level,tmp_sub_num)
-        end
-      end
-    end
-  end
   
 end
