@@ -15,10 +15,10 @@
       %tr.node{ :class => cycle(:odd, :even) }
         %td= link_to node.alias, main_app.node_path(node.id), :title=>node.description
         - @networks.each do |net|
-          - nr = NodeRole.peers_by_node_and_role(node.deployment, node, net.role).first
+          - nr = NodeRole.peers_by_node_and_role(node.deployment, node, net.role).first rescue nil
           %td
             - if nr
-              - ip = allocations.detect { |a| a.network.id == net.id }
+              - ip = allocations.detect { |a| a.network.id == net.id and !a.range.name.ends_with? "-v6"}
               %span
                 %span.led{:class => NodeRole::STATES[nr.state], :title=>nr.state_name}
                   - addr = ip.address rescue t('not_set')
