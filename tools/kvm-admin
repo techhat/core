@@ -91,7 +91,7 @@ fi
 
 trap 'myclean' 0 INT QUIT TERM
 
-if [[ ! $use_iamge = true ]]; then
+if [[ ! $use_image = true ]]; then
     # Inject opencrowbar packages and kickstart into the PXE install ISO.
     mkdir -p "$TMPDIR/initrd"
     tar -C "$admin_server_loc" -czf "$TMPDIR/initrd/ocb.tar.gz" ocb-packages
