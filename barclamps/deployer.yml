@@ -24,9 +24,3 @@ roles:
       - provisioner-repos
     flags:
       - implicit
-    attribs:
-      - name: 'hint-admin-mac'
-        description: 'Hint for Admin MAC address'
-        map: 'admin_mac'
-
-
