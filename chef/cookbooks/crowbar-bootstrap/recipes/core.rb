@@ -331,6 +331,26 @@ directory "/root/.ssh" do
   mode 0755
 end
 
+bash "Enable root access" do
+  cwd "/root/.ssh"
+  code <<EOC
+cat authorized_keys /home/crowbar/.ssh/id_rsa.pub >> authorized_keys.new
+sort -u <authorized_keys.new >authorized_keys
+rm authorized_keys.new
+EOC
+end
+
+template "/etc/ssh/sshd_config" do
+  source "sshd_config.erb"
+  action :create
+  notifies :restart, 'service[ssh]', :immediately
+end
+
+# Why does opensuse consider ping to be a security risk?
+bash "Allow everyone to ping" do 
+  code "chmod u+s $(which ping) $(which ping6)"
+end
+
 user "crowbar" do
   home "/home/crowbar"
   action :create
@@ -388,9 +408,4 @@ end
 bash "Make sure pg_config is in the PATH" do
   code "ln -sf /usr/pgsql-9.3/bin/pg_config /usr/local/bin/pg_config"
   not_if "which pg_config"
-end
-
-# Why does opensuse consider ping to be a security risk?
-bash "Allow everyone to ping" do 
-  code "chmod u+s $(which ping) $(which ping6)"
 end

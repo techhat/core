@@ -10,7 +10,8 @@ fi
 prefix_r=(recipe[barclamp]
           recipe[ohai]
           recipe[utils])
-boot_r=('recipe[crowbar-bootstrap]'
+boot_r=('recipe[crowbar-bootstrap:boot]')
+core_r=('recipe[crowbar-bootstrap::core]'
         'recipe[crowbar-bootstrap::wsman]'
         'recipe[crowbar-bootstrap::grub]'
         'recipe[crowbar-bootstrap::sledgehammer]'
@@ -18,15 +19,28 @@ boot_r=('recipe[crowbar-bootstrap]'
         'recipe[crowbar-bootstrap::go]'
         'recipe[crowbar-bootstrap::goiardi-build]'
         'recipe[crowbar-bootstrap::sws-build]')
+provisioner_r=("${prefix_r[@]",
+               'recipe[crowbar-bootstrap::provisioner]')
 database_r=('recipe[crowbar-bootstrap::postgresql]'
             'recipe[crowbar-bootstrap::goiardi]')
 proxy_r=("${prefix_r[@]}"
          'recipe[crowbar-squid]')
+node_r=("${prefix_r[@]}",
+        'recipe[crowbar-bootstrap:node]')
 
-prefix_recipes="${prefix_r[*]}"; prefix_recipes="${prefix_recipes// /,}";
-boot_recipes="${boot_r[*]}"; boot_recipes="${boot_recipes// /,}"
-database_recipes="${database_r[*]// /,}"; database_recipes="${database_recipes// /,}"
-proxy_recipes="${proxy_r[*]// /,}"; proxy_recipes="${proxy_recipes// /,}"
+make_recipes() {
+    local res="$(printf "%s,", "$@")"
+    printf "${res%,}"
+}
+
+
+prefix_recipes="$(make_recipes "${prefix_r[@]}")"
+boot_recipes="$(make_recipes "${boot_r[@]}")"
+core_recipes="$(make_recipes "${core_r[@]}")"
+node_recipes="$(make_recipes "#{node_r[@]}")"
+database_recipes="$(make_recipes "${database_r[@]}")"
+provisioner_recipes="$(make_recipes "${provisioner_r[@]}")"
+proxy_recipes="$(make_recipes "${proxy_r[@]}")"
 
 cd /opt/opencrowbar/core
 # Figure out what we are running on.
