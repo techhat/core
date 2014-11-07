@@ -1,3 +1,4 @@
+[![Stories in Ready](https://badge.waffle.io/opencrowbar/core.png?label=ready&title=Ready)](https://waffle.io/opencrowbar/core)
 # Welcome to OpenCrowbar
 
 Welcome to the OpenCrowbar Project - the gateway to a new hardware provisioning experience that delivers the best of software deployment automation and orchestration. OpenCrowbar is a successor of the 3 year-old & still active [Crowbar project](http://github.com/crowbar). It derives much of its functionality from its predecessor, but offers a lot more.
