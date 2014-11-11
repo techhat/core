@@ -426,7 +426,7 @@ class Node < ActiveRecord::Base
       unless blocking_children.empty?
         Rails.logger.info("Node: #{nr.name} cannot move even though it is a candidate.")
         Rails.logger.info("Move is blocked by:")
-        blocking_chidlren.each do |c|
+        blocking_children.each do |c|
           Rails.logger.info("  #{c.name}: #{c.deployment.name}, #{c.run_count}, #{c.state_name}")
         end
         next
