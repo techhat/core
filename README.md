@@ -24,7 +24,7 @@ We've also made it easy to setup and run Crowbar using our [**Fast-Start (with D
 
 The principal motivation for creation of OpenCrowbar is the transition a from bare metal installer into a tool that manages ongoing operations.  OpenCrowbar enables upgrade and continuous deployment automation. This capability is important for large scale deployments of evolving complex projects like OpenStack, Hadoop, and Ceph.
 
-OpenCrowbar provides the foundation for operations automation. OpenCrowabr is an open reference implementation that can be reliably deployed in large-scale, multi-site datacenters.  This effectively productizes best practices in a way that allows cration of consistent and discoverable operating environments.  Users benefit with fast time-to-value and we benefit by having consistent installations across the ecosystem.  
+OpenCrowbar provides the foundation for operations automation. OpenCrowbar is an open reference implementation that can be reliably deployed in large-scale, multi-site datacenters.  This effectively productizes best practices in a way that allows creation of consistent and discoverable operating environments.  Users benefit with fast time-to-value and we benefit by having consistent installations across the ecosystem.  
 
 ## Benefits of OpenCrowbar
 
