@@ -342,8 +342,9 @@ run_kvm() {
     # a few booting and rebooting bugs.
     # $@ = after shifing, other args to be passed to kvm.
     # In addition, we expect that the caller has set vm_nics appropriatly.
-    local waitargs=() reboot=false
-    local pxeboot='' driveboot=''
+    local waitargs=() reboot=false snapshot=''
+    local pxeboot='' driveboot='' diskfile="$VM_DIR/$VMID.disk"
+    local disk_format="raw"
     while true; do
         case $1 in
             # -daemon tells the framework to stop active monitoring
@@ -362,6 +363,13 @@ run_kvm() {
             -dieif) waitargs+=("$1" "$2"); shift;;
             # -reboot allows the VM to reboot instead of halting on reboot.
             -reboot) reboot=true;;
+            # Run the main disk in snapshot mode.
+            -snapshot) snapshot=true;;
+            # Use the passed disk as the main one instead of $VMID.disk
+            -disk)
+                diskfile="$2"
+                disk_format="qcow2"
+                shift;;
             *) break;;
         esac
         shift
@@ -405,7 +413,7 @@ run_kvm() {
         -name "kvm-$vm_gen")
     if [[ $kvm_use_ahci = true ]]; then
         kvmargs+=(-device "ahci,id=ahci0,bus=pci.0,multifunction=on")
-        kvmargs+=(-drive "file=$VM_DIR/$VMID.disk,if=none,format=raw,cache=$drive_cache,id=drive-ahci-0")
+        kvmargs+=(-drive "file=$diskfile,if=none,format=$disk_format,cache=$drive_cache,id=drive-ahci-0")
         kvmargs+=(-device "ide-drive,bus=ahci0.0,drive=drive-ahci-0,id=drive-0")
         local drive_idx=1
         for image in "$VM_DIR/$VMID-"*".disk"; do
@@ -417,7 +425,7 @@ run_kvm() {
         done
         unset drive_idx
     else
-        local drivestr="file=$VM_DIR/$VMID.disk,if=scsi,format=raw,cache=$drive_cache"
+        local drivestr="file=$diskfile,if=scsi,format=$disk_format,cache=$drive_cache"
         if [[ $driveboot ]]; then
             drivestr+=",boot=on"
         fi
@@ -438,8 +446,10 @@ run_kvm() {
     unset vlan
     if [[ $pxeboot ]]; then
         kvmargs+=(-boot "order=n")
-    elif [[ $driveboot ]]; then
+    elif [[ $driveboot && $reboot = false ]]; then
         kvmargs+=(-boot "order=nc")
+    else
+        kvmargs+=(-boot "order=c")
     fi
 
     if [[ $reboot = false ]]; then

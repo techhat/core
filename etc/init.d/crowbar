@@ -1,12 +1,14 @@
 #!/bin/bash
+# chkconfig:         2345 90 10
+# description:       Service runner for Crowbar
 ### BEGIN INIT INFO
 # Provides:          opencrowbar-webserver
-# Required-Start:    $syslog $network $named
-# Should-Start:      xinetd postrgesql-9.3
-# Required-Stop:     $syslog $network $named
-# Should-Stop:       xinetd postgresql-9.3
-# Default-Start:     3 5
-# Default-Stop:      0 1 2 6
+# Required-Start:    $syslog $network $named postrgesql-9.3
+# Required-Stop:     $syslog $network $named postgresql-9.3
+# Should-Start:      xinetd
+# Should-Stop:       xinetd
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
 # Short-Description: Start the OpenCrowbar Web application
 # Description:       Manages the OpenCrowbar Web application
 ### END INIT INFO
@@ -50,7 +52,6 @@ start(){
     as_crowbar bundle exec puma -d -C $PUMA_CFG
     echo "Starting delayed_job NodeRoleRunner queue (10 workers)"
     as_crowbar bundle exec script/delayed_job --queue=NodeRoleRunner -n 10 start
-
 }
 
 stop() {

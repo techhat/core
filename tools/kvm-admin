@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export 'PS4=${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
+
 set -e
 # Check that we are in the root of the opencrowbar checkout tree
 if [[ $0 = /* ]]; then
@@ -11,23 +13,53 @@ else
     exit 1
 fi
 
+while [[ $1 ]]; do
+    case $1 in
+        --save-image)
+            save_image=true
+            image_name=$(readlink -f "$2")
+            if [[ ! $image_name ]]; then
+                echo "Will not be able to save disk image to $2, directory ${2%/*} does not exist."
+                exit 1
+            elif [[ ! -w ${image_name%/*} ]]; then
+                echo "Will not be able to save disk image to $2, directory ${2%/*} is not writable."
+                exit 1
+            elif [[ -f $image_name && ! -w $image_name ]]; then
+                echo "Will not be able to save disk image to $2, that file is not writable."
+                exit 1
+            fi
+            shift 2;;
+        --use-image)
+            use_image=true
+            image_name=$(readlink -f "$2")
+            if ! [[ $image_name && -w $image_name ]]; then
+                echo "Cannot write to $image_name, will not be able to use it."
+                exit 1
+            fi
+            shift 2;;
+        --demo)
+            use_image=true
+            image_name=$(readlink -f "$2")
+            if ! [[ $image_name && -f $image_name ]]; then
+                echo "Disk image $image_name does not exist, will not be able to use it."
+                exit 1
+            fi
+            ephemeral_admin=true
+            shift 2;;
+        *)
+            echo "Invalid options: ${*}"
+            echo "Please try one of:"
+            echo "   --save-image <file> to save the admin disk image after kvm-admin is killed,"
+            echo "   --demo <file> to run a previosly-saved image discarding changes,"
+            echo "   --use-image <file> to run a previously-saved image keeping changes"
+            exit 1;;
+    esac
+done
+
 export OCBDIR="${OCBDIR%/core/tools/kvm-admin}"
 
 admin_server_loc="$HOME/.cache/opencrowbar/tftpboot/centos-6.5"
 admin_server_iso="$HOME/.cache/opencrowbar/tftpboot/isos/CentOS-6.5-x86_64-bin-DVD1.iso"
-
-if [[ ! -f $admin_server_iso ]]; then
-    echo "Cannot find $admin_server_iso"
-    exit 1
-fi
-
-if [[ ! -d $OCBDIR/build-tools/.git ]]; then
-    echo "Cloning build-tools into $OCBDIR"
-    (cd "$OCBDIR" && git clone https://github.com/opencrowbar/build-tools)
-fi
-echo "Creating OCB install RPM packages"
-"$OCBDIR/build-tools/bin/make-rpms.sh"
-
 . "$OCBDIR/core/tools/kvm_lib.sh"
 TMPDIR=$(mktemp -d /tmp/ocb-kvm-admin-XXXXXX)
 
@@ -35,15 +67,35 @@ myclean() {
     set +e
     rm -rf "$TMPDIR"
     sudo iptables -t nat -D POSTROUTING -s 192.168.124.0/22 \! -d 192.168.124.0/22 -j MASQUERADE
+    if [[ $save_image = true ]]; then
+        kill_vm killed
+        echo "Saving the disk image to $image_name.  Please do not interrupt!"
+        qemu-img convert -c -p -f raw -O qcow2 "$VM_DIR/$VMID.disk" "$image_name"
+    fi
     cleanup
     kill_ocb_bridge
 }
+
+if [[ ! $use_image = true ]]; then
+    if [[ ! -f $admin_server_iso ]]; then
+        echo "Cannot find $admin_server_iso"
+        exit 1
+    fi
+    if [[ ! -d $OCBDIR/build-tools/.git ]]; then
+        echo "Cloning build-tools into $OCBDIR"
+        (cd "$OCBDIR" && git clone https://github.com/opencrowbar/build-tools)
+    fi
+    echo "Creating OCB install RPM packages"
+    "$OCBDIR/build-tools/bin/make-rpms.sh"
+fi
+
 trap 'myclean' 0 INT QUIT TERM
 
-# Inject opencrowbar packages and kickstart into the PXE install ISO.
-mkdir -p "$TMPDIR/initrd"
-tar -C "$admin_server_loc" -czf "$TMPDIR/initrd/ocb.tar.gz" ocb-packages
-cat >"$TMPDIR/initrd/opencrowbar.ks" <<'EOF'
+if [[ ! $use_image = true ]]; then
+    # Inject opencrowbar packages and kickstart into the PXE install ISO.
+    mkdir -p "$TMPDIR/initrd"
+    tar -C "$admin_server_loc" -czf "$TMPDIR/initrd/ocb.tar.gz" ocb-packages
+    cat >"$TMPDIR/initrd/opencrowbar.ks" <<'EOF'
 # Opencrowbar Admin Development Kickstart
 install
 cdrom
@@ -130,41 +182,54 @@ nameserver 8.8.4.4
 EOQ
 
 EOF
-cp "$admin_server_loc/install/images/pxeboot/initrd.img" "$TMPDIR"
-chmod 644 "$TMPDIR/initrd.img" 
-(cd "$TMPDIR/initrd"; find . -depth  |cpio --create --format=newc |gzip -9 >>"$TMPDIR/initrd.img")
+    cp "$admin_server_loc/install/images/pxeboot/initrd.img" "$TMPDIR"
+    chmod 644 "$TMPDIR/initrd.img" 
+    (cd "$TMPDIR/initrd"; find . -depth  |cpio --create --format=newc |gzip -9 >>"$TMPDIR/initrd.img")
 
-install_params=("ksdevice=eth0"
-    "ks=file:/opencrowbar.ks"
-    "ip=192.168.124.10"
-    "netmask=255.255.252.0 nofb"
-    "text")
-install_params+=("crowbar.authkey=$(sed 's/ /\\040/g' <"$HOME/.ssh/id_rsa.pub")")
-. "$OCBDIR/core/tools/proxy_lib.sh"
-mangle_proxies "${OCB_BRIDGE_IP%/*}"
-for proxy in "${!mangled_proxies[@]}"; do
-    install_params+=("crowbar.$proxy=${mangled_proxies[$proxy]}")
-done
+    install_params=("ksdevice=eth0"
+                    "ks=file:/opencrowbar.ks"
+                    "ip=192.168.124.10"
+                    "netmask=255.255.252.0 nofb"
+                    "text")
+    install_params+=("crowbar.authkey=$(sed 's/ /\\040/g' <"$HOME/.ssh/id_rsa.pub")")
+    . "$OCBDIR/core/tools/proxy_lib.sh"
+    mangle_proxies "${OCB_BRIDGE_IP%/*}"
+    for proxy in "${!mangled_proxies[@]}"; do
+        install_params+=("crowbar.$proxy=${mangled_proxies[$proxy]}")
+    done
+fi
 
 make_ocb_bridge
-qemu-img create -f raw "$VM_DIR/$VMID.disk" 30G &>/dev/null
+if [[ ! $use_image = true ]]; then
+    qemu-img create -f raw "$VM_DIR/$VMID.disk" 30G &>/dev/null
+fi
 makenics
 # Let the admin node talk to the outside world.
 sudo iptables -t nat -A POSTROUTING -s 192.168.124.0/22 \! -d 192.168.124.0/22 -j MASQUERADE
 
-# Kick off the installer
-run_kvm -kernel "$admin_server_loc/install/images/pxeboot/vmlinuz" \
-    -initrd "$TMPDIR/initrd.img" \
-    -append "${install_params[*]}" \
-    -cdrom "$admin_server_iso"
+if [[ ! $use_image = true ]]; then
+    # Kick off the installer
+    run_kvm -kernel "$admin_server_loc/install/images/pxeboot/vmlinuz" \
+            -initrd "$TMPDIR/initrd.img" \
+            -append "${install_params[*]}" \
+            -cdrom "$admin_server_iso"
+fi
 
 # Once we get here, the OS should be installed.
+admin_args=(-bootc)
+if [[ $use_image = true ]]; then
+    admin_args+=(-disk "$image_name")
+fi
+if [[ $ephemeral_admin = true ]]; then
+    admin_args+=(-snapshot -reboot)
+fi
 while [[ ! -f $VM_DIR/$VMID.killed ]]; do
     update_vm_status "Booting node to disk"
-    if run_kvm -bootc; then
+    if run_kvm "${admin_args[@]}"; then
         kill_vm exited
     else
         update_vm_status "Node failed to deploy."
+        save_image=''
         kill_vm killed
     fi
 done
