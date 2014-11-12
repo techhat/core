@@ -82,7 +82,7 @@ Machine requirements are:
                     Select Method "Manual"
                     Click [Add]
                         Enter IP address: 192.168.124.10
-                        Click on blank field below "Netmask". Enter: 24, or 255.255.255.0, no gateway
+                        Click on blank field below "Netmask". Enter: 22, or 255.255.252.0, no gateway
                         Enter DNS ip address (Ex.38.151.210.40)
                     Click [Apply]
             Click [Close]
