@@ -18,7 +18,8 @@ We've also made it easy to setup and run Crowbar using our [**Fast-Start (with D
 
 * [Live Weekly Planning and Design Meetings](http://bit.ly/crowbar-calendar)
 * [Mailing List](http://bit.ly/crowbarlist)
-* #Crowbar IRC channel on Freenode  
+* [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/opencrowbar/core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+* #Crowbar IRC channel on Freenode  - kinda quiet - best to find us on list.
 
 ## Exec Summary 
 
