@@ -34,7 +34,10 @@ upstream_proxy ||= ENV["upstream_proxy"]
 upstream_proxy ||= ENV["http_proxy"]
 upstream_proxy_address = nil
 upstream_proxy_port = nil
-if upstream_proxy && !upstream_proxy.empty? && upstream_proxy != "http://#{v4addr.addr}:8123"
+
+is_upstream_proxy_me = ((upstream_proxy == "http://#{v4addr.addr}:8123") or (upstream_proxy == "http://127.0.0.1:8123"))
+
+if upstream_proxy && !upstream_proxy.empty? && !is_upstream_proxy_me
   matchers = /http:\/\/(?<address>(\[[0-9a-f:]+\])|([^:]+)):(?<port>[0-9]+)/.match(upstream_proxy)
   raise "Could not parse upstream proxy!" unless matchers["address"]
   upstream_proxy_address = matchers["address"]
