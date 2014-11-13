@@ -16,7 +16,7 @@ An outline is provided as a foundation for QA validation requirements for OpenCr
 
 Known limitations of the installation process, its sensitivities to updates and to upgrades is summarized.
 
-## Pre-Requisites
+## Prerequisites
 
 Before commencing installation and configuration, ensure that everything needed is available and that all remote resources that must be accessed are capable of being reached.
 
@@ -154,8 +154,8 @@ replace the system.
 
   1. Revert your VM to the last Snapshot taken,  (You did follow the advice above to make a SnapShot, correct?)
   1. yum clean all; yum makecache
-  1. yum remove opencrowbar-hardware # If it was installed
-  1. yum remove opencrowbar-core
+  1. yum erase opencrowbar-hardware # If it was installed
+  1. yum erase opencrowbar-core
   1. yum install -y opencrowbar-core
   1. yum install -y opencrowbar-hardware # If you want hardware support
   1. cd /opt/opencrowbar/core
