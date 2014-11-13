@@ -138,7 +138,7 @@ networks.each do |network|
   sw_port = -1
   sw_port_name = nil
 
-  line = IO.readlines(tcpdump_out).grep(/Subtype Local/).join ''
+  line = IO.readlines(tcpdump_out).grep(/Subtype Local|Subtype Interface Name/).join ''
   #Chef::Log.debug("subtype intf name line: #{line}")
   if line =~ %r!(\d+)/\d+/(\d+)!
     sw_unit, sw_port = $1, $2
