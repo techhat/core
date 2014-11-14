@@ -62,7 +62,7 @@ installed:
    * Screen: "Select the appropriate keyboard ...", Select "U.S. English", Click [Next]
    * Screen: "What type of devices will your installation involve\?", Select "Basic Storage Devices", Click [Next]
    * Pop-up: "Storage Device Warning", Click [Yes, discard any data]
-   * Screen: "Please name this computer. The hostname ...", In the Hostname field enter: "admin.mytest.lcl"
+   * Screen: "Please name this computer. The hostname ...", In the Hostname field enter as valid FCDN (Ex. admin.mytest.lcl)
    * Click [Configure Network]
       * Network configuration requirements depend on how many NICs are available, and on available network topology
       * For Single NIC configuration:
@@ -87,12 +87,13 @@ installed:
             * Select Method "Manual"
                * Click [Add]
                   * Enter IP address: 192.168.124.10
-                  * Click on blank field below "Netmask". Enter: 22, or 255.255.252.0, no gateway
+                  * Click on blank field below "Netmask". Enter: 24, or 255.255.255.0, no gateway
                   * Enter DNS ip address (Ex.38.151.210.40)
             * Click [Apply]
-   * Click [Close]
+         * Click [Close]
+      * Click [Next]
    * Screen: "Please select the nearest city in your time zone:", Select your time zone, Click [Next]
-   * Screen: "The root account is used for administering the system. ...", Enter Root password "crowbar", Confirm: "crowbar", Click [Next]
+   * Screen: "The root account is used for administering the system. ...", Enter  a Root password (Ex. crowbar), Confirm , Click [Next]
    * Popup: "Weak Password", Click [Use Anyway]
    * Screen: "Which type of installation would you like?", Select "Use All Space", Click [Next]
    * Popup: "Writing storage configuration to disk", Click [Write changes to disk]
