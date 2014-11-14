@@ -76,12 +76,7 @@ installed:
                   * Enter DNS ip address (Ex.38.151.210.40)
             * Click [Apply]
       * For Dual NIC configuration:
-         * Select "System eth1" (first NIC - on public network), Click [Edit]
-            * Check "Connect automatically"
-            * Click [IPV4 Settings]
-            * Select Method "Automatic (DHCP)" if appropriate, else configure network settings. (Need ip, netmask and gw)
-            * Click [Apply]
-         * Select "System eth0" (second NIC - on private admin network), Click [Edit]
+        * Select "System eth0" (First NIC - on private admin network), Click [Edit]
             * Check "Connect automatically"
             * Click [IPV4 Settings]
             * Select Method "Manual"
@@ -89,8 +84,13 @@ installed:
                   * Enter IP address: 192.168.124.10
                   * Click on blank field below "Netmask". Enter: 24, or 255.255.255.0, no gateway
                   * Enter DNS ip address (Ex.38.151.210.40)
+            * Click [Apply] 
+        * Select "System eth1" (Second NIC - on public network), Click [Edit]
+            * Check "Connect automatically"
+            * Click [IPV4 Settings]
+            * Select Method "Automatic (DHCP)" if appropriate, else configure network settings. (Need ip, netmask and gw)
             * Click [Apply]
-         * Click [Close]
+          * Click [Close]
       * Click [Next]
    * Screen: "Please select the nearest city in your time zone:", Select your time zone, Click [Next]
    * Screen: "The root account is used for administering the system. ...", Enter  a Root password (Ex. crowbar), Confirm , Click [Next]
