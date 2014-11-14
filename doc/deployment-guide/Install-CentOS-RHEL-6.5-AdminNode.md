@@ -133,7 +133,7 @@ updates, see below.
 
 Execute the following commands:
    1. cd /opt/opencrowbar/core
-   1. ./production.sh <FQDN of the admin node>
+   1. ./production.sh &lt;FQDN of the admin node&gt;
 
 Once this is complete, the admin node is configured.  Don't worry about
 the failed to converge message, continue on to the next.
