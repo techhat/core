@@ -33,13 +33,14 @@ validate(JSON) when is_record(JSON, obj) ->
   J = JSON#obj.data,
   R =[JSON#obj.type == "barclamp",
       bdd_utils:is_a(J, string, version), 
+      bdd_utils:is_a(J, string, build_version), 
       bdd_utils:is_a(J, string, commit), 
       bdd_utils:is_a(J, string, build_on), 
       bdd_utils:is_a(J, string, source_path), 
       bdd_utils:is_a(J, string, source_url), 
       bdd_utils:is_a(J, dbid, barclamp_id), 
       bdd_utils:is_a(J, string, cfg_data),
-      bdd_utils:is_a(J, length, 12),
+      bdd_utils:is_a(J, length, 13),
       crowbar_rest:validate(J)],
   bdd_utils:assert(R, debug);
 validate(JSON) -> 
