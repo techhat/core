@@ -1,6 +1,6 @@
 ## Connecting to the BMC Network
 
-By default, Crowbar sets up the BMC network on 192.168.128.xxx/22.  You may, of course, modify this by changing the BMC network in the `/networks` page.  These instructions have been created with the assumption that you are using the default network and should be modified to match your specific configuration.
+By default, Crowbar sets up the BMC network on 192.168.128.xxx/24.  You may, of course, modify this by changing the BMC network in the `/networks` page.  These instructions have been created with the assumption that you are using the default network and should be modified to match your specific configuration.
 
 ### Attaching Admin to BMC
 
@@ -8,7 +8,7 @@ While Crowbar will configure the admin node and managed node BMCs, it does not c
 
 These instructions assume you are using a Linux desktop with the Admin node running in a docker container.  The container is using docker0 as the network bridge to the nodes.
 
-You must add the bmc range the bridge from your workstation: `sudo ip addr add 192.168.128.1/22 dev docker0`
+You must add the bmc range the bridge from your workstation: `sudo ip addr add 192.168.128.1/24 dev docker0`
   
 You should now be able to ping the node's BMC interfaces.  By default they are assigned on from 192.168.128.21, so `ping 192.168.128.21` should work.
 

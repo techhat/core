@@ -38,7 +38,7 @@
             %td= text_field_tag :conduit, Network::DEFAULTCONDUIT, :size=>4
             %td
               = '192.168.124.0/24'
-              = hidden_field_tag :ranges, '"ranges":[{"name": "admin","first": "192.168.124.10/22","last": "192.168.124.11/22"}, {"name": "host", "first": "192.168.124.81/22","last": "192.168.127.254/22"},{"name": "dhcp","first": "192.168.124.21/22","last": "192.168.124.80/22"}]'
+              = hidden_field_tag :ranges, '"ranges":[{"name": "admin","first": "192.168.124.10/24","last": "192.168.124.11/24"}, {"name": "host", "first": "192.168.124.81/24","last": "192.168.124.254/24"},{"name": "dhcp","first": "192.168.124.21/24","last": "192.168.124.80/24"}]'
             %td
               %input.button{:type => "submit", :value => t('add')}
 

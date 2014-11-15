@@ -58,8 +58,8 @@ OCB_CPUS=4
 VMID=$$
 
 # IP address of the node that ends up as the admin node.
-OCB_ADMIN_IP=192.168.124.10/22
-OCB_BRIDGE_IP=192.168.124.1/22
+OCB_ADMIN_IP=192.168.124.10/24
+OCB_BRIDGE_IP=192.168.124.1/24
 CROWBAR_KEY="crowbar:crowbar"
 OCB_SCREEN="ocb-test"
 
