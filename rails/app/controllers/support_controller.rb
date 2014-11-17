@@ -113,8 +113,8 @@ class SupportController < ApplicationController
         NetworkRange.create :name=>'host', :network_id=>net.id, :first=>"192.168.124.81/24", :last=>"192.168.124.254/24"
         # bmc network
         bmc = Network.create :name=>Network::BMC_NET, :description=>I18n.t('support.bootstrap.bmc_net'),  :deployment_id=>deployment.id, :conduit=>Network::BMCCONDUIT, :v6prefix => Network::V6AUTO
-        NetworkRange.create :name=>'admin', :network_id=>bmc.id, :first=>"192.168.128.10/22", :last=>"192.168.128.20/22"
-        NetworkRange.create :name=>'host', :network_id=>bmc.id, :first=>"192.168.128.21/22", :last=>"192.168.131.254/22"
+        NetworkRange.create :name=>'admin', :network_id=>bmc.id, :first=>"192.168.128.10/24", :last=>"192.168.128.20/24"
+        NetworkRange.create :name=>'host', :network_id=>bmc.id, :first=>"192.168.128.21/24", :last=>"192.168.128.254/24"
 
       end
     end
