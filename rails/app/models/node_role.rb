@@ -52,7 +52,7 @@ class NodeRole < ActiveRecord::Base
   scope           :peers_by_state,    ->(ss,state) { in_deployment(ss).in_state(state) }
   scope           :peers_by_role,     ->(ss,role)  { in_deployment(ss).with_role(role) }
   scope           :peers_by_node,     ->(ss,node)  { in_deployment(ss).on_node(node) }
-  scope           :peers_by_node_and_role,     ->(s,n,r) { peers_by_node(s,n).with_role(r) }
+  scope           :peers_by_node_and_role,  ->(n,r) { on_node(n).with_role(r) }
   scope           :deployment_node_role,    ->(s,n,r) { where(['deployment_id=? AND node_id=? AND role_id=?', s.id, n.id, r.id]) }
 
   # make sure that new node-roles have require upstreams
