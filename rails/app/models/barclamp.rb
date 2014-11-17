@@ -56,19 +56,25 @@ class Barclamp < ActiveRecord::Base
       Rails.logger.info "Importing Barclamp #{bc_name} from #{source_path}"
 
       # verson tracking
-      gitcommit = "unknown" if bc['git'].nil? or bc['git']['commit'].nil?
-      gitdate = "unknown" if bc['git'].nil? or bc['git']['date'].nil?
+      gitcommit = "unknown"
+      gitdate = "unknown"
+      if bc['git']
+        gitcommit = bc['git']['commit'] || 'unknown'
+        gitdate = bc['git']['date'] || 'unknown'
+      end
       version = bc["version"] || '2.0'
+      build_version = bc["build_version"] || '2.0'
 
       source_url = bc["source_url"] || "http://github/opencrowbar/unknown"
-      barclamp.update_attributes!(:description => bc['description'] || bc_name.humanize,
-                                  :version     => version,
-                                  :source_path => source_path,
-                                  :source_url  => source_url,
-                                  :build_on    => gitdate,
-                                  :barclamp_id => parent_id || barclamp.id,
-                                  :commit      => gitcommit,
-                                  :cfg_data    => bc)
+      barclamp.update_attributes!(:description   => bc['description'] || bc_name.humanize,
+                                  :version       => version,
+                                  :build_version => build_version,
+                                  :source_path   => source_path,
+                                  :source_url    => source_url,
+                                  :build_on      => gitdate,
+                                  :barclamp_id   => parent_id || barclamp.id,
+                                  :commit        => gitcommit,
+                                  :cfg_data      => bc)
 
       # Load node maanger information, if any.
       bc['hammers'].each do |nm|
