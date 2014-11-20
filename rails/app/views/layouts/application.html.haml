@@ -51,8 +51,8 @@
       =t '.provided_by'
       %a{:href=>"http://opencrowbar.org", :target=>"_new"}
         %img{:src=>"/images/ocb_logo.png", :alt=>"Crowbar Project", :title=>"Crowbar Project", :width=>'20px', :style=>"vertical-align:middle;padding-bottom:2px"}
-      %a{:href=>"https://github.com/orgs/opencrowbar/members", :target=>"_new", :alt=>"Dell, Inc."}
-        OpenCrowbar Project team
+      %a{:href=>"https://github.com/orgs/opencrowbar/people", :target=>"_new", :alt=>"OpenCrowbar"}
+        OpenCrowbar Project Team
       =t 'version', :version=>(Rails.env.development? ? "Development" : Barclamp.where( :name => "crowbar").first.build_version)
 
 :javascript
