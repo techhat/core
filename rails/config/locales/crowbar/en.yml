@@ -476,7 +476,7 @@ en:
       cohort: "Cohort"
   support:
     index:
-      title: Exported Files
+      title: Exported Items
       none_exported: There are no exported files to download
 #      other: Other Files
 #      chef: Chef Objects
