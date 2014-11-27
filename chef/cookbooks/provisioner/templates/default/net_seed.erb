@@ -82,12 +82,14 @@ d-i mirror/http/proxy string
 # Select which update services to use; define the mirrors to be used.
 # Values shown below are the normal defaults.
 #d-i apt-setup/services-select multiselect security
-<% if @online -%>
-d-i apt-setup/security_host string security.ubuntu.com
-d-i apt-setup/security_path string /ubuntu
-<% elsif @cc_use_local_security -%>
+#d-i apt-setup/security_host string security.ubuntu.com
+#d-i apt-setup/security_path string /ubuntu
+<% if @cc_use_local_security -%>
 d-i apt-setup/security_host string <%=install_site %>
 d-i apt-setup/security_path string <%=install_path %>
+<% else %>
+d-i apt-setup/security_host string
+d-i apt-setup/security_path string
 <% end -%>
 
 
