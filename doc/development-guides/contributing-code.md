@@ -3,6 +3,8 @@
 Before [submitting pull requests]
 (https://help.github.com/articles/using-pull-requests), please make sure you understand the Apache license.  We consider submitting a pull to be accepting the project license terms.
 
+We are using this [style](http://nvie.com/posts/a-successful-git-branching-model/) branching model.  The main goal is not to develop in *master*, but on the *develop* branch so that *master* is the latest validated code.  *develop* should be stable and tests should have been run against it, but hasn't necessarily been regression tested for production release stability.  Feature branches are encouraged for shared work.  Large features requiring multiple items or multiple individual participation can be created in the OpenCrowbar repo.  This should be discussed in the weekly OpenCrowbar meetings.  Once complete, these features would be merged into *develop*.
+
 #### Guidelines for Pull Requests
 
    * Must be Apache 2 license
@@ -18,6 +20,8 @@ Before [submitting pull requests]
       * Major changes
       * New barclamps
       * New technology
+   * Pull requests should be against a defined feature branch in the OpenCrowbar repo or the *develop* branch
+   * Pull requests once pulled into *develop* will be merged into *master* at release boundaries.
 
 #### Timing
 
