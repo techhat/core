@@ -20,8 +20,8 @@ We are using this [style](http://nvie.com/posts/a-successful-git-branching-model
       * Major changes
       * New barclamps
       * New technology
-    * Pull requests should be against a defined feature branch in the OpenCrowbar repo or the *develop* branch
-    * Pull requests once pulled into *develop* will be merged into *master* at release boundaries.
+   * Pull requests should be against a defined feature branch in the OpenCrowbar repo or the *develop* branch
+   * Pull requests once pulled into *develop* will be merged into *master* at release boundaries.
 
 #### Timing
 
