@@ -38,7 +38,7 @@ Machine requirements are:
       * The second NIC will be wired into a network that routes to the internet. Internet access is required for installation of CentOS/RHEL 6.5
       * Note: It is possible to use a single NIC. In that case the default network address will be 192.168.124.0/24, the admin node IP address will be 192.168.124.10
       * Where a single NIC is used, the private admin network (192.168.124.0/24) must be capable of download of files from the internet or from a local caching server
-   * Storage: A disk capacity of at least 10 GB is preferred. * Make sure you configure RAID on the drives before installing.
+   * Storage: A disk capacity of at least 80 GB is preferred. * Make sure you configure RAID on the drives before installing.
  
 Ensure that all physical network transports are correctly configured and are operational - at least check/verify that:
    * All network cabling is in place
