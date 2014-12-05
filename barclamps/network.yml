@@ -36,6 +36,13 @@ roles:
                   sequence:
                     - type: str
                       pattern: /[0-9a-fA-F]{4}\:[0-9a-fA-F]{2}\/[0-9a-fA-F]{4}\:[0-9a-fA-F]{2}\:[0-9a-fA-F]{2}/
+  - name: network-lldpd
+    jig: chef
+    requires:
+      - network-admin
+      - provisioner-server
+    flags:
+      - implicit
 
   # there are more roles BUT they are dynamically created
 
