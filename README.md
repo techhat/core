@@ -2,17 +2,25 @@
 # Welcome to OpenCrowbar
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/opencrowbar/core?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-Welcome to the OpenCrowbar Project - the gateway to a new hardware provisioning experience that delivers the best of software deployment automation and orchestration. OpenCrowbar is a successor of the 3 year-old & still active [Crowbar project](http://github.com/crowbar). It derives much of its functionality from its predecessor, but offers a lot more.
+Welcome to the OpenCrowbar Project - the gateway to a new hardware provisioning experience that delivers the best of software deployment automation and orchestration. OpenCrowbar is a successor of the 4 year-old & still active [Crowbar project](http://github.com/crowbar). It derives much of its functionality from its predecessor, but offers a lot more.
 
 ## Getting Started & Documentation
 
 Documentation close by and located in under the **/doc** directory of OpenCrowbar and for each workload module.
 
+Want to _try out OpenCrowbar_?  Install following the [**deployment guide (for Centos)**](/doc/deployment-guide).
+
 Please refer to the [/doc directories](/doc/README.md) for detailed information.  We attempt to define and maintain one sub-directory for each functional element.  This structure is intended to be common across all workloads in the [OpenCrowbar project](https://github.com/opencrowbar/)
 
 > Please, do NOT add documentation in locations outside of the  **/doc** directory trees!  If necessary, expand this README to include pointers to important **/doc** information.
 
-We've also made it easy to setup and run Crowbar using our [**Fast-Start (with Docker)**](/doc/development-guides/dev-systems) as a rapid-fire code/test/commit cycle tool.  
+We've also made it easy to setup and run latest Crowbar using our [**Fast-Start (with Docker)**](/doc/development-guides/dev-systems) as a rapid-fire code/test/commit cycle tool.  
+
+## Current Release
+
+* Release v2.1 as of 12/3/2010 (was known as _Broom_) on *master* branch
+* Development for _Camshaft_ cycle moved to *develop* branch
+* Earlier Reseases: Anvil became v2.0 in Apr 2014
 
 ## Join Our Community
 
