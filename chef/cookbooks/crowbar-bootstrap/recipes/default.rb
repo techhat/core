@@ -162,7 +162,7 @@ when "centos","redhat","suse","opensuse","fedora"
   file "/etc/sysconfig/network" do
     action :create
     content "NETWORKING=yes"
-  end if File.file?("/etc/sysconfig/network")
+  end if !File.file?("/etc/sysconfig/network")
   # We want a better Ruby on the admin nodes, but should not muck up
   # all the other nodes.
   if %w{centos-6.5 redhat-6.5}.member?(os_token)
