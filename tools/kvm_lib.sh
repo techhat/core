@@ -2,7 +2,7 @@
 
 export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
 # Commands we have to run under sudo -n
-SUDO_CMDS="brctl ip umount mount"
+SUDO_CMDS="/sbin/brctl ip umount mount"
 # Commands we need to run as $USER
 NEEDED_CMDS="ruby gem screen qemu-img sudo"
 # Gems we have to have installed.
