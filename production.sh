@@ -28,7 +28,7 @@ if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
 fi
 # At the end of this we have a running proxy server.  Use it.
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${proxy_recipes}"
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${core_recipes}"
 . /etc/profile
 ./setup/00-crowbar-rake-tasks.install && \
     ./setup/01-crowbar-start.install && \
@@ -134,7 +134,6 @@ admin_node="
 ###
 # This should vanish once we have a real bootstrapping story.
 ###
-ip_re='([0-9a-f.:]+/[0-9]+)'
 
 # Create a stupid default admin network
 crowbar networks create "$admin_net"
@@ -151,6 +150,7 @@ crowbar roles bind crowbar-admin-node to "$FQDN"
 crowbar nodes commit "$FQDN"
 
 # Figure out what IP addresses we should have, and add them.
+ip_re='([0-9a-f.:]+/[0-9]+)'
 netline=$(crowbar nodes addresses "$FQDN" on admin)
 nets=(${netline//,/ })
 for net in "${nets[@]}"; do
@@ -160,16 +160,6 @@ for net in "${nets[@]}"; do
     ip addr add "$net" dev eth0 || :
     echo "${net%/*} $FQDN" >> /etc/hosts || :
 done
-
-# Now that we have shiny new IP addresses, make sure that Squid has the right
-# addresses in place for always_direct exceptions, and pick up the new proxy
-# environment variables.
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o 'recipe[barclamp],recipe[ohai],recipe[utils],recipe[crowbar-squid]'
-. /etc/profile
-
-# Make sure that Crowbar is running with the proper environment variables
-service crowbar stop
-service crowbar start
 
 # flag allows you to stop before final step
 if ! [[ $* = *--zombie* ]]; then

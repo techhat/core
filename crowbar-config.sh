@@ -20,7 +20,7 @@ date
 
 export CROWBAR_KEY=$(cat /etc/crowbar.install.key)
 export PATH=$PATH:/opt/opencrowbar/core/bin
-FQDN=`hostname`
+FQDN=`hostname -f`
 
 if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
     export upstream_proxy=$http_proxy
@@ -123,11 +123,6 @@ for net in "${nets[@]}"; do
     ip addr add "$net" dev eth0 || :
     echo "${net%/*} $FQDN" >> /etc/hosts || :
 done
-
-# Now that we have shiny new IP addresses, make sure that Squid has the right
-# addresses in place for always_direct exceptions, and pick up the new proxy
-# environment variables.
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o 'recipe[barclamp],recipe[ohai],recipe[utils],recipe[crowbar-squid]'
 
 # flag allows you to stop before final step
 if ! [[ $* = *--zombie* ]]; then

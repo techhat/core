@@ -19,14 +19,14 @@ core_r=('recipe[crowbar-bootstrap::core]'
         'recipe[crowbar-bootstrap::go]'
         'recipe[crowbar-bootstrap::goiardi-build]'
         'recipe[crowbar-bootstrap::sws-build]')
-provisioner_r=("${prefix_r[@]",
-               'recipe[crowbar-bootstrap::provisioner]')
-database_r=('recipe[crowbar-bootstrap::postgresql]'
-            'recipe[crowbar-bootstrap::goiardi]')
-proxy_r=("${prefix_r[@]}"
-         'recipe[crowbar-squid]')
 node_r=("${prefix_r[@]}",
         'recipe[crowbar-bootstrap:node]')
+database_r=('recipe[crowbar-bootstrap::postgresql]'
+            'recipe[crowbar-bootstrap::goiardi]')
+provisioner_r=("${prefix_r[@]",
+               'recipe[crowbar-bootstrap::provisioner]')
+proxy_r=("${prefix_r[@]}"
+         'recipe[crowbar-squid]')
 
 make_recipes() {
     local res="$(printf "%s,", "$@")"
