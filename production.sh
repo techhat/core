@@ -29,6 +29,7 @@ fi
 # At the end of this we have a running proxy server.  Use it.
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${core_recipes}"
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${node_recipes}"
 . /etc/profile
 ./setup/00-crowbar-rake-tasks.install && \
     ./setup/01-crowbar-start.install && \
