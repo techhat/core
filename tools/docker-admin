@@ -91,5 +91,6 @@ done
 # since 0.8.1 we need to run in privileged mode so we can change the networking
 docker_args+=("--privileged")
 # Run whatever we specified to run inside a container.
+sudo rm -rf "$HOME/.cache/opencrowbar/tftpboot/nodes"
 docker run "${docker_args[@]}" "$image" /opt/opencrowbar/core/tools/docker-init.sh "$@"
 exit $?
