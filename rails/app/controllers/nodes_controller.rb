@@ -107,6 +107,10 @@ class NodesController < ApplicationController
     node_action :redeploy!
   end
 
+  def propose
+    node_action :propose!
+  end
+  
   def commit
     node_action :commit!
   end

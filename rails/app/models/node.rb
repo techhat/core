@@ -315,6 +315,14 @@ class Node < ActiveRecord::Base
     is_docker_node
   end
 
+  def propose!
+    Node.transaction do
+      node_roles.order("cohort ASC").each do |nr|
+        nr.propose!
+      end
+    end
+  end
+
   def commit!
     Role.all_cohorts.each do |r|
       if (!admin && !is_docker_node? && r.discovery)

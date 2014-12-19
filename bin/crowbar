@@ -472,6 +472,20 @@ class ProxyWithAttribs < CrowbarProxy
     OpenCrowbar::Attrib.new(obj)
   end
 
+  def do_propose(*rest)
+    obj,res = REST.put("#{self.class.path}/#{id}/propose")
+    maybe_json_die(obj,res)
+    @blob = obj
+    self
+  end
+
+  def do_commit(*rest)
+    obj,res = REST.put("#{self.class.path}/#{id}/commit")
+    maybe_json_die(obj,res)
+    @blob = obj
+    self
+  end
+
 end
 
 module OpenCrowbar
@@ -535,20 +549,6 @@ module OpenCrowbar
   class Deployment < ProxyWithAttribs
     def name
     @blob["name"]
-    end
-
-    def do_propose(*rest)
-      obj,res = REST.put("#{self.class.path}/#{id}/propose")
-      maybe_json_die(obj,res)
-      @blob = obj
-      self
-    end
-
-    def do_commit(*rest)
-      obj,res = REST.put("#{self.class.path}/#{id}/commit")
-      maybe_json_die(obj,res)
-      @blob = obj
-      self
     end
 
     def do_recall(*rest)
