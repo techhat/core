@@ -342,10 +342,14 @@ class Node < ActiveRecord::Base
   def redeploy!
     Node.transaction do
       reload
-      update!(bootenv: "sledgehammer")
       node_roles.update_all(run_count: 0, state: NodeRole::PROPOSED)
+      update!(bootenv: "sledgehammer")
     end
-    power.reboot
+    if actions[:power][:reset]
+      actions[:power].reset
+    else
+      actions[:power].reboot
+    end
     commit!
   end
 
@@ -411,7 +415,7 @@ class Node < ActiveRecord::Base
     return unless self.bootenv_changed?
     return unless self.actions[:boot]
     new_bootenv = self.changes["bootenv"]
-    if new_bootenv == "local" && !self.hint[:always_pxe]
+    if new_bootenv == "local"
       self.actions[:boot].disk
     else
       self.actions[:boot].pxe
