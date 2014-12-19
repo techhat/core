@@ -181,6 +181,8 @@ Crowbar::Application.routes.draw do
             resources :hammers
             resources :attribs
             resources :roles
+            put :propose
+            put :commit
             put :power
             put :debug
             put :undebug
@@ -195,6 +197,8 @@ Crowbar::Application.routes.draw do
           resources :node_roles do
             resources :attribs
             put :retry
+            put :propose
+            put :commit
           end
           resources :roles do
             resources :attribs

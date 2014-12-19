@@ -110,6 +110,25 @@ class NodeRolesController < ApplicationController
     end
   end
 
+  def propose
+    @node_role = NodeRole.find_key params[:node_role_id]
+    @node_role.propose!
+    respond_to do |format|
+      format.html { redirect_to node_role_path(@node_role.id) }
+      format.json { render api_show @node_role }
+    end
+  end
+
+  def commit
+    @node_role = NodeRole.find_key params[:node_role_id]
+    @node_role.commit!
+    respond_to do |format|
+      format.html { redirect_to node_role_path(@node_role.id) }
+      format.json { render api_show @node_role }
+    end
+  end
+
+
   def retry
     params[:id] ||= params[:node_role_id]
     @node_role = NodeRole.find_key params[:id]
