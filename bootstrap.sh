@@ -8,7 +8,7 @@ if [[ $http_proxy && !$no_proxy ]] ; then
 fi
 
 prefix_recipes='recipe[barclamp],recipe[ohai],recipe[utils]'
-boot_recipes="$prefix_recipes,recipe[crowbar-bootstrap]"
+boot_recipes="$prefix_recipes,recipe[crowbar-bootstrap],recipe[crowbar-bootstrap::wsman]"
 database_recipes="$prefix_recipes,recipe[crowbar-bootstrap::postgresql],recipe[crowbar-bootstrap::goiardi]"
 proxy_recipes="$prefix_recipes,recipe[crowbar-squid]"
 

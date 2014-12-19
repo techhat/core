@@ -9,3 +9,5 @@ default["bootstrap"]["goiardi"]["repo"] = "github.com/ctdk/goiardi"
 default["bootstrap"]["goiardi"]["port"] = 4646
 default["bootstrap"]["goiardi"]["protocol"] = "http"
 default["bootstrap"]["sws"] = "github.com/VictorLowther/sws"
+default["bootstrap"]["openwsman"]["repo"]="https://github.com/openwsman/openwsman"
+default["bootstrap"]["openwsman"]["version"]="v2.4.12"

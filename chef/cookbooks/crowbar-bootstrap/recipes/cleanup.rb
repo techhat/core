@@ -9,13 +9,14 @@ bash "Upgrade all the things" do
 end
 
 [
- "/root/.ssh",
- "/home/crowbar/.ssh",
- "/var/cache/crowbar/rails-cache",
- "/var/log/crowbar",
- "/var/cache/yum",
- "/var/cache/apt/archives",
- "/rpmbuild"
+  "/root/.ssh",
+  "/root/openwsman",
+  "/home/crowbar/.ssh",
+  "/var/cache/crowbar/rails-cache",
+  "/var/log/crowbar",
+  "/var/cache/yum",
+  "/var/cache/apt/archives",
+  "/rpmbuild"
 ].each do |target|
   directory target do
     action :delete
