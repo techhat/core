@@ -36,10 +36,7 @@ else
     exit 1
 fi
 
-which curl &>/dev/null || \
-    install_prereqs
-which chef-solo &>/dev/null || \
-    yum -y install http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.16.4-1.el6.x86_64.rpm
+which chef-solo &>/dev/null || install_prereqs
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${boot_recipes}" || {
     echo "Chef-solo bootstrap run failed"
     exit 1
