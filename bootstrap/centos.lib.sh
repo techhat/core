@@ -7,7 +7,5 @@ install_prereqs() {
         .  <(locale)
     fi
     yum -y install curl which
-    which chef-solo || \
-        yum -y install \
-        http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.12.8-2.el6.x86_64.rpm
+    yum -y install http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.16.4-1.el6.x86_64.rpm
 }
