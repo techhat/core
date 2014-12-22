@@ -165,8 +165,8 @@ when "centos","redhat","suse","opensuse","fedora"
   end if !File.file?("/etc/sysconfig/network")
   # We want a better Ruby on the admin nodes, but should not muck up
   # all the other nodes.
-  if %w{centos-6.5 redhat-6.5}.member?(os_token)
-    repos << "bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/el6"
+  if /^(centos|redhat)-6/ =~ os_token
+    repos << "bare ruby 20 http://opencrowbar.s3-website-us-east-1.amazonaws.com/ruby"
   end
   repos.each do |repo|
     rtype,rdest = repo.split(" ",2)
