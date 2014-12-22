@@ -424,7 +424,7 @@ rpms:
       - httpd-devel
       - mod_fcgid
       - mod_ssl
-  centos-7.0:
+  centos-7.0.1406:
     raw_pkgs:
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.16.4-1.el6.x86_64.rpm
@@ -597,6 +597,7 @@ rpms:
     # To extract ISO images without needing a loopback mount.
     - bsdtar
     - git
+    - patch
   build_pkgs:
     - make
     - gcc
