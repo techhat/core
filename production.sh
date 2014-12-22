@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-set -e
 date
 export RAILS_ENV=production
 [[ $1 ]] || {
@@ -23,6 +22,7 @@ export RAILS_ENV=production
 
 cd /opt/opencrowbar/core
 . ./bootstrap.sh
+set -e
 if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
     export upstream_proxy=$http_proxy
 fi

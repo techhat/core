@@ -1,0 +1,11 @@
+default["bootstrap"]["tracedir"] = "/var/cache/crowbar-bootstrap"
+default["bootstrap"]["crowbar_yml"]= "/opt/opencrowbar/core/crowbar.yml"
+default["bootstrap"]["sledgehammer"]["url"] = "http://opencrowbar.s3-website-us-east-1.amazonaws.com/sledgehammer"
+default["bootstrap"]["sledgehammer"]["signature"] = "0f61af2f6be9288d5529e15aa223e036730a8387"
+default["bootstrap"]["tftproot"] = "/tftpboot"
+default["bootstrap"]["goball"] = "go1.3.3.linux-amd64.tar.gz"
+default["bootstrap"]["gopath"] = "/root/go"
+default["bootstrap"]["goiardi"]["repo"] = "github.com/ctdk/goiardi"
+default["bootstrap"]["goiardi"]["port"] = 4646
+default["bootstrap"]["goiardi"]["protocol"] = "http"
+default["bootstrap"]["sws"] = "github.com/VictorLowther/sws"

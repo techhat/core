@@ -18,9 +18,12 @@ roles:
     jig: script
     description: 'Provides a chef-server instance.'
     attribs:
-      - name: chef-server_deploy
-        description: 'Whether to deploy our own chef server or not.'
-        map: 'chefjig/server/deploy'
+      - name: chef-server_port
+        description: "The TCP port that the chef server is listening on"
+        map: 'chefjig/server/port'
+      - name: chef-server_protocol
+        description: "The protocol used to talk to the chef server"
+        map: 'chefjig/server/protocol'
       - name: chef-server_url
         description: 'URL that clients should use to talk to the chef server'
         map: 'chefjig/server/url'

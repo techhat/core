@@ -18,8 +18,13 @@
 #
 #
 
-crowbar_yml = "/opt/opencrowbar/core/crowbar.yml"
-sledgehammer_signature = "0f61af2f6be9288d5529e15aa223e036730a8387"
+tracedir=node["bootstrap"]["tracedir"]
+directory tracedir do
+  recursive true
+end
+
+crowbar_yml = node["bootstrap"]["crowbar_yml"]
+sledgehammer_signature = node["bootstrap"]["sledgehammer"]["signature"]
  
 unless File.exists?(crowbar_yml)
   raise "No crowbar checkout to bootstrap!"
@@ -40,8 +45,8 @@ unless prereqs["os_support"].member?(os_token)
   raise "Cannot install crowbar on #{os_token}!  Can only install on one of #{prereqs["os_support"].join(" ")}"
 end
 
-tftproot = "/tftpboot"
-sledgehammer_url="http://opencrowbar.s3-website-us-east-1.amazonaws.com/sledgehammer/#{sledgehammer_signature}"
+tftproot = node["bootstrap"]["tftproot"]
+sledgehammer_url="#{node["bootstrap"]["sledgehammer"]["url"]}/#{sledgehammer_signature}"
 sledgehammer_dir="#{tftproot}/sledgehammer/#{sledgehammer_signature}"
 
 repos = []
@@ -129,7 +134,7 @@ unless proxies.empty?
   end
 end
 
-file "/tmp/install_pkgs" do
+file "#{tracedir}/install_pkgs" do
   action :nothing
 end
 
@@ -138,10 +143,10 @@ template "/etc/gemrc" do
   variables(:proxy => ENV["http_proxy"])
 end
 
-template "/tmp/required_pkgs" do
+template "#{tracedir}/required_pkgs" do
   source "required_pkgs.erb"
   variables( :pkgs => pkgs )
-  notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+  notifies :create_if_missing, "file[#{tracedir}/install_pkgs]",:immediately
 end
 
 repofile_path = case node["platform"]
@@ -155,7 +160,7 @@ when "debian","ubuntu"
   template "/etc/apt/sources.list.d/crowbar.list" do
     source "crowbar.list.erb"
     variables( :repos => repos )
-    notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+    notifies :create_if_missing, "file[#{tracedir}/install_pkgs]",:immediately
   end
 when "centos","redhat","suse","opensuse","fedora"
   # Docker images do not have this, but the postgresql init script insists on it being present.
@@ -174,15 +179,15 @@ when "centos","redhat","suse","opensuse","fedora"
     when "rpm"
       rpm_file = rdest.split("/")[-1]
       bash "Install #{rpm_file}" do
-        code "rpm -Uvh /tmp/#{rpm_file}"
+        code "rpm -Uvh #{tracedir}/#{rpm_file}"
         action :nothing
         ignore_failure true
-        notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+        notifies :create_if_missing, "file[#{tracedir}/install_pkgs]",:immediately
       end
 
       bash "Fetch #{rpm_file}" do
-        code "curl -fgL -o '/tmp/#{rpm_file}' '#{rdest}'"
-        not_if "test -f '/tmp/#{rpm_file}'"
+        code "curl -fgL -o '#{tracedir}/#{rpm_file}' '#{rdest}'"
+        not_if "test -f '#{tracedir}/#{rpm_file}'"
         notifies :run, "bash[Install #{rpm_file}]",:immediately
       end
 
@@ -195,7 +200,7 @@ when "centos","redhat","suse","opensuse","fedora"
                   :repo_prio => rprio,
                   :repo_url => rurl
                   )
-        notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+        notifies :create_if_missing, "file[#{tracedir}/install_pkgs]",:immediately
       end
     when "repo"
       rurl,rname = rdest.split(" ",2)
@@ -206,7 +211,7 @@ when "centos","redhat","suse","opensuse","fedora"
                   :repo_prio => 20,
                   :repo_url => rurl
                   )
-        notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+        notifies :create_if_missing, "file[#{tracedir}/install_pkgs]",:immediately
       end
     else
       raise "#{node["platform"]}: Unknown repo type #{rtype}"
@@ -257,7 +262,7 @@ EOC
     template "/etc/apt/sources.list.d/crowbar.list" do
       source "crowbar.list.erb"
       variables( :repos => repos )
-      notifies :create_if_missing, "file[/tmp/install_pkgs]",:immediately
+      notifies :create_if_missing, "file[#{tracedir}/install_pkgs]",:immediately
     end
   else
     raise "Don't know how to create raw_pkgs repo on #{node["platform"]}"
@@ -266,12 +271,12 @@ end
 
 bash "Install required files" do
   code case node["platform"]
-       when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm /tmp/install_pkgs"
-       when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm /tmp/install_pkgs"
+       when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
+       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
+       when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
        else raise "Don't know how to install required files for #{node["platform"]}'"
        end
-  only_if do ::File.exists?("/tmp/install_pkgs") end
+  only_if do ::File.exists?("#{tracedir}/install_pkgs") end
 end
 
 extra_files.each do |f|
@@ -464,4 +469,71 @@ end
     link_type :symbolic
     to "../sledgehammer/#{sledgehammer_signature}/#{f}"
   end
+end
+
+goball=node["bootstrap"]["goball"]
+bash "Fetch and install Go" do
+  code <<EOC
+curl -fgL -o '/tmp/#{goball}' 'https://storage.googleapis.com/golang/#{goball}'
+tar -C '/usr/local' -xzf '/tmp/#{goball}'
+rm '/tmp/#{goball}'
+EOC
+  not_if { File.directory?("/usr/local/go") }
+end
+
+cookbook_file "/etc/profile.d/gopath.sh" do
+  action :create
+end
+
+bash "Install sqitch for database management" do
+  code <<EOC
+curl -L http://cpanmin.us | perl - --sudo App::cpanminus
+cpanm --quiet --notest App::Sqitch
+EOC
+  not_if "which sqitch"
+end
+
+ENV["GOPATH"]=node["bootstrap"]["gopath"]
+
+directory node["bootstrap"]["gopath"] do
+  action :create
+end
+
+goiardi_repo=node["bootstrap"]["goiardi"]["repo"]
+
+goiardi_src="#{ENV["GOPATH"]}/src/#{goiardi_repo}"
+
+bash "Fetch Goiardi Source" do
+  code "/usr/local/go/bin/go get -t '#{goiardi_repo}'"
+  not_if { File.directory?(goiardi_src) }
+end
+
+bash "Build and Install Goiardi" do
+  cwd goiardi_src
+  code "/usr/local/go/bin/go build && mv goiardi /usr/local/bin"
+  not_if "which goiardi"
+end
+
+%w{/etc/goiardi /var/cache/goiardi}.each do |d|
+  directory d do
+    action :create
+    recursive true
+  end
+end
+
+template "/etc/systemd/system/goiardi.service" do
+  only_if "test -d /etc/systemd/system"
+  source "goiardi.service.erb"
+end
+
+swsrepo=node["bootstrap"]["sws"]
+bash "Build stupid web server" do
+
+  code <<EOC
+/usr/local/go/bin/go get #{swsrepo}
+cd "$GOPATH/src/#{swsrepo}"
+/usr/local/go/bin/go build
+mv sws /usr/local/bin
+EOC
+  not_if "which sws"
 end
