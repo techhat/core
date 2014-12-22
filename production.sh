@@ -14,7 +14,6 @@
 # limitations under the License.
 
 set -e
-
 date
 export RAILS_ENV=production
 [[ $1 ]] || {
@@ -22,11 +21,11 @@ export RAILS_ENV=production
     exit 1
 }
 
+cd /opt/opencrowbar/core
+. ./bootstrap.sh
 if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
     export upstream_proxy=$http_proxy
 fi
-
-. ./bootstrap.sh
 # At the end of this we have a running proxy server.  Use it.
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
 chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${proxy_recipes}"

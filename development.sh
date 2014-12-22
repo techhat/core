@@ -27,6 +27,7 @@ if [[ $TMUX ]]; then
   echo 'Using TMUX > "export TMUX=false" to disable.'
 fi
 
+cd /opt/opencrowbar/core
 # setup & load env info
 . ./bootstrap.sh 
 
