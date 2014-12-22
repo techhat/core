@@ -18,9 +18,9 @@ source_url: "https://github.com/opencrowbar/core"
 
 os_support:
   - ubuntu-12.04
-  - redhat-6.5
-  - centos-6.5
-  - centos-7.0
+  - redhat-6.6
+  - centos-6.6
+  - centos-7.0.1406
   - opensuse-13.1
   - fedora-20
 
@@ -323,7 +323,7 @@ debs:
     - ntp
 
 rpms:
-  redhat-6.5:
+  redhat-6.6:
     raw_pkgs:
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.16.4-1.el6.x86_64.rpm
@@ -373,7 +373,7 @@ rpms:
       - mod_fcgid
       - mod_ssl
       - mod_wsgi
-  centos-6.5:
+  centos-6.6:
     raw_pkgs:
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-server-11.1.3-1.el6.x86_64.rpm
       - http://opscode-omnibus-packages.s3.amazonaws.com/el/6/x86_64/chef-11.16.4-1.el6.x86_64.rpm
