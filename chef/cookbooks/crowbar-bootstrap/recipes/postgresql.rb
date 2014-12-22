@@ -13,8 +13,17 @@ when "ubuntu","debian"
 when "centos","redhat"
   pg_conf_dir = "/var/lib/pgsql/9.3/data"
   bash "Init the postgresql database" do
-    code "service postgresql-9.3 initdb en_US.UTF-8"
+    code <<EOC
+su -l -c '/usr/pgsql-9.3/bin/initdb --locale=en_US.UTF-8 -D #{pg_conf_dir}' postgres
+EOC
     not_if do File.exists?("#{pg_conf_dir}/pg_hba.conf") end
+  end
+
+  if File.exists?("/usr/lib/systemd/system/postgresql-9.3.service") &&
+     File.exists?("/.dockerenv")
+    bash "Disable OOM disablement for Postgresql" do
+      code "sed 's/^OOM/#OOM/' </usr/lib/systemd/system/postgresql-9.3.service >/etc/systemd/system/postgresql-9.3.service"
+    end
   end
   service "postgresql" do
     service_name "postgresql-9.3"
