@@ -395,6 +395,9 @@ rpms:
       - gecode-devel
       - iproute
       - squid
+      - perl-devel
+      - perl-CPAN
+      - perl-DBD-Pg
     pkgs:
       # openldap stuff
       - openldap

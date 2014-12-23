@@ -21,6 +21,8 @@
 # Also note that this is pure evil in a can, and should really
 # be wrapped up in an RPM if we ever want to use it outside of Docker.
 
+return unless /^(redhat|centos)-7/ =~ "#{node[:platform]}-#{node[:platform_version]}"
+
 tracedir=node["bootstrap"]["tracedir"]
 directory tracedir do
   recursive true

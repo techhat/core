@@ -7,10 +7,26 @@ if [[ $http_proxy && !$no_proxy ]] ; then
     export no_proxy="127.0.0.1,localhost,::1"
 fi
 
-prefix_recipes='recipe[barclamp],recipe[ohai],recipe[utils]'
-boot_recipes="$prefix_recipes,recipe[crowbar-bootstrap],recipe[crowbar-bootstrap::wsman],recipe[crowbar-bootstrap::grub]"
-database_recipes="$prefix_recipes,recipe[crowbar-bootstrap::postgresql],recipe[crowbar-bootstrap::goiardi]"
-proxy_recipes="$prefix_recipes,recipe[crowbar-squid]"
+prefix_r=(recipe[barclamp]
+          recipe[ohai]
+          recipe[utils])
+boot_r=('recipe[crowbar-bootstrap]'
+        'recipe[crowbar-bootstrap::wsman]'
+        'recipe[crowbar-bootstrap::grub]'
+        'recipe[crowbar-bootstrap::sledgehammer]'
+        'recipe[crowbar-bootstrap::gemstuff]'
+        'recipe[crowbar-bootstrap::go]'
+        'recipe[crowbar-bootstrap::goiardi-build]'
+        'recipe[crowbar-bootstrap::sws-build]')
+database_r=('recipe[crowbar-bootstrap::postgresql]'
+            'recipe[crowbar-bootstrap::goiardi]')
+proxy_r=("${prefix_r[@]}"
+         'recipe[crowbar-squid]')
+
+prefix_recipes="${prefix_r[*]}"; prefix_recipes="${prefix_recipes// /,}";
+boot_recipes="${boot_r[*]}"; boot_recipes="${boot_recipes// /,}"
+database_recipes="${database_r[*]// /,}"; database_recipes="${database_recipes// /,}"
+proxy_recipes="${proxy_r[*]// /,}"; proxy_recipes="${proxy_recipes// /,}"
 
 cd /opt/opencrowbar/core
 # Figure out what we are running on.

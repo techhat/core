@@ -58,6 +58,11 @@ bash "Populate goiardi database" do
   code "sqitch deploy db:pg://goiardi@/goiardi"
 end
 
+template "/etc/init.d/goiardi" do
+  mode "0755"
+  source "goiardi.init.erb"
+end
+
 service "goiardi" do
   action [:enable, :start]
 end

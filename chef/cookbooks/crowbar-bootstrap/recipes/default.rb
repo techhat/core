@@ -18,13 +18,13 @@
 #
 #
 
-tracedir=node["bootstrap"]["tracedir"]
+tftproot = node["bootstrap"]["tftproot"]
+tracedir = node["bootstrap"]["tracedir"]
 directory tracedir do
   recursive true
 end
 
 crowbar_yml = node["bootstrap"]["crowbar_yml"]
-sledgehammer_signature = node["bootstrap"]["sledgehammer"]["signature"]
  
 unless File.exists?(crowbar_yml)
   raise "No crowbar checkout to bootstrap!"
@@ -44,10 +44,6 @@ os_pkg_type = case node["platform"]
 unless prereqs["os_support"].member?(os_token)
   raise "Cannot install crowbar on #{os_token}!  Can only install on one of #{prereqs["os_support"].join(" ")}"
 end
-
-tftproot = node["bootstrap"]["tftproot"]
-sledgehammer_url="#{node["bootstrap"]["sledgehammer"]["url"]}/#{sledgehammer_signature}"
-sledgehammer_dir="#{tftproot}/sledgehammer/#{sledgehammer_signature}"
 
 repos = []
 pkgs = []
@@ -100,6 +96,8 @@ extra_files.compact!
 extra_files.uniq!
 
 Chef::Log.debug(repos)
+
+node.normal[:bootstrap][:gems] = gems
 
 proxies = Hash.new
 ["http_proxy","https_proxy","no_proxy"].each do |p|
@@ -272,7 +270,7 @@ end
 bash "Install required files" do
   code case node["platform"]
        when "ubuntu","debian" then "apt-get -y update && apt-get -y --force-yes install #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
-       when "centos","redhat","fedora" then "yum -y makecache && yum -y install #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
+       when "centos","redhat","fedora" then "yum -y install #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
        when "suse","opensuse" then "zypper -n install --no-recommends #{pkgs.join(" ")} && rm #{tracedir}/install_pkgs"
        else raise "Don't know how to install required files for #{node["platform"]}'"
        end
@@ -395,145 +393,4 @@ end
 # Why does opensuse consider ping to be a security risk?
 bash "Allow everyone to ping" do 
   code "chmod u+s $(which ping) $(which ping6)"
-end
-
-gems.each do |gem|
-  bash "install gem #{gem}" do
-    code "gem install #{gem}"
-    not_if "gem list --local |grep -q '^#{gem}'"
-  end
-end
-
-directory "#{tftproot}/gemsite/gems" do
-  action :create
-  recursive true
-end
-
-bash "Create skeleton local gemsite" do
-  cwd "#{tftproot}/gemsite"
-  code "gem generate_index"
-  not_if "test -d '#{tftproot}/gemsite/quick'"
-end
-
-["/var/run/crowbar",
- "/var/cache/crowbar",
- "/var/cache/crowbar/cookbooks",
- "/var/cache/crowbar/gems",
- "/var/cache/crowbar/bin",
- "/var/log/crowbar"
-].each do |d|
-  directory d do
-    owner "crowbar"
-    action :create
-    recursive true
-  end
-end
-
-# warning for common error
-if File.exists?("/opt/opencrowbar/core/rails/Gemfile.lock")
-  Chef::Log.info("Using existing Gemfile.lock.  This will cause errors if Gemfile has been updated.  Delete lock and retry")
-end 
-
-bash "install required gems for Crowbar using Bundler" do
-  code "su -l -c 'cd /opt/opencrowbar/core/rails; bundle install --path /var/cache/crowbar/gems --standalone --binstubs /var/cache/crowbar/bin' crowbar"
-end
-
-directory "#{tftproot}/discovery" do
-  action :create
-end
-
-directory sledgehammer_dir do
-  action :create
-  recursive true
-end
-
-ruby_block "Download Sledgehammer #{sledgehammer_signature}" do
-  block do
-    files = ["initrd0.img","vmlinuz0","sha1sums"]
-    Dir.chdir(sledgehammer_dir) do |path|
-      unless File.file?("sha1sums")
-        files.each do |f|
-          dload = "#{sledgehammer_url}/#{f}"
-          Chef::Log.info("Downloading #{dload}")
-          raise("Cannot download #{dload}") unless system("curl -L -f -O '#{dload}'")
-        end
-      end
-      raise("Sledgehammer image at #{sledgehammer_dir} corrupt or nonexistent") unless system("sha1sum -c sha1sums")
-    end
-  end
-end
-
-["initrd0.img", "vmlinuz0"].each do |f|
-  link "#{tftproot}/discovery/#{f}" do
-    action :create
-    link_type :symbolic
-    to "../sledgehammer/#{sledgehammer_signature}/#{f}"
-  end
-end
-
-goball=node["bootstrap"]["goball"]
-bash "Fetch and install Go" do
-  code <<EOC
-curl -fgL -o '/tmp/#{goball}' 'https://storage.googleapis.com/golang/#{goball}'
-tar -C '/usr/local' -xzf '/tmp/#{goball}'
-rm '/tmp/#{goball}'
-EOC
-  not_if { File.directory?("/usr/local/go") }
-end
-
-cookbook_file "/etc/profile.d/gopath.sh" do
-  action :create
-end
-
-bash "Install sqitch for database management" do
-  code <<EOC
-curl -L http://cpanmin.us | perl - --sudo App::cpanminus
-cpanm --quiet --notest App::Sqitch
-EOC
-  not_if "which sqitch"
-end
-
-ENV["GOPATH"]=node["bootstrap"]["gopath"]
-
-directory node["bootstrap"]["gopath"] do
-  action :create
-end
-
-goiardi_repo=node["bootstrap"]["goiardi"]["repo"]
-
-goiardi_src="#{ENV["GOPATH"]}/src/#{goiardi_repo}"
-
-bash "Fetch Goiardi Source" do
-  code "/usr/local/go/bin/go get -t '#{goiardi_repo}'"
-  not_if { File.directory?(goiardi_src) }
-end
-
-bash "Build and Install Goiardi" do
-  cwd goiardi_src
-  code "/usr/local/go/bin/go build && mv goiardi /usr/local/bin"
-  not_if "which goiardi"
-end
-
-%w{/etc/goiardi /var/cache/goiardi}.each do |d|
-  directory d do
-    action :create
-    recursive true
-  end
-end
-
-template "/etc/systemd/system/goiardi.service" do
-  only_if "test -d /etc/systemd/system"
-  source "goiardi.service.erb"
-end
-
-swsrepo=node["bootstrap"]["sws"]
-bash "Build stupid web server" do
-
-  code <<EOC
-/usr/local/go/bin/go get #{swsrepo}
-cd "$GOPATH/src/#{swsrepo}"
-/usr/local/go/bin/go build
-mv sws /usr/local/bin
-EOC
-  not_if "which sws"
 end
