@@ -27,6 +27,9 @@ provisioner_r=("${prefix_r[@]",
                'recipe[crowbar-bootstrap::provisioner]')
 proxy_r=("${prefix_r[@]}"
          'recipe[crowbar-squid]')
+consul_r=('recipe[crowbar-bootstrap::consul]'
+          'recipe[consul::install]'
+          'recipe[consul::ui]')
 
 make_recipes() {
     local res="$(printf "%s,", "$@")"
@@ -41,6 +44,7 @@ node_recipes="$(make_recipes "#{node_r[@]}")"
 database_recipes="$(make_recipes "${database_r[@]}")"
 provisioner_recipes="$(make_recipes "${provisioner_r[@]}")"
 proxy_recipes="$(make_recipes "${proxy_r[@]}")"
+consul_recipes="$(make_recipes "${consul_r[@]}")"
 
 cd /opt/opencrowbar/core
 # Figure out what we are running on.
@@ -69,7 +73,3 @@ else
 fi
 
 which chef-solo &>/dev/null || install_prereqs
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${boot_recipes}" || {
-    echo "Chef-solo bootstrap run failed"
-    exit 1
-}

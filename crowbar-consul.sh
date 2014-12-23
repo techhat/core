@@ -19,8 +19,8 @@ date
 # setup & load env info
 . ./bootstrap.sh
 
-which consul && consul watch -service=crowbar-database -type=service  | grep -q Node && exit 0
+which consul && consul watch -service=consul -type=service  | grep -q Node && exit 0
 
 # install the database
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${consul_recipes}"
 

@@ -77,3 +77,17 @@ bash "create crowbar user for postgres" do
   not_if "sudo -H -u postgres -- psql postgres -tAc \"SELECT 1 FROM pg_roles WHERE rolname='crowbar'\" |grep -q 1"
 end
 
+# XXX: One day change this to listen on a non-unix domain socket.
+# XXX: One day store the username/password into the consul key/value store.
+# XXX: One day use encrypted keys to store the username and password
+
+bash "consul reload" do
+  code "consul reload"
+  action :nothing
+end
+
+template "/etc/consul.d/crowbar-database.json" do
+  source "crowbar-database.json.erb"
+  notifies :run, "bash[consul reload]", :immediately
+end
+
