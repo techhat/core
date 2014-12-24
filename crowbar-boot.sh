@@ -1,24 +1,23 @@
-#
-# Cookbook Name:: crowbar-bootstrap
-# Recipe:: node
-#
-# Copyright (C) 2014 Dell, Inc.
+#!/bin/bash
+# Copyright 2014, Victor Lowther
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
 # You may obtain a copy of the License at
 #
-# http://www.apache.org/licenses/LICENSE-2.0
+#  http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
 # distributed under the License is distributed on an "AS IS" BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#
-#
 
+set -e -x
+date
 
-# Eventually this will create the initial Crowbar configuration and node,
-# but for now it does nothing.
+# setup & load env info
+. ./bootstrap.sh
 
+# install the core app
+chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${boot_recipes}"

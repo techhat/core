@@ -17,10 +17,38 @@ set -e
 date
 
 . /etc/profile
+cd /opt/opencrowbar/core
 
-export CROWBAR_KEY=$(cat /etc/crowbar.install.key)
-export PATH=$PATH:/opt/opencrowbar/core/bin
-FQDN=`hostname -f`
+[[ $1 ]] || {
+    echo "Must pass the FQDN you want the admin node to have as the first argument!"
+    exit 1
+}
+
+FQDN=$1
+
+DOMAINNAME=${FQDN#*.}
+if [[ ! -f /.dockerenv ]]; then
+    HOSTNAME=${FQDN%%.*}
+    # Fix up the localhost address mapping.
+    sed -i -e "s/\(127\.0\.0\.1.*\)/127.0.0.1 $FQDN $HOSTNAME localhost.localdomain localhost/" /etc/hos
+    sed -i -e "s/\(127\.0\.1\.1.*\)/127.0.1.1 $FQDN $HOSTNAME localhost.localdomain localhost/" /etc/hos
+    # Fix Ubuntu/Debian Hostname
+    echo "$FQDN" > /etc/hostname
+    hostname $FQDN
+else
+    HOSTNAME=$(cat /etc/hostname)
+    FQDN="${HOSTNAME}.${DOMAINNAME}"
+fi
+
+export FQDN
+
+# Fix CentOs/RedHat Hostname
+if [ -f /etc/sysconfig/network ] ; then
+  sed -i -e "s/HOSTNAME=.*/HOSTNAME=$FQDN/" /etc/sysconfig/network
+fi
+
+# Set domainname (for dns)
+echo "$DOMAINNAME" > /etc/domainname
 
 if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
     export upstream_proxy=$http_proxy
@@ -123,6 +151,20 @@ for net in "${nets[@]}"; do
     ip addr add "$net" dev eth0 || :
     echo "${net%/*} $FQDN" >> /etc/hosts || :
 done
+
+# Now that we have shiny new IP addresses, make sure that Squid has the right
+# addresses in place for always_direct exceptions, and pick up the new proxy
+# environment variables.
+
+(
+    . bootstrap.sh
+    chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${proxy_recipes}"
+)
+. /etc/profile
+
+# Make sure that Crowbar is running with the proper environment variables
+service crowbar stop
+service crowbar start
 
 # flag allows you to stop before final step
 if ! [[ $* = *--zombie* ]]; then

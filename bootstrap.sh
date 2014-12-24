@@ -10,39 +10,31 @@ fi
 prefix_r=(recipe[barclamp]
           recipe[ohai]
           recipe[utils])
-boot_r=('recipe[crowbar-bootstrap:boot]')
-core_r=('recipe[crowbar-bootstrap::core]'
+boot_r=('recipe[crowbar-bootstrap::boot]'
         'recipe[crowbar-bootstrap::wsman]'
         'recipe[crowbar-bootstrap::grub]'
         'recipe[crowbar-bootstrap::sledgehammer]'
         'recipe[crowbar-bootstrap::gemstuff]'
         'recipe[crowbar-bootstrap::go]'
         'recipe[crowbar-bootstrap::goiardi-build]'
-        'recipe[crowbar-bootstrap::sws-build]')
-node_r=("${prefix_r[@]}",
-        'recipe[crowbar-bootstrap:node]')
+        'recipe[crowbar-bootstrap::sws-build]'
+        'recipe[crowbar-bootstrap::consul]'
+        'recipe[consul::install]'
+        'recipe[consul::ui]')
 database_r=('recipe[crowbar-bootstrap::postgresql]'
             'recipe[crowbar-bootstrap::goiardi]')
-provisioner_r=("${prefix_r[@]",
-               'recipe[crowbar-bootstrap::provisioner]')
 proxy_r=("${prefix_r[@]}"
          'recipe[crowbar-squid]')
-consul_r=('recipe[crowbar-bootstrap::consul]'
-          'recipe[consul::install]'
-          'recipe[consul::ui]')
+consul_r=('recipe[consul::start-service]')
 
 make_recipes() {
-    local res="$(printf "%s,", "$@")"
+    local res="$(printf "%s," "$@")"
     printf "${res%,}"
 }
 
-
 prefix_recipes="$(make_recipes "${prefix_r[@]}")"
 boot_recipes="$(make_recipes "${boot_r[@]}")"
-core_recipes="$(make_recipes "${core_r[@]}")"
-node_recipes="$(make_recipes "#{node_r[@]}")"
 database_recipes="$(make_recipes "${database_r[@]}")"
-provisioner_recipes="$(make_recipes "${provisioner_r[@]}")"
 proxy_recipes="$(make_recipes "${proxy_r[@]}")"
 consul_recipes="$(make_recipes "${consul_r[@]}")"
 

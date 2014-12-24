@@ -17,10 +17,14 @@ set -e
 date
 
 # setup & load env info
+if [[ ! -f /etc/profile.d/crowbar.sh ]]; then
+    cat > /etc/profile.d/crowbar.sh <<EOF
+if ! fgrep -q '/opt/opencrowbar/core/bin' < <(echo $PATH); then
+    export PATH=$PATH:/opt/opencrowbar/core/bin
+fi
+EOF
+fi
 . ./bootstrap.sh
-
-# install the core app
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${core_recipes}"
 
 export RAILS_ENV=production
 
