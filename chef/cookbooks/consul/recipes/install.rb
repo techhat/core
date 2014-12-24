@@ -35,4 +35,3 @@ mv consul /usr/local/bin
 EOC
   not_if { ::File.exists?("/usr/local/bin/consul") }
 end
-include_recipe 'consul::_service'
