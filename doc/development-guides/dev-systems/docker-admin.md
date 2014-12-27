@@ -114,7 +114,7 @@ able to install operating systems on slave nodes.  By default, the
 
  * `ubuntu-14.04`: `ubuntu-14.04.1-server-amd64.iso`
  * `centos-6.5`: `CentOS-6.5-x86_64-bin-DVD1.iso`
- * `centos-7.0`: `CentOS-7.0-1406-x86_64-DVD.iso`
+ * `centos-7.0.1406`: `CentOS-7.0-1406-x86_64-DVD.iso`
 
 > This list is subject to change!  For the latest list, consult [Provisioner Base Images](https://github.com/opencrowbar/core/blob/master/chef/roles/provisioner-base-images/role-template.json) template file.
 
