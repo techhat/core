@@ -24,7 +24,7 @@ action :add do
         owner "root"
         group "root"
         source "grub.cfg.erb"
-        variables(:append_line => new_resource.kernel_params,
+        variables(:append_line => "crowbar.fqdn=#{new_resource.name} #{new_resource.kernel_params}",
                   :initrd => new_resource.initrd,
                   :machine_key => node["crowbar"]["provisioner"]["machine_key"],
                   :kernel => new_resource.kernel)
