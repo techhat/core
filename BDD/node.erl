@@ -85,7 +85,7 @@ add_node(Name, Role, Params, Atom) ->
   bind(O#obj.id, Role),
   % add os choices for admin node
   case Role of
-    "crowbar-admin-node" -> node_role:available_os(O#obj.id, ["ubuntu-12.04","centos-6.5"]);
+    "crowbar-admin-node" -> node_role:available_os(O#obj.id, ["ubuntu-12.04","centos-6.6"]);
     _ -> noop
   end,
   % complete deploy

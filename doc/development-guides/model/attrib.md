@@ -41,7 +41,7 @@ and fields:
           enum:
             - ubuntu-12.04
             - redhat-6.5
-            - centos-6.5
+            - centos-6.6
 
 #### Attrib Fields
 
