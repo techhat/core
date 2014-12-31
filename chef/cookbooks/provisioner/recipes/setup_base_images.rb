@@ -32,9 +32,6 @@ node.normal["crowbar"]["provisioner"]["server"]["webserver"]=provisioner_web
 os_token="#{node["platform"]}-#{node["platform_version"]}"
 tftproot =  node["crowbar"]["provisioner"]["server"]["root"]
 discover_dir="#{tftproot}/discovery"
-pxecfg_dir="#{discover_dir}/pxelinux.cfg"
-uefi_dir=discover_dir
-pxecfg_default="#{pxecfg_dir}/default"
 
 # Build base sledgehammer kernel args
 sledge_args = Array.new
@@ -72,11 +69,6 @@ unless node.normal["crowbar"]["provisioner"]["server"]["repositories"]
 end
 node.normal["crowbar"]["provisioner"]["server"]["available_oses"] = Mash.new
 
-directory "#{pxecfg_dir}" do
-  action :create
-  recursive true
-end
-
 directory "#{tftproot}/nodes" do
   action :create
   recursive true
@@ -87,29 +79,14 @@ cookbook_file "#{tftproot}/nodes/start-up.sh" do
   action :create
 end
 
-template "#{pxecfg_dir}/default" do
+template "#{tftproot}/boot/grub/grub.cfg" do
   mode 0644
   owner "root"
   group "root"
-  source "default.erb"
+  source "default.grub.cfg.erb"
   variables(:append_line => "#{append_line} crowbar.state=discovery",
-            :install_name => "discovery",
-            :initrd => "initrd0.img",
             :machine_key => node["crowbar"]["provisioner"]["machine_key"],
-            :kernel => "vmlinuz0")
-end
-
-# Do uefi as well.
-template "#{uefi_dir}/elilo.conf" do
-  mode 0644
-  owner "root"
-  group "root"
-  source "default.elilo.erb"
-  variables(:append_line => "#{append_line} crowbar.state=discovery",
-            :install_name => "discovery",
-            :initrd => "initrd0.img",
-            :machine_key => node["crowbar"]["provisioner"]["machine_key"],
-            :kernel => "vmlinuz0")
+            :v4addr => v4addr.addr)
 end
 
 node["crowbar"]["provisioner"]["server"]["supported_oses"].each do |os,params|
@@ -280,8 +257,8 @@ EOC
   unless node["crowbar"]["provisioner"]["server"]["boot_specs"][os]
     node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os] = Mash.new
   end
-  node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os]["kernel"] = "../#{os}/install/#{kernel}"
-  node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os]["initrd"] = "../#{os}/install/#{initrd}"
+  node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os]["kernel"] = "#{os}/install/#{kernel}"
+  node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os]["initrd"] = "#{os}/install/#{initrd}"
   node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os]["os_install_site"] = os_install_site
   node.normal["crowbar"]["provisioner"]["server"]["boot_specs"][os]["kernel_params"] = append
 
@@ -302,31 +279,4 @@ EOC
       end
     end
   end
-end
-
-# Generate the appropriate pxe and uefi config files for discovery
-# These will only be used if we have not already discovered the system.
-
-package "syslinux"
-
-ruby_block "Install pxelinux.0" do
-  block do
-    ["share","lib"].each do |d|
-      next unless ::File.exists?("/usr/#{d}/syslinux/pxelinux.0")
-      ::Kernel.system("cp /usr/#{d}/syslinux/pxelinux.0 #{discover_dir}")
-    end
-  end
-  not_if do ::File.exists?("#{discover_dir}/pxelinux.0") end
-end
-
-bash "Install elilo as UEFI netboot loader" do
-  code <<EOC
-cd #{uefi_dir}
-tar xzf '#{tftproot}/files/elilo-3.16-all.tar.gz'
-mv elilo-3.16-x86_64.efi bootx64.efi
-mv elilo-3.16-ia32.efi bootia32.efi
-mv elilo-3.16-ia64.efi bootia64.efi
-rm elilo*.efi elilo*.tar.gz || :
-EOC
-  not_if "test -f '#{uefi_dir}/bootx64.efi'"
 end

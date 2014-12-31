@@ -24,9 +24,6 @@ os_token="#{node[:platform]}-#{node[:platform_version]}"
 tftproot = node["crowbar"]["provisioner"]["server"]["root"]
 discover_dir="#{tftproot}/discovery"
 node_dir="#{tftproot}/nodes"
-pxecfg_dir="#{discover_dir}/pxelinux.cfg"
-uefi_dir=discover_dir
-pxecfg_default="#{pxecfg_dir}/default"
 node.normal["crowbar_wall"] ||= Mash.new
 node.normal["crowbar_wall"]["dhcp"] ||= Mash.new
 node.normal["crowbar_wall"]["dhcp"]["clients"] ||= Mash.new
@@ -38,14 +35,10 @@ new_clients = {}
   nodeaddr = sprintf("%X",v4addr.address)
   bootenv = dhcp_info["bootenv"]
   mac_list = dhcp_info["mac_addresses"]
-  pxefile = "#{pxecfg_dir}/#{nodeaddr}"
-  uefifile = "#{uefi_dir}/#{nodeaddr}.conf"
   new_clients[mnode_name] = {
     "v4addr" => dhcp_info["v4addr"],
     "nodeaddr" => nodeaddr,
     "mac_addresses" => mac_list,
-    "pxefile" => pxefile,
-    "uefifile" => uefifile
   }
   # Generate an appropriate control.sh for the system.
   directory "#{node_dir}/#{mnode_name}" do
@@ -55,12 +48,22 @@ new_clients = {}
   Chef::Log.info("DHCP: #{mnode_name} Updating PXE and UEFI boot for bootenv #{bootenv}")
   # Default to creating appropriate boot config files for Sledgehammer.
   case bootenv
+  when "local"
+    mac_list.each_index do |idx|
+      ["#{tftproot}/nodes/#{mac_list[idx].downcase}.grub",
+       "#{tftproot}/nodes/#{mac_list[idx].upcase}.grub"].each do |grubfile|
+        template grubfile do
+          source "grub.local.erb"
+          action "create"
+        end
+      end
+    end
   when "sledgehammer"
     pxe_params = node["crowbar"]["provisioner"]["server"]["sledgehammer_kernel_params"].split(' ')
     pxe_params << "crowbar.fqdn=#{mnode_name}"
     provisioner_bootfile mnode_name do
       kernel_params pxe_params.join(" ")
-      address v4addr
+      address mac_list
       bootenv "sledgehammer"
       action :add
     end
@@ -76,17 +79,11 @@ new_clients = {}
                 :v4_addr => node.address("admin",IP::IP4).addr
                 )
     end
-  when "local"
-    provisioner_bootfile mnode_name do
-      bootenv "sledgehammer"
-      address v4addr
-      action :remove
-    end
   when "ubuntu-12.04-install"
     provisioner_debian mnode_name do
       distro "ubuntu"
       version "12.04"
-      address v4addr
+      address mac_list
       target mnode_name
       action :add
     end
@@ -94,15 +91,15 @@ new_clients = {}
     provisioner_debian mnode_name do
       distro "ubuntu"
       version "14.04"
-      address v4addr
+      address mac_list
       target mnode_name
       action :add
     end
-  when "centos-6.5-install"
+  when "centos-6.6-install"
     provisioner_redhat mnode_name do
       distro "centos"
-      version "6.5"
-      address v4addr
+      version "6.6"
+      address mac_list
       target mnode_name
       action :add
     end
@@ -110,7 +107,7 @@ new_clients = {}
     provisioner_redhat mnode_name do
       distro "redhat"
       version "6.5"
-      address v4addr
+      address mac_list
       target mnode_name
       action :add
     end
@@ -118,7 +115,7 @@ new_clients = {}
     provisioner_fedora mnode_name do
       distro "fedora"
       version "20"
-      address v4addr
+      address mac_list
       target mnode_name
       action :add
     end
@@ -126,35 +123,31 @@ new_clients = {}
     provisioner_fedora mnode_name do
       distro "redhat"
       version "7.0"
-      address v4addr
+      address mac_list
       target mnode_name
       action :add
     end
-  when "centos-7.0-install"
+  when "centos-7.0.1406-install"
     provisioner_fedora mnode_name do
       distro "centos"
-      version "7.0"
-      address v4addr
+      version "7.0.1406"
+      address mac_list
       target mnode_name
       action :add
     end
   else
     Chef::Log.info("Not messing with boot files for bootenv #{bootenv}")
   end
-  # Create pxe and uefi netboot files.
-  # We always need our FQDN.
   mac_list.each_index do |idx|
     if bootenv == "local"
       dhcp_opts = []
     else
       dhcp_opts = [
-                   '  if option arch = 00:06 {
-      filename = "discovery/bootia32.efi";
-   } else if option arch = 00:07 {
-      filename = "discovery/bootx64.efi";
+"  if option arch = 00:07 or option arch = 00:09 {
+      filename = \"grub-x86_64.efi\";
    } else {
-      filename = "discovery/pxelinux.0";
-   }',
+      filename = \"grub.pxe\";
+   }",
                    "next-server #{provisioner_addr}"]
     end
     dhcp_host "#{mnode_name}-#{idx}" do
@@ -186,7 +179,7 @@ end
   end
   a = provisioner_bootfile old_node["bootenv"] do
     action :nothing
-    address IP.coerce(old_node["v4addr"])
+    address mac_list
   end
   a.run_action(:remove)
   a = directory "#{node_dir}/#{old_node_name}" do

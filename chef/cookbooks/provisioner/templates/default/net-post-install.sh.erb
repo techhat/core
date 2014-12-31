@@ -83,7 +83,21 @@ elif [[ -f /etc/crowbar.install.key ]]; then
     export CROWBAR_KEY="$(cat /etc/crowbar.install.key)"
 fi
 
-HOSTNAME=$(hostname -f)
+hostname_re='crowbar\.fqdn=([^ ]+)'
+if [[ $(cat /proc/cmdline) =~ $hostname_re ]]; then
+   HOSTNAME=${BASH_REMATCH[1]}
+   if [ -f /etc/sysconfig/network ] ; then
+      sed -i -e "s/HOSTNAME=.*/HOSTNAME=${HOSTNAME}/" /etc/sysconfig/network
+    fi
+    echo "${HOSTNAME#*.}" >/etc/domainname
+else
+    echo "Cannot set hostname, we fail."
+    sleep 999
+    reboot -f
+fi
+echo "$HOSTNAME" >/etc/hostname
+hostname "$HOSTNAME"
+
 
 export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 export LC_ALL=C LANGUAGE=C LANG=C

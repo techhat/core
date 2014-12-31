@@ -54,6 +54,7 @@ en:
       network-storage: "Storage Network"
       network-bmc: "Managment Network"
       network-pilot: "Pilot Network"
+      network-lldpd: "LLDPD Network Service"
   networks:
     index:
       title: "Installed Networks"

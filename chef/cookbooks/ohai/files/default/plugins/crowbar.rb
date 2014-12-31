@@ -56,38 +56,11 @@ end
 
 crowbar_ohai[:switch_config] ||= Mash.new
 
-# Packet captures are cached from previous runs; however this requires
-# the use of predictable pathnames. To prevent this becoming a security
-# risk, we create a dedicated directory and ensure that we own it and
-# it's not writable by anyone else.
-#
-# See https://bugzilla.novell.com/show_bug.cgi?id=774967
-@tcpdump_dir = '/tmp/ohai-tcpdump'
-
-begin
-  Dir.mkdir(@tcpdump_dir, 0700)
-rescue Errno::EEXIST
-  # already created by previous run
-rescue
-  raise "Failed to mkdir #{@tcpdump_dir}: #$!"
-end
-
-me = Etc.getpwuid(Process.uid).name
-unless File.owned? @tcpdump_dir
-  raise "#{@tcpdump_dir} must be owned by #{me}"
-end
-File::chmod(0700, @tcpdump_dir)
-
-def tcpdump_file(network)
-  Pathname(@tcpdump_dir) + "#{network}.out"
-end
-
 networks = []
 mac_map = {}
 bus_found=false
 logical_name=""
 mac_addr=""
-wait=false
 Dir.foreach("/sys/class/net") do |entry|
   next if entry =~ /\./
   # We only care about actual physical devices.
@@ -119,57 +92,6 @@ Dir.foreach("/sys/class/net") do |entry|
   f.close
   #Chef::Log.debug("MAC is #{mac_addr.strip}")
 
-  tcpdump_out = tcpdump_file(logical_name)
-  #Chef::Log.debug("tcpdump to: #{tcpdump_out}")
-
-  if ! File.exists? tcpdump_out
-    cmd = "ifconfig #{logical_name} up ; tcpdump -c 1 -lv -v -i #{logical_name} -a -e -s 1514 ether proto 0x88cc > #{tcpdump_out}"
-    #Chef::Log.debug("cmd: #{cmd}")
-    System.background_time_command(45, true, logical_name, cmd)
-    wait=true
-  end
-end
-system("sleep 45") if wait
-
-networks.each do |network|
-  tcpdump_out = tcpdump_file(network)
-
-  sw_unit = -1
-  sw_port = -1
-  sw_port_name = nil
-
-  line = IO.readlines(tcpdump_out).grep(/Subtype Local|Subtype Interface Name/).join ''
-  #Chef::Log.debug("subtype intf name line: #{line}")
-  if line =~ %r!(\d+)/\d+/(\d+)!
-    sw_unit, sw_port = $1, $2
-  end
-  if line =~ /: Unit (\d+) Port (\d+)/
-    sw_unit, sw_port = $1, $2
-  end
-  if line =~ /: g(\d+)/
-    sw_unit, sw_port = 0, $1
-  end
-  if line =~ %r!: (\S+ (\d+)/(\d+))!
-    sw_port_name, sw_unit, sw_port = $1, $2, $3
-  else
-    sw_port_name = "#{sw_unit}/0/#{sw_port}"
-  end
-
-  sw_name = -1
-  # Using mac for now, but should change to something else later.
-  line = IO.readlines(tcpdump_out).grep(/Subtype MAC address/).join ''
-  #Chef::Log.debug("subtype MAC line: #{line}")
-  if line =~ /: (.*) \(oui/
-    sw_name = $1
-  end
-
-  crowbar_ohai[:switch_config][network] = Mash.new unless crowbar_ohai[:switch_config][network]
-  crowbar_ohai[:switch_config][network][:interface] = network
-  crowbar_ohai[:switch_config][network][:mac] = mac_map[network].downcase
-  crowbar_ohai[:switch_config][network][:switch_name] = sw_name
-  crowbar_ohai[:switch_config][network][:switch_port] = sw_port
-  crowbar_ohai[:switch_config][network][:switch_port_name] = sw_port_name
-  crowbar_ohai[:switch_config][network][:switch_unit] = sw_unit
 end
 
 crowbar_ohai[:disks] ||= Mash.new

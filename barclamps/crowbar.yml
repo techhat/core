@@ -27,6 +27,7 @@ roles:
       - provisioner-dhcp-database
       - provisioner-repos
       - provisioner-docker-setup
+      - network-lldpd
     conflicts:
       - crowbar-managed-node
     provides:
@@ -42,6 +43,7 @@ roles:
       - dns-client
       - logging-client
       - ntp-client
+      - network-lldpd
   - name: crowbar-hardware-configured
     description: "Crowbar Harware Configured Checkpoint"
     jig: noop

@@ -26,11 +26,11 @@
                         "iso_file": "RHEL6.5-20131111.0-Server-x86_64-DVD1.iso",
                         "append": "method=%os_install_site%"
                     },
-                    "centos-6.5": {
+                    "centos-6.6": {
                         "initrd": "images/pxeboot/initrd.img",
                         "kernel": "images/pxeboot/vmlinuz",
                         "append": "method=%os_install_site%",
-                        "iso_file": "CentOS-6.5-x86_64-bin-DVD1.iso",
+                        "iso_file": "CentOS-6.6-x86_64-bin-DVD1.iso",
                         "online_mirror": "http://mirrors.kernel.org/centos/6/"
                     },
                     "redhat-7.0": {
@@ -39,7 +39,7 @@
                         "iso_file": "rhel-server-7.0-x86_64-dvd.iso",
                         "append": "method=%os_install_site% inst.geoloc=0"
                     },
-                    "centos-7.0": {
+                    "centos-7.0.1406": {
                         "initrd": "images/pxeboot/initrd.img",
                         "kernel": "images/pxeboot/vmlinuz",
                         "append": "method=%os_install_site% inst.geoloc=0",

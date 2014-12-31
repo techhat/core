@@ -26,6 +26,7 @@
   "network-public":"network",
   "network-bmc":"network",
   "network-pilot":"network",
+  "network-lldpd":"network",
   "ntp-server": "core",
   "ntp-client": "clients",
   "packstack-installed-node":"hide",

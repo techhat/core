@@ -101,7 +101,7 @@ bash "Increase squid start timeout" do
 end
 
 service "squid" do
-  reload_command "squid -k reconfigure"
+  reload_command "squid -k reconfigure || :"
   action [:enable, :start]
 end
 

@@ -17,13 +17,13 @@ class BarclampChef::Server < Role
 
   def sysdata(nr)
     addr = nr.node.addresses.detect{|addr|addr.v4?}.addr
+    port = Attrib.get("chef-server_port",nr.role)
+    protocol = Attrib.get("chef-server_protocol",nr.role)
     { "chefjig" => {
         "server" => {
           "fqdn" => nr.node.name,
           "address" => addr,
-          "url" => "https://#{addr}",
-          "deploy" => true,
-          "client-name" => "crowbar"
+          "url" => "#{protocol}://#{addr}:#{port}"
         }
       }
     }

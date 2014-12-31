@@ -58,8 +58,8 @@ done
 
 export OCBDIR="${OCBDIR%/core/tools/kvm-admin}"
 
-admin_server_loc="$HOME/.cache/opencrowbar/tftpboot/centos-6.5"
-admin_server_iso="$HOME/.cache/opencrowbar/tftpboot/isos/CentOS-6.5-x86_64-bin-DVD1.iso"
+admin_server_loc="$HOME/.cache/opencrowbar/tftpboot/centos-6.6"
+admin_server_iso="$HOME/.cache/opencrowbar/tftpboot/isos/CentOS-6.6-x86_64-bin-DVD1.iso"
 . "$OCBDIR/core/tools/kvm_lib.sh"
 TMPDIR=$(mktemp -d /tmp/ocb-kvm-admin-XXXXXX)
 
@@ -138,8 +138,8 @@ exec > /mnt/sysimage/root/post-install.log 2>&1
 set -x
 mkdir -p /mnt/sysimage/opt/opencrowbar
 tar -C /mnt/sysimage/opt/opencrowbar -xzf /ocb.tar.gz
-mkdir -p /mnt/sysimage/tftpboot/centos-6.5/install
-cp -a /mnt/source/. /mnt/sysimage/tftpboot/centos-6.5/install/.
+mkdir -p /mnt/sysimage/tftpboot/centos-6.6/install
+cp -a /mnt/source/. /mnt/sysimage/tftpboot/centos-6.6/install/.
 
 %post
 export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '

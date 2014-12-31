@@ -14,8 +14,26 @@ tools="${tools%/*}"
 
 . "$tools/tmux_lib.sh"
 
+if [[ ! $1 ]]; then
+    echo "First argument to $0 must be the address of the Crowbar admin node!"
+    exit 1
+fi
+if ! ssh "root@$1" -- test -x /opt/opencrowbar/core/bin/crowbar; then
+    echo "Crowbar not accessible at root@$1!"
+    exit 1
+fi
+echo "Crowbar admin accessble at root@$1"
+root="root@$1"
+
+if [[ ! $2 || ! ($2 =~ ^[0-9]+$) ]]; then
+    echo "Second argument to $0 must be the number of docker slaves to run!"
+    exit 1
+fi
+
+shift
+
 on_admin() {
-    ssh root@172.17.0.2 -- "$@"
+    ssh "$root" -- "$@"
 }
 crowbar() {
     on_admin /opt/opencrowbar/core/bin/crowbar "$@"
