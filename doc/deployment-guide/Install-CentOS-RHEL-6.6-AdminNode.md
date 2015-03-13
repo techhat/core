@@ -135,8 +135,7 @@ After logging in as root, run the following command (as an example) to
 install hardware support off of the latest master build:
 
 ```
-wget --no-check-certificate -O -
-https://raw.githubusercontent.com/opencrowbar/core/develop/tools/crowbar-install.sh | source /dev/stdin
+wget --no-check-certificate -O -https://raw.githubusercontent.com/opencrowbar/core/develop/tools/crowbar-install.sh | source /dev/stdin
 ```
 
 or if you don't want hardware support (bios, RAID, and IPMI) and the
@@ -144,8 +143,7 @@ develop builds, run the following command:
 
 ```
 wget --no-check-certificate -O -
-https://raw.githubusercontent.com/opencrowbar/core/develop/tools/crowbar-install.sh
-| source /dev/stdin --develop --without-hardware
+https://raw.githubusercontent.com/opencrowbar/core/develop/tools/crowbar-install.sh | source /dev/stdin --develop --without-hardware
 ```
 
 This will take a little bit of time.  Once complete, you will need to
@@ -161,11 +159,10 @@ updates, see below.
 
 ## OpenCrowbar Configuration
 
-Execute the following commands:
+Execute the following command:
 
 ```
-  cd /opt/opencrowbar/core
-  ./production.sh &lt;FQDN of the admin node&gt;
+  /opt/opencrowbar/core/production.sh &lt;FQDN of the admin node&gt;
 ```
 
 Once this is complete, the admin node is configured.  Don't worry about
@@ -192,8 +189,7 @@ replace the system.
   1. yum erase opencrowbar-core
   1. yum install -y opencrowbar-core
   1. yum install -y opencrowbar-hardware # If you want hardware support
-  1. cd /opt/opencrowbar/core
-  1. ./production.sh &lt;FQDN&gt;
+  1. /opt/opencrowbar/core/production.sh &lt;FQDN&gt;
   1. Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
 
 ## Known Limitations:
