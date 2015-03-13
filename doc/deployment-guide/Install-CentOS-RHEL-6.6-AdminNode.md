@@ -126,7 +126,7 @@ order):
    * Select release (if not specificed, it is master).  The following options:
       * --develop - Use RPMs built from the develop tree.
       * --master - Use RPMs built from the master tree. This is same as not specified.
-      * --release <name> - Use RPMs built from the release <name> tree.
+      * --release &lt;name&gt; - Use RPMs built from the release &lt;name&gt; tree.
    * --without-hardware - Don't install the hardware RPM
    * --download-os - This will download the Centos-7.0.1406 ISO for
 installation of nodes. By default, this is not done.
@@ -165,7 +165,7 @@ Execute the following commands:
 
 ```
   cd /opt/opencrowbar/core
-  ./production.sh <FQDN of the admin node>
+  ./production.sh &lt;FQDN of the admin node&gt;
 ```
 
 Once this is complete, the admin node is configured.  Don't worry about
@@ -193,7 +193,7 @@ replace the system.
   1. yum install -y opencrowbar-core
   1. yum install -y opencrowbar-hardware # If you want hardware support
   1. cd /opt/opencrowbar/core
-  1. ./production.sh <FQDN>
+  1. ./production.sh &lt;FQDN&gt;
   1. Launch your web browser and connect to the IP address of the Admin node on port 3000 using a browser of choice (Google Chrome, or Internet Explorer) URL:http://192.168.124.10:3000
 
 ## Known Limitations:
