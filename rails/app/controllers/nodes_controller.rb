@@ -26,13 +26,19 @@ class NodesController < ApplicationController
               Node.all
             end
     respond_to do |format|
-      format.html { }
+      format.html { @list.delete_if { |n| n.system }}
       format.json { render api_index Node, @list }
     end
   end
   
+  # API /api/status/nodes(/:id)
   def status
-    nodes = Node.all
+    nodes = if params[:id]
+      node = Node.find_key params[:id]
+      nodes = Node.where :id=>node.id
+    else
+      nodes = Node.all
+    end
     status = {}
     nodes.each do |n|
       state = n.state
@@ -83,16 +89,25 @@ class NodesController < ApplicationController
   end
 
   def power
-    params.require(:poweraction)
     @node = Node.find_key(params[:id] || params[:name] || params[:node_id])
-    @poweraction = params[:poweraction].to_sym
-    render :json => {
-      "id" => @node.id,
-      "action" => params[:poweraction],
-      "result" => @node.power.send(@poweraction)
-    },
-    :status => 200,
-    :content_type => cb_content_type(:json,"result")
+    if request.put?
+      params.require(:poweraction)
+      @poweraction = params[:poweraction].to_sym
+      if @node.power.include? @poweraction
+        result = @node.power.send(@poweraction) rescue nil
+        # special case for development
+        if result.nil? 
+          render api_not_implemented(@poweraction, "see logs for internal error") unless Rails.env.development?
+          result = "development faked"
+        end
+        render api_result({"id" => @node.id, "action" => @poweraction, "result" => result })
+      else
+        render api_not_implemented @node, @poweraction, @node.power.keys
+      end
+    elsif request.get?
+      render api_array @node.power
+    end
+      
   end
 
   def debug
@@ -107,6 +122,10 @@ class NodesController < ApplicationController
     node_action :redeploy!
   end
 
+  def propose
+    node_action :propose!
+  end
+  
   def commit
     node_action :commit!
   end
@@ -125,6 +144,7 @@ class NodesController < ApplicationController
                                          :deployment_id,
                                          :allocated,
                                          :alive,
+                                         :system,
                                          :available,
                                          :bootenv))
       # Keep suport for mac and ip hints in short form around for legacy Sledgehammer purposes

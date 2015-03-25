@@ -15,3 +15,7 @@ else
 fi
 
 /etc/init.d/crowbar start
+# Wait for the webserver to be ready.
+while ! /opt/opencrowbar/core/bin/crowbar -U crowbar -P crowbar users list; do
+    sleep 1
+done

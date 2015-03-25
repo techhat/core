@@ -29,6 +29,7 @@ web_port = node["crowbar"]["provisioner"]["server"]["web_port"]
 use_local_security = node["crowbar"]["provisioner"]["server"]["use_local_security"]
 provisioner_web="http://#{v4addr.addr}:#{web_port}"
 node.normal["crowbar"]["provisioner"]["server"]["webserver"]=provisioner_web
+machine_key = node["crowbar"]["provisioner"]["machine_key"]
 os_token="#{node["platform"]}-#{node["platform_version"]}"
 tftproot =  node["crowbar"]["provisioner"]["server"]["root"]
 discover_dir="#{tftproot}/discovery"
@@ -63,6 +64,15 @@ append_line = node["crowbar"]["provisioner"]["server"]["sledgehammer_kernel_para
 # If the comitted proposal has a defualt, try it.
 # Otherwise use the OS the provisioner node is using.
 
+bash "Set up selinux contexts for #{tftproot}" do
+  code <<EOC
+semanage fcontext -a -f '' -t public_content_t "#{tftproot}"
+semanage fcontext -a -f '' -t public_content_t "#{tftproot}(/.*)?"
+EOC
+  only_if "which selinuxenabled && selinuxenabled"
+  not_if "ls -adZ #{tftproot} |grep -q public_content_t"
+end
+
 unless default = node["crowbar"]["provisioner"]["server"]["default_os"]
   node.normal["crowbar"]["provisioner"]["server"]["default_os"] = default = os_token
 end
@@ -92,7 +102,7 @@ template "#{pxecfg_dir}/default" do
   owner "root"
   group "root"
   source "default.erb"
-  variables(:append_line => "#{append_line} crowbar.state=discovery",
+  variables(:append_line => "#{append_line} crowbar.state=discovery crowbar.install.key=#{machine_key}",
             :install_name => "discovery",
             :initrd => "initrd0.img",
             :machine_key => node["crowbar"]["provisioner"]["machine_key"],
@@ -255,7 +265,7 @@ EOC
     '%os_site%'         => web_path,
     '%os_install_site%' => os_install_site
   }
-  append = params["append"]
+  append = params["append"] || ""
 
   # Sigh.  There has to be a more elegant way.
   replaces.each { |k,v|
@@ -330,3 +340,9 @@ rm elilo*.efi elilo*.tar.gz || :
 EOC
   not_if "test -f '#{uefi_dir}/bootx64.efi'"
 end
+
+bash "Restore selinux contexts for #{tftproot}" do
+  code "restorecon -R -F #{tftproot}"
+  only_if "which selinuxenabled && selinuxenabled"
+end
+

@@ -89,8 +89,8 @@ class NodeRole < ActiveRecord::Base
                           :delete_sql => "SELECT 1") # TODO: Figure out how to remove
 
   # Parent and child links based on noderole -> noderole attribute dependency.
-  has_many        :parent_attrib_links, class_name: "NodeRoleAttribLink", foreign_key: "child_id"
-  has_many        :child_attrib_links,  class_name: "NodeRoleAttribLink", foreign_key: "parent_id"
+  has_many        :parent_attrib_links, class_name: "NodeRoleAttribLink", foreign_key: "child_id", :dependent => :destroy
+  has_many        :child_attrib_links,  class_name: "NodeRoleAttribLink", foreign_key: "parent_id", :dependent => :destroy
 
   # State transitions:
   # All node roles start life in the PROPOSED state.
@@ -571,6 +571,7 @@ class NodeRole < ActiveRecord::Base
       Run.run!
     end
     if active?
+      node.halt_if_bored(self) if role.powersave
       NodeRole.transaction do
         # Immediate children of an ACTIVE node go to TODO
         children.where(state: BLOCKED).each do |c|

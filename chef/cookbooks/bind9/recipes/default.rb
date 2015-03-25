@@ -23,14 +23,14 @@ when "redhat","centos"
     source "redhat-sysconfig-named.erb"
     mode 0644
     owner "root"
-    variables :options => { "OPTIONS" => "-c /etc/bind/named.conf" }
+    variables :options => { "OPTIONS" => "-c /etc/named.conf" }
   end
 when "suse"
   template "/etc/sysconfig/named" do
     source "suse-sysconfig-named.erb"
     mode 0644
     owner "root"
-    variables :options => { "NAMED_ARGS" => "-c /etc/bind/named.conf" }
+    variables :options => { "NAMED_ARGS" => "-c /etc/named.conf" }
   end
 end
 
@@ -74,7 +74,7 @@ end
 end
 
 # Rewrite our default configuration file
-template "/etc/bind/named.conf" do
+template "/etc/named.conf" do
   source "named.conf.erb"
   mode 0644
   owner "root"
@@ -85,3 +85,16 @@ template "/etc/bind/named.conf" do
   variables(:forwarders => node[:crowbar][:dns][:forwarders])
   notifies :restart, "service[bind9]", :immediately
 end
+
+bash "reload consul" do
+  code "/usr/local/bin/consul reload"
+  action :nothing
+end
+
+template "/etc/consul.d/crowbar-dns.json" do
+  source "consul-dns-server.json.erb"
+  mode 0644
+  owner "root"
+  notifies :run, "bash[reload consul]", :immediately
+end
+

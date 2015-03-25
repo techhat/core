@@ -110,6 +110,25 @@ class NodeRolesController < ApplicationController
     end
   end
 
+  def propose
+    @node_role = NodeRole.find_key params[:node_role_id]
+    @node_role.propose!
+    respond_to do |format|
+      format.html { redirect_to node_role_path(@node_role.id) }
+      format.json { render api_show @node_role }
+    end
+  end
+
+  def commit
+    @node_role = NodeRole.find_key params[:node_role_id]
+    @node_role.commit!
+    respond_to do |format|
+      format.html { redirect_to node_role_path(@node_role.id) }
+      format.json { render api_show @node_role }
+    end
+  end
+
+
   def retry
     params[:id] ||= params[:node_role_id]
     @node_role = NodeRole.find_key params[:id]
@@ -130,6 +149,7 @@ class NodeRolesController < ApplicationController
         elsif NodeRole.committed.in_state(NodeRole::TRANSITION).count > 0
           render :json => { "message" => "working" }, :status => 202
         elsif NodeRole.committed.in_state(NodeRole::ERROR).count > 0
+          Rails.logger.info("Failed node roles: #{NodeRole.committed.in_state(NodeRole::ERROR).inspect}")
           render :json => { "message" => "failed" }, :status => 409
         else
           render :json => { "message" => "finished" }, :state => 200

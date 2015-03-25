@@ -20,6 +20,7 @@
 set -x
 shopt -s extglob
 export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
+cp /usr/share/zoneinfo/GMT /etc/localtime
 
 export http_proxy="http://<%=@proxy%>"
 export https_proxy="$http_proxy"
@@ -27,7 +28,7 @@ export no_proxy="localhost,127.0.0.1,localaddress,.<%=@domain%>"
 provisioner="<%=@provisioner_web%>"
 crowbar="http://<%=@provisioner_name%>:3000"
 crowbar_v4="http://<%=@v4_addr%>:3000"
-chef_rpm=chef-11.10.0-1.el6.x86_64.rpm
+chef_rpm=chef-11.16.4-1.el6.x86_64.rpm
 
 # Set up just enough infrastructure to let the jigs work.
 # Allow client to pass http proxy environment variables

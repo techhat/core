@@ -55,15 +55,29 @@ export PS4='${BASH_SOURCE}@${LINENO}(${FUNCNAME[0]}): '
 (cd /etc/yum.repos.d && rm *)
 <% end -%>
 
-HOSTNAME=$(hostname)
-
 key_re='crowbar\.install\.key=([^ ]+)'
+
 if [[ $(cat /proc/cmdline) =~ $key_re ]]; then
     export CROWBAR_KEY="${BASH_REMATCH[1]}"
     echo "$CROWBAR_KEY" >/etc/crowbar.install.key
 elif [[ -f /etc/crowbar.install.key ]]; then
     export CROWBAR_KEY="$(cat /etc/crowbar.install.key)"
 fi
+
+hostname_re='crowbar\.fqdn=([^ ]+)'
+if [[ $(cat /proc/cmdline) =~ $hostname_re ]]; then
+   HOSTNAME=${BASH_REMATCH[1]}
+   if [ -f /etc/sysconfig/network ] ; then
+      sed -i -e "s/HOSTNAME=.*/HOSTNAME=${HOSTNAME}/" /etc/sysconfig/network
+    fi
+    echo "${HOSTNAME#*.}" >/etc/domainname
+else
+    echo "Cannot set hostname, we fail."
+    sleep 999
+    reboot -f
+fi
+echo "$HOSTNAME" >/etc/hostname
+hostname "$HOSTNAME"
 
 echo "proxy=<%=@proxy%>" >> /etc/yum.conf
 sed -i '/^enabled/ s/1/0/' /etc/yum/pluginconf.d/fastestmirror.conf

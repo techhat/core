@@ -140,6 +140,15 @@ request(Method, {URL, Headers, ContentType, Input}, HTTPOptions, Options) ->
   % use the old response that returns the HTTPC tuple
   bdd_utils:log(trace, simple_auth, request, "~p to ~p", [Method, URL]),
   Response = request_action(Method, {URL, Headers, ContentType, Input}, HTTPOptions, Options),
+  case Response of
+    {ok, _} -> no_action;
+    {error, ResponseError1} -> 
+               bdd_utils:log(error, simple_auth, request, "~p to ~p error ~p~n", [Method, URL, ResponseError1]),
+               throw("ERROR in HTTP Action");
+    {_, ResponseError2} -> 
+               bdd_utils:log(error, simple_auth, request, "~p to ~p unexpected ~p~n", [Method, URL, ResponseError2]),
+               throw("UNEXPECTED in HTTP Action")
+  end,
   {ok, {{"HTTP/1.1",Code,_State}, Header, Body}} = Response,
   MediaType = proplists:get_value("content-type", Header),
   {DataType, Version} = case string:tokens(MediaType, ";=") of
@@ -232,14 +241,14 @@ calcResponse(DigestLine, User, Password, URI, Method, Nc) ->
 	{User, Realm, Nonce,  URI, Nc, CNonce, Response, Opaque}.	
 
 calc_response(Method, User, Password, URI, Realm, _Opaque, Nonce, Nc, CNonce, Qop) ->	
-	HA1 = 	hex(binary_to_list(crypto:md5( string:join([User, Realm, Password], ":")))),
-	HA2 = 	hex(binary_to_list(crypto:md5( string:join([Method, URI], ":")))),
+	HA1 = 	hex(binary_to_list(crypto:hash( string:join([User, Realm, Password], ":")))),
+	HA2 = 	hex(binary_to_list(crypto:hash( string:join([Method, URI], ":")))),
 	%io:format("HA1:~p~n", [HA1]),
 	%io:format("HA2:~p~n", [HA2]),	
 	%HA1 result, server nonce (nonce), request counter (nc), client nonce (cnonce), quality of protection code (qop) and HA2 result is calculated.
 	Step3Arg = string:join([HA1, Nonce, Nc, CNonce, Qop, HA2], ":"),
   %io:format("3rd step:~p~n", [Step3Arg]),
-	hex(binary_to_list(crypto:md5( Step3Arg))).
+	hex(binary_to_list(crypto:hash( Step3Arg))).
 
 %% Implements example of digest response calculation from Wikipedia 
 %% (http://en.wikipedia.org/wiki/Digest_access_authentication)

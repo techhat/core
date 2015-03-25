@@ -49,6 +49,7 @@ class Role < ActiveRecord::Base
   scope           :bootstrap,          -> { where(:bootstrap=>true) }
   scope           :abstract,           -> { where(abstract: true)}
   scope           :milestone,          -> { where(milestone: true)}
+  scope           :service,            -> { where(service: true)}
   scope           :active,             -> { joins(:jig).where(["jigs.active = ?", true]) }
   scope           :all_cohorts,        -> { active.order("cohort ASC, name ASC") }
   scope           :all_cohorts_desc,   -> { active.order("cohort DESC, name ASC") }
@@ -138,6 +139,14 @@ class Role < ActiveRecord::Base
 
   def name_safe
     name_i18n.gsub("-","&#8209;").gsub(" ","&nbsp;")
+  end
+
+  def github
+    baseurl = barclamp.source_url
+    baseurl ||= barclamp.parent.source_url    
+    return I18n.t('unknown') unless baseurl
+    "#{baseurl}\/tree\/master\/#{jig.name}\/roles\/#{name}"
+
   end
 
   def update_cohort

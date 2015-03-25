@@ -111,12 +111,12 @@ en:
     utils_description: "Tools and System Functions "
     util_logs: "Exported Items"
     util_logs_description: "Download information complied for review"
-    jigs: "Installed Jigs"
+    jigs: "Jigs"
     jigs_description: "Configuration Manager Plug-ins"
+    hammers: "Hammers"
+    hammers_description: "External Interface Mechanisms"
     barclamps: "Barclamps"
     barclamps_description: "Provisioning and Operations Modules "
-    bootstrap: "Bootstrap"
-    bootstrap_description: "Review Settings for Initial Configuration"
 
     help: Help
     help_description: Help
@@ -192,7 +192,7 @@ en:
   # Layout / Views
   layouts:
     application:
-      provided_by: Provided by
+      provided_by: Based On
     deployment:
       anneal:
         annealling: "Annealing (initiated by user)"
@@ -215,6 +215,7 @@ en:
       parent: "Parent"
       description: "Description"
       roles: "Roles"
+      commit: "xRef"
     show:
       description: "Description"
       roles: "Roles"
@@ -222,6 +223,8 @@ en:
       source_url: "Source URL"
       version: "Version"
       rawconfig: "Raw Configuration"
+      commit: "Commit xRef"
+      build_on: "Date xRef"
   dashboard:
     list:
       title: "Bulk Edit Nodes"
@@ -274,6 +277,7 @@ en:
     show:
       graph: "Graph"
       assign: "Assign Nodes to Roles"
+      services: Deployment Services
       assigned: "Assigned Nodes to Roles"
       roles: "Assigned Roles"
       available_nodes: "Available Nodes"
@@ -343,16 +347,16 @@ en:
       admin: "Admin?"
       alias: "Alias"
       no_nodes: "No Nodes Registered.  Suggested action: configure Crowbar."
-      bootstrap: "Configure System"
       <<: *deployment_common
       <<: *node_role_states
     show:
       node_roles: "In Process Actions"
       alive: "Alive"
       available: "Available"
-      addresses: "Addresses"
+      addresses: "Networking"
       all_node_roles: "All Node Roles"
-      admin: "(admin)"
+      admin: "(Admin)"
+      system: "(System)"
       attribs: "Attributes"
       name: "Name"
       description: "Description"
@@ -364,6 +368,8 @@ en:
       ip: IP Address
       status: Status
       state: State
+      vendor: "System Type"
+      serial: "Serial #"
       hardware: Hardware
       switch_name: "Switch Name"
       switch_port: "Switch Port"
@@ -385,7 +391,7 @@ en:
       release: "Release"
       bootenv: "Boot Environment"
       power: "Available Power Actions"
-      network: Network"
+      network: "Network"
       range: "Range"
       address: "Address"
       conduit: "Conduit"
@@ -433,6 +439,38 @@ en:
       value: "Value"
       save: "Update"
       error: "Render Error"
+  available_hammers:
+    index:
+      id: "ID"
+      title: "Available Hammers"
+      name: "Name"
+      klass: "Class"
+      priority: "Priority"
+      hammers: "Hammer Count"
+    show:
+      name: "Name"
+      class: "Class"
+      priority: "Priority"
+      hammers: "Implemented Hammers"
+  hammers:
+    index:
+      title: "Hammers"
+      name: "Name"
+      authenticator: "Authenticator"
+      endpoint: "End Point"
+      priority: "Priority"
+      username: "Username"
+      nodes: "Node"
+    show:
+      id: "ID"
+      title: "%{hammer} on %{node}"
+      name: "Name"
+      authenticator: "Authenticator"
+      endpoint: "End Point"
+      priority: "Priority"
+      username: "Username"
+      nodes: "Node"
+      hammer: "Hammer"
   roles:
     common: &roles_common
       flags: "Flags"
@@ -443,6 +481,7 @@ en:
       abstract: "Abstract"
       cluster: "Cluster"
       destructive: "Destructive"
+      service: "Service"
       provides: "Provides"
       conflicts: "Conflicts"
       server: "Server"
@@ -462,6 +501,7 @@ en:
       attributes: "Defined Attributes"
       attrib: "Name"
       map: "Map"
+      source: "Source"
     names:
       role: "Roles"
     anneal:
@@ -487,32 +527,6 @@ en:
 #      delete_succeeded: Delete Succeeded
 #      delete_failed: Delete Failed
 #      wait: "Exporting... Please wait or check back later (screen will automatically update when complete)"
-    bootstrap:
-      title: "Initial System Configuration"
-      admin_server: "Assign Admin Node"
-      admin_net: "Create Admin Network"
-      bmc_net: "Create BMC Network"
-      bind_admin_server: "Bind Roles"
-      attribs: "Review Key Attributes"
-      start_server: "Activate Admin Node"
-      monitor: "Monitor Installation"
-      create: "Add '%{server}' Node"
-      add: "Add '%{role}' Role"
-      anneal: "Annealer View"
-      hint: 'Select Role to edit initial settings'
-      attrib: 'Attribute'
-      value: 'Value'
-      ui_renderer: "Debug"
-      name: "Name"
-      description: 'Description'
-      deployment: 'Deployment'
-      vlan: "VLAN"
-      v6prefix: "IPv6 Prefix"
-      bridge: "Bridge"
-      team: "Team"
-      conduit: "Conduit"
-      ranges: "Ranges"
-      start: "Start Server"
     settings:
       name: "Name"
       value: "Value"

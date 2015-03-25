@@ -15,13 +15,21 @@
 #
 class AvailableHammersController < ApplicationController
 
-  # API GET /crowbar/v2/available_hammers
+  # API GET /api/v2/available_hammers
   def index
-    render api_index AvailableHammer, AvailableHammer.all
+    @hammers = AvailableHammer.order('priority')
+    respond_to do |format|
+      format.html { } # show.html.erb
+      format.json { render api_index AvailableHammer, @hammers }
+    end
   end
 
   def show
-    render api_show AvailableHammer.find_key(params[:id])
+    @hammer = AvailableHammer.find_key params[:id]
+    respond_to do |format|
+      format.html {  }
+      format.json { render api_show @hammer }
+    end
   end
 
 end

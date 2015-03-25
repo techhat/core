@@ -24,6 +24,14 @@ roles:
         map: 'test/delay'
         description: 'UI Simulated Delay'
         ui_renderer: 'barclamp_test/attribs/delay'
+  - name: test-async
+    jig: role-provided
+    requires:
+      - test-client
+    attribs:
+      - name: async-result 
+        description: "track return info from async action"
+        map: 'async/result'
   - name: test-server
     jig: test
     requires:

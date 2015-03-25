@@ -28,10 +28,13 @@ class DeploymentsController < ApplicationController
     respond_to do |format|
       format.html {
         @roles = @deployment.deployment_roles.sort{|a,b|a.role.cohort <=> b.role.cohort}
+        # remove the service roles
+        @roles.delete_if { |r| r.role.service }
         # alpha lists by ID
         @nodes = Node.order("name ASC").select do |n|
+          (!n.is_system? and
           (n.deployment_id == @deployment.id) ||
-          (n.node_roles.where(:deployment_id => @deployment.id).count > 0)
+          (n.node_roles.where(:deployment_id => @deployment.id).count > 0))
         end
       }
       format.json { render api_show @deployment }
@@ -64,6 +67,40 @@ class DeploymentsController < ApplicationController
     @deployment = Deployment.find_key params[:id]
     @deployment.destroy
     render api_delete @deployment
+  end
+
+  def status 
+    deployment = Deployment.find_key params[:id]
+
+    out = {
+      node_roles: {},
+      id: -1,
+      state: -1,
+      md5: '',
+      status: 'unknown'
+    }
+
+    nr = if deployment
+      out[:md5] = deployment.node_role_md5
+      out[:state] = deployment.state
+      out[:status] = Deployment::STATES[deployment.state]
+      out[:id] = deployment.id
+      deployment.node_roles
+    else
+      NodeRole.all
+    end
+      
+    nr.each do |role|
+      state = role.state
+      #state = rand(4) #testing random states (for updating)
+      out[:node_roles][role.id] = {
+        status: NodeRole::STATES[state],
+        state: state
+      }
+    end
+
+
+    render api_array out.to_json
   end
 
   def anneal

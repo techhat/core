@@ -15,6 +15,7 @@
 
 -module(dev).
 -export([pop/0, pop/1, unpop/0, g/1]).  
+-export([watch/1, watch/2]).  
 -include("bdd.hrl").
 
 g(Item)         -> 
@@ -66,22 +67,39 @@ pop(ConfigRaw)  ->
 % tear it down
 unpop()       ->  
   {ok, Build} = file:consult(bdd_utils:config(simulator, "dev.config")),
-  [ remove(N) || {N, _, _, _, _} <- buildlist(Build, nodes) ], 
+  [ remove(N2) || {N2, _, _} <- buildlist(Build, deployments) ], 
+  [ remove(N1) || {N1, _, _, _, _} <- buildlist(Build, nodes) ], 
   bdd_crud:delete(node:g(path), g(node_name)),
   bdd:stop([]). 
+
+% watch a URL and inject into the log
+watch(URL)          -> watch(URL, "<<<<<< LOG WATCHER >>>>>>").
+watch(URL, LogMsg)  -> watch(URL, LogMsg, 250, 0).
+watch(URL, LogMsg, Delay, Iter) ->
+  R = eurl:get_http(URL),
+  case Iter rem 4 of
+    1 -> bdd_utils:log(info, dev, watch, "Checking URL ~p every ~p (iteration ~p)", [URL, Delay, Iter]);
+    _ -> noop
+  end,
+  case R#http.code of
+    200 -> timer:sleep(Delay), watch(URL, LogMsg, Delay, Iter+1);
+    _   ->  bdd_utils:marker(LogMsg), R
+  end.
 
 buildlist(Source, Type) ->
   {Type, R} = lists:keyfind(Type, 1, Source),
   R.
 
 remove(Atom) ->
-  bdd_crud:delete(Atom).
+  [{http, Msg, _Code, _URL, _, _, crowbar, _}] = bdd_crud:delete(Atom),
+  bdd_utils:log(info, dev, remove, "Removed ~p with status ~p", [Atom, Msg]).
 
 add_node({Atom, Name, Description, Order, Group}) ->
   Path = bdd_restrat:alias(node, g, [path]),
   Obj = bdd_crud:read_obj(Path,Name),
   case Obj#obj.id of
     "-1" -> O = node:add_node(Name, [{description, Description}, {order, Order}, {group, Group}], Atom),
+          bdd_utils:log(info, node, create_node, "Node ~p created (id ~p)", [Name, O#obj.id]),
           % load test data
           crowbar:step([], {step_given, {0, 1}, ["test loads the","node_discovery","data into",node, Name]}),
           O;

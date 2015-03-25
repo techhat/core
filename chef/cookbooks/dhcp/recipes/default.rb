@@ -14,8 +14,7 @@
 #
 
 include_recipe "utils"
-
-provisioner_port = (node["crowbar"]["provisioner"]["server"]["web_port"] rescue 8091)
+include_recipe "bind9::install"
 
 directory "/etc/dhcp3"
 directory "/etc/dhcp3/groups.d"
@@ -137,7 +136,8 @@ when "suse"
 end
 
 domain_name = (node[:crowbar][:dns][:domain] || node[:domain] rescue node[:domain])
-admin_ip = IP.coerce(node[:crowbar][:provisioner][:server][:v4addr])
+# XXX: This should be done by attribute injection - fix as part of provisioner service work
+admin_ip = node.address("admin",IP::IP4)
 admin_net = node[:crowbar][:network][:admin]
 lease_time = node[:crowbar][:dhcp][:lease_time]
 net_pools = admin_net["ranges"].select{|range|["dhcp","host"].include? range["name"]}

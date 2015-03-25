@@ -61,6 +61,8 @@ class Node < ActiveRecord::Base
   scope    :admin,              -> { where(:admin => true) }
   scope    :alive,              -> { where(:alive => true) }
   scope    :available,          -> { where(:available => true) }
+  scope    :regular,            -> { where(:admin => false, :system=>false) }
+  scope    :system,             -> { where(:system => true) }
 
   # Get all the attributes applicable to a node.
   # This includes:
@@ -96,16 +98,16 @@ class Node < ActiveRecord::Base
   # look at Node state by scanning all node roles.
   def state
     Node.transaction do
+      # first look for single items that change the whole node
       node_roles.each do |nr|
-        if nr.proposed?
-          return NodeRole::PROPOSED
-        elsif nr.error?
-          return NodeRole::ERROR
-        elsif [NodeRole::BLOCKED, NodeRole::TODO, NodeRole::TRANSITION].include? nr.state
-          return NodeRole::TODO
-        end
+        return nr.state if [NodeRole::TRANSITION, NodeRole::ERROR, NodeRole::PROPOSED].include? nr.state
+      end
+      # then scan for secondary items (ordering could hide the earlier items)
+      node_roles.each do |nr|
+        return NodeRole::TODO if [NodeRole::BLOCKED, NodeRole::TODO].include? nr.state
       end
     end
+    # fall through (all NRs must be active)
     return NodeRole::ACTIVE
   end
 
@@ -136,7 +138,8 @@ class Node < ActiveRecord::Base
   end
 
   def addresses
-    net = Network.find_by!(:name => "admin")
+    net = Network.find_by!(:name => "admin") rescue nil
+    return [] unless net
     res = network_allocations.where(network_id: net.id).map do |a|
       a.address
     end
@@ -144,7 +147,9 @@ class Node < ActiveRecord::Base
   end
 
   def address
-    addresses.detect{|a|a.reachable?}
+    res = addresses.detect{|a|a.reachable?}
+    Rails.logger.warn("Node #{name} did not have any reachable addresses in #{addresses.map{ |a| a.addr }.join(",")}") unless res
+    res 
   end
 
   def url_address
@@ -159,6 +164,10 @@ class Node < ActiveRecord::Base
     admin
   end
 
+  def is_system?
+    system
+  end
+
   def virtual?
     virtual = [ "KVM", "VMware Virtual Platform", "VMWare Virtual Platform", "VirtualBox" ]
     virtual.include? get_attrib('hardware')
@@ -166,7 +175,7 @@ class Node < ActiveRecord::Base
 
   # retrieves the Attrib from Attrib
   def get_attrib(attrib)
-    Attrib.get(attrib, self, :discovery) rescue nil
+    Attrib.get(attrib, self) rescue nil
   end
 
   def merge_quirks(new_quirks)
@@ -193,6 +202,14 @@ class Node < ActiveRecord::Base
   def actions
     @nodemgr_actions = Hammer.gather(self) unless @nodemgr_actions
     @nodemgr_actions
+  end
+
+  def halt_if_bored(nr)
+    return unless power[:on]
+    return unless nr.children.empty? || nr.children.all?{|nr|nr.proposed?}
+    return if get_attrib("stay_on")
+    Rails.logger.info("Node #{self.name} is bored, powering off.")
+    self.bootenv == "local" ? power.halt : power.off
   end
 
   def power
@@ -315,9 +332,17 @@ class Node < ActiveRecord::Base
     is_docker_node
   end
 
+  def propose!
+    Node.transaction do
+      node_roles.order("cohort ASC").each do |nr|
+        nr.propose!
+      end
+    end
+  end
+
   def commit!
     Role.all_cohorts.each do |r|
-      if (!admin && !is_docker_node? && r.discovery)
+      if (!system && !admin && !is_docker_node? && r.discovery)
         r.add_to_node(self)
       end
     end
@@ -334,10 +359,14 @@ class Node < ActiveRecord::Base
   def redeploy!
     Node.transaction do
       reload
-      update!(bootenv: "sledgehammer")
       node_roles.update_all(run_count: 0, state: NodeRole::PROPOSED)
+      update!(bootenv: "sledgehammer")
     end
-    power.reboot
+    if actions[:power][:reset]
+      actions[:power].reset
+    else
+      actions[:power].reboot
+    end
     commit!
   end
 
@@ -387,6 +416,7 @@ class Node < ActiveRecord::Base
 
   def alive?
     return false if alive == false
+    return true if self.is_system?
     return true unless Rails.env == "production"
     a = address
     return true if a && self.run("echo alive")[2].success?
@@ -403,7 +433,7 @@ class Node < ActiveRecord::Base
     return unless self.bootenv_changed?
     return unless self.actions[:boot]
     new_bootenv = self.changes["bootenv"]
-    if new_bootenv == "local" && !self.hint[:always_pxe]
+    if new_bootenv == "local"
       self.actions[:boot].disk
     else
       self.actions[:boot].pxe
@@ -489,7 +519,6 @@ class Node < ActiveRecord::Base
 
   # make sure some safe values are set for the node
   def default_population
-    self.admin = true if Node.admin.count == 0    # first node, needs to be admin
     self.name = self.name.downcase
     self.alias ||= self.name.split(".")[0]
     self.deployment ||= Deployment.system
@@ -513,12 +542,15 @@ class Node < ActiveRecord::Base
     # Call all role on_node_create hooks with self.
     # These should happen synchronously.
     # do the low cohorts first
-    Hammer.bind(manager_name: "ssh", username: "root", node: self)
+    if !self.is_system?
+      Hammer.bind(manager_name: "ssh", username: "root", node: self)
+    end
     Rails.logger.info("Node: calling all role on_node_create hooks for #{name}")
     Role.all_cohorts.each do |r|
       Rails.logger.info("Node: Calling #{r.name} on_node_create for #{self.name}")
       r.on_node_create(self)
       if (admin && r.bootstrap)
+        Rails.logger.info("Node: Adding #{r.name} to #{self.name} (bootstrap)")
         r.add_to_node(self)
       end
     end

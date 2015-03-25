@@ -17,6 +17,7 @@ en:
     node_roles:
   common:
     roles:
-      saltstack-master: "Saltstack Master"
-      saltstack-minion: "Saltstack Minion"
+      saltstack: "SaltStack Platform"
+      saltstack-master: "SaltStack Master"
+      saltstack-minion: "SaltStack Minion"
     attribs:

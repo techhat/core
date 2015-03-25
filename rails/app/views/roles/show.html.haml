@@ -16,6 +16,9 @@
       - if Rails.env.development?
         %dt= t '.type'
         %dd= "[#{@role.class.to_s}]"
+      - if @role.github and (current_user.settings(:docs).sources rescue false)
+        %dt= t '.source'
+        %dd= link_to @role.github, @role.github
       %dt= t '.flags'
       %dd
         = t '.library' if @role.library 
@@ -23,6 +26,7 @@
         = t '.implicit' if @role.implicit
         = t '.bootstrap' if @role.bootstrap
         = t '.abstract' if @role.abstract
+        = t '.service' if @role.service
 
   .clear
 
@@ -35,7 +39,6 @@
 
   - unless params.include? :form
     %h3= t '.upstream'
-
     = render :partial => "index", :locals => { :list => @role.parents, :jig_name => nil }
 
 %h3= t'.attributes'

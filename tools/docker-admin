@@ -41,7 +41,7 @@ declare -A image_map
 #image_map["ubuntu"]="ubuntu:precise"
 image_map["ubuntu"]="opencrowbar/ubuntu:12.04-4"
 #image_map["centos"]="centos:centos6"
-image_map["centos"]="opencrowbar/centos:6.5-12"
+image_map["centos"]="opencrowbar/centos:6.6-2"
 image_map["centos7"]="centos:centos7"
 image_map["opensuse"]="mmckeen/opensuse-13-1:latest"
 image_map["fedora"]="fedora:20"
@@ -69,8 +69,9 @@ if [[ -f $HOME/.ssh/id_rsa.pub ]]; then
 else
     docker_args+=(-e "SSH_PUBKEY=")
 fi
-docker_args+=(-p "3000:3000")
-docker_args+=(-p "443:443")
+docker_args+=(-p "3000:3000")   # Crowbar Rails web server
+docker_args+=(-p "8500:8500")   # Consul Server
+docker_args+=(-p "443:443")     # Chef Server
 bridge="docker0"
 bridge_re='-b=([^ ])'
 bridge_addr_re='inet ([0-9.]+)/'
@@ -91,5 +92,10 @@ done
 # since 0.8.1 we need to run in privileged mode so we can change the networking
 docker_args+=("--privileged")
 # Run whatever we specified to run inside a container.
+sudo rm -rf "$HOME/.cache/opencrowbar/tftpboot/nodes"
 docker run "${docker_args[@]}" "$image" /opt/opencrowbar/core/tools/docker-init.sh "$@"
+
+# helpful reminder for docker hygene
+echo "now may be a good time to run: docker ps -q -a | xargs docker rm"
+
 exit $?

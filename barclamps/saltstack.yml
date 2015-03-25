@@ -14,16 +14,23 @@
 #
 
 roles:
+  - name: saltstack
+    jig: noop
+    description: 'SaltStack Platform'
+    requires:
+      - saltstack-minion
+    flags:
+      - milestone
   - name: saltstack-master
     jig: script
-    description: 'Provides a saltstack-master instance.'
+    description: 'Provides a SaltStack Master instance.'
     flags:
       - cluster
     requires:
       - crowbar-installed-node
     attribs:
       - name: saltstack-master_ip
-        description: 'IP that minions should use to talk to the salt master'
+        description: 'IP that minions should use to talk to the SaltStack Master'
         map: 'saltstack/master/ip'
         schema:
           type: str

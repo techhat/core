@@ -7,7 +7,9 @@ rm -rf /var/cache/crowbar \
     /var/lib/gems/*/gems \
     /opt/opencrowbar/core/rails/Gemfile.lock
 touch /tmp/install_pkgs
-./bootstrap.sh && \
+cd /opt/opencrowbar/core
+./bootstrap.sh
+./crowbar-boot.sh
     chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o 'recipe[crowbar-bootstrap::cleanup]' || {
     echo "Failed to create a cleaned Docker image"
     exit 1

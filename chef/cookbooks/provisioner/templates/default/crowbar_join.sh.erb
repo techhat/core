@@ -14,6 +14,15 @@
 # limitations under the License.
 #
 
+### BEGIN INIT INFO
+# Provides:               crowbar_join.sh
+# Required-Start:         sshd
+# Required-Stop:
+# Default-Start:          2 3 4 5
+# Default-Stop:
+# Short-Description:      Crowbar Join Script
+#### END INIT INFO
+
 # Spin while we wait for the interface to come up.
 
 echo "Waiting on our network interface to come up..."
@@ -21,9 +30,6 @@ while ! ip addr | grep -v " lo" | grep -q "inet "
 do
   sleep 1
 done
-
-# Get our hostname
-HOSTNAME=$(hostname -f)
 
 if [[ -f /etc/crowbar.install.key ]]; then
     export CROWBAR_KEY="$(cat /etc/crowbar.install.key)"
@@ -33,7 +39,7 @@ put_alive() {
     while ! curl -f -u "$CROWBAR_KEY" --digest -L -X PUT \
         -d "bootenv=local" \
         -d "alive=$1" \
-        "http://<%=@admin_ip%>:3000/api/v2/nodes/$HOSTNAME" &>/dev/null; do
+        "http://<%=@admin_ip%>:3000/api/v2/nodes/<%=@name%>" &>/dev/null; do
         sleep 1
     done
 }

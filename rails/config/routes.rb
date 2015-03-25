@@ -46,6 +46,8 @@ Crowbar::Application.routes.draw do
   resources :docs, constraints: {id: /[^\?]*/}
 
   resources :groups
+  resources :hammers
+  resources :available_hammers
   resources :jigs
   resources :node_roles  do
     put :retry
@@ -83,8 +85,6 @@ Crowbar::Application.routes.draw do
     get 'fail'          => "support#fail"
     get 'settings'      => "support#settings", :as => :utils_settings
     put 'settings(/:id/:value)' => "support#settings_put", :as => :utils_settings_put
-    get  "bootstrap"     => "support#bootstrap", :as => :bootstrap
-    post "bootstrap"     => "support#bootstrap_post", :as => :bootstrap_post
     namespace :scaffolds do
       resources :attribs do as_routes end
       resources :available_hammers do as_routes end
@@ -102,6 +102,7 @@ Crowbar::Application.routes.draw do
       resources :nodes do as_routes end
       resources :hammers do as_routes end
       resources :node_roles do as_routes end
+      resources :node_role_attrib_links do as_routes end
       resources :roles do as_routes end
       resources :role_requires do as_routes end
       resources :runs do as_routes end
@@ -112,6 +113,8 @@ Crowbar::Application.routes.draw do
   scope 'support' do
     get 'logs', :controller => 'support', :action => 'logs'
     get 'get_cli', :controller => 'support', :action => 'get_cli'
+    # bootstrap used by BDD to create admin
+    post "bootstrap"     => "support#bootstrap_post", :as => :bootstrap_post
   end
 
   devise_for :users, { :path_prefix => 'my', :module => :devise, :class_name=> 'User' }
@@ -181,11 +184,12 @@ Crowbar::Application.routes.draw do
             resources :hammers
             resources :attribs
             resources :roles
-            put :power
+            put :propose
+            put :commit
+            match :power, via: [:get, :put]
             put :debug
             put :undebug
             put :redeploy
-            put :commit
             get 'addresses'
           end
           resources :hammers do
@@ -195,6 +199,8 @@ Crowbar::Application.routes.draw do
           resources :node_roles do
             resources :attribs
             put :retry
+            put :propose
+            put :commit
           end
           resources :roles do
             resources :attribs
@@ -207,8 +213,6 @@ Crowbar::Application.routes.draw do
             delete "lock", :controller => "users", :action => "unlock"
             put "reset_password", :controller => "users", :action => "reset_password"
           end
-
-          resources :dhcps
 
         end # version
       end # api

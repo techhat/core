@@ -16,29 +16,44 @@
 set -e
 date 
 export RAILS_ENV=development
-
-# use the host proxy 
-if [[ $http_proxy ]] && ! pidof squid; then
-    export upstream_proxy=$http_proxy
-fi
+touch /tmp/development.txt
 
 # developers may not want TMUX, give them a hint
 if [[ $TMUX ]]; then
   echo 'Using TMUX > "export TMUX=false" to disable.'
 fi
 
-# setup & load env info
-. ./bootstrap.sh 
+cd /opt/opencrowbar/core
 
-# install the database
-chef-solo -c /opt/opencrowbar/core/bootstrap/chef-solo.rb -o "${database_recipes}"
+# cleanup logs
+if [ -f rails/log/development.log ]; then
+  rm rails/log/development.log
+fi
 
-./setup/00-crowbar-rake-tasks.install && \
-    ./setup/01-crowbar-start.install && \
-    ./setup/02-make-machine-key.install || {
-    echo "Failed to bootstrap the Crowbar UI"
-    exit 1
-}
+# bootstrap
+. ./bootstrap.sh
 
-. /etc/profile
-/bin/bash -i
+if [[ $http_proxy && !$upstream_proxy ]] && ! pidof squid; then
+    export upstream_proxy=$http_proxy
+fi
+
+# for dev environment, we force the FQDN
+FQDN="devadmin.opencrowbar.org"
+hostname $FQDN
+
+# Fix CentOs/RedHat Hostname
+if [ -f /etc/sysconfig/network ] ; then
+  sed -i -e "s/HOSTNAME=.*/HOSTNAME=$FQDN/" /etc/sysconfig/network
+fi
+# Set domainname (for dns)
+echo "${FQDN#*.}" > /etc/domainname
+export FQDN
+
+./crowbar-boot.sh
+./crowbar-consul.sh
+./crowbar-database.sh
+./crowbar-core.sh "$RAILS_ENV"
+
+# Make sure that Crowbar is running with the proper environment variables
+service crowbar stop
+service crowbar start

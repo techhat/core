@@ -18,6 +18,7 @@
 -export([json_build/1]).
 -include("bdd.hrl").
 
+g(Item) when is_list(Item) -> g(list_to_atom(Item));
 g(Item) ->
   case Item of
     "cli"   -> g(cli);
@@ -74,6 +75,8 @@ parse_object(Results) ->
                 ID = proplists:get_value("id", JSON),
                 #obj{namespace = crowbar, data=JSON, type = Type, id = ID, url = Results#http.url};
     "array" ->  JSON = json:parse(Results#http.data),
+                #array{namespace = crowbar, data=JSON, type = Type, url = Results#http.url, count = length(JSON) };
+    "result" -> JSON = json:parse(Results#http.data),
                 #array{namespace = crowbar, data=JSON, type = Type, url = Results#http.url, count = length(JSON) };
     "list"  ->  JSON = json:parse(Results#http.data),
                 IDs = [proplists:get_value("id", I) || I <- JSON],
@@ -134,12 +137,18 @@ step(_Global, {step_setup, {_Scenario, _N}, Test}) ->
   bdd_utils:alias(group, group_cb),
   bdd_utils:alias(user, user_cb),
   bdd_utils:alias(networkrange, range),
+  % before we do anything else, we need to create some consul services
+  Services = bdd_utils:config(services, ["dns-service", "ntp-service"]),
+  [true,true] = [consul:reg_serv(S) || S <- Services],
+  bdd_utils:log(info, crowbar, global_setup, "Consul Registered ~p",[Services]),
+  % make sure there's a worker
+  true = worker(),
   % skip some activity if we're logging at debug level
   case lists:member(debug,get(log)) of
-    true -> bdd_utils:log(debug, crowbar, step, "Skipping Setup Queue Empty, Make Admin Net & Test Attribs",[]);
+    true -> bdd_utils:log(debug, crowbar, global_setup, "Skipping Setup Queue Empty, Make Admin Net & Test Attribs",[]);
     _ ->
       % make sure that the delayed job queues are running
-      true = bdd_clirat:step([], {foo, {0,0}, ["process", "delayed","returns", "delayed_job.([0..9])"]}),
+      crowbar:step([], {foo, {0,0}, ["process", "delayed","returns", "delayed_job.([0..9])"]}),
       % turn off the delays in the test jig
       %role:step(Global, {step_given, {Scenario, _N}, ["I set the",role, "test-admin", "property", "test", "to", "false"]}), 
       %role:step(Global, {step_given, {Scenario, _N}, ["I set the",role, "test-server", "property", "test", "to", "false"]}), 
@@ -150,8 +159,27 @@ step(_Global, {step_setup, {_Scenario, _N}, Test}) ->
       network:make_admin()
   end,
   % create node for testing
-  bdd_utils:log(debug, crowbar, step, "Global Setup running (creating node ~p)",[g(node_name)]),
+  bdd_utils:log(debug, crowbar, global_setup, "Global Setup running (creating node ~p)",[g(node_name)]),
   node:add_node(g(node_name), "crowbar-admin-node", [{description, Test ++ g(description)}, {order, 100}, {admin, "true"}], g(node_atom)),
+  % setup phantom node roles
+  bdd_utils:log(debug, crowbar, global_setup, "Adding Service Roles", []),
+  Phantom = bdd_utils:config(system_phantom,"system-phantom.internal.local"),
+  PhantomRoles = bdd_utils:config(system_phantom_roles, ["dns-service", "ntp-service","dns-mgmt_service"]),
+  ServiceNRs = eurl:path([node:g(path), Phantom, "node_roles"]),
+  R = eurl:get_http(ServiceNRs),
+  O = bdd_restrat:get_object(R),
+  bdd_utils:log(debug, crowbar, global_setup, "Checking for Phantom Node Roles ~p",[O#list.count]),
+  case O#list.count of
+    1 -> Attribs = ["chef-server_port", "chef-server_protocol"],
+          JSON = [crowbar:json([{name, A}, {description, g(description)}, {barclamp, 'test'}, {order, g(order)}, {writable, true}]) || A <- Attribs],
+          bdd_utils:log(info, crowbar, global_setup, "Creating Attribs ~p",[Attribs]),
+          [bdd_restrat:create(attrib:g(path), J, attrib, 0) || J <- JSON],
+          [node:bind(Phantom,PR) || PR <- PhantomRoles],
+          bdd_utils:log(info, crowbar, global_setup, "Bound Roles ~p to Phantom ~p",[PhantomRoles, Phantom]),
+          node:commit(Phantom),
+          node:alive(Phantom);
+    _  -> noop 
+  end,
   true;
 
 % find the node from setup and remove it
@@ -233,18 +261,56 @@ step(_Given, {step_when, _N, ["REST gets the",network,Network,range,Key]})  ->
   bdd_utils:log(debug, crowbar, step, "REST range get the object ~p for ~p path", [Network, URI]),
   bdd_restrat:step(_Given, {step_when, _N, ["REST requests the",URI,"page"]});
 
+step(_Global, {_, {_Scenario, _N}, [node,Node,"has the",Role,"role"]}) -> 
+  bdd_utils:log(debug, crowbar, step, "REST add role ~p to node ~p", [Role, Node]),
+  node:bind(Node, Role);
+
+step(_Given, {_, {_Scenario, _N}, [node,Node,"is committed"]}) -> 
+  bdd_utils:log(debug, crowbar, step, "REST commits node ~p", [Node]),
+  node:commit(Node),
+  node:alive(Node);
+
+step(_Given, {_, {_Scenario, _N}, ["REST retries",node,Node,node_role,Role]}) -> 
+  bdd_utils:log(debug, crowbar, step, "REST retry Node ~p Role ~p", [Node, Role]),
+  Path = eurl:path([node:g(path),Node,"node_roles"]),
+  Obj = bdd_crud:read_obj(Path,Role),
+  bdd_utils:log(trace, crowbar, step, "REST retry object ~p", [Obj]),
+  R = eurl:path([node_role:g(path),Obj#obj.id,"retry"]),
+  bdd_utils:log(debug, crowbar, step, "REST retry path ~p", [R]),
+  bdd_crud:update(R, "");
+
 % ============================  THEN STEPS =========================================
 
 
 % helper for limiting checks to body
-step(Result, {step_then, _N, ["I should see", Text, "in the body"]}) -> 
+step(Result, {step_then, {_Scenario, _N}, ["I should see", Text, "in the body"]}) -> 
   bdd_webrat:step(Result, {step_then, _N, ["I should see", Text, "in section", "main_body"]});
 
 % helper for limiting checks to body
-step(Result, {step_then, _N, ["I should not see", Text, "in the body"]}) -> 
+step(Result, {step_then, {_Scenario, _N}, ["I should not see", Text, "in the body"]}) -> 
   bdd_webrat:step(Result, {step_then, _N, ["I should not see", Text, "in section", "main_body"]});
 
+% check node status
+step(Result, {step_then, {_Scenario, _N}, [node, Node, "should not be in state", State]}) -> 
+  not step(Result, {step_then, {_Scenario, _N}, [node, Node, "should be in state", State]});
+
+step(_Result, {step_then, {_Scenario, _N}, [node, Node, "should be in state", State]}) -> 
+  URI = eurl:path(["api","status", "nodes", Node]),
+  bdd_utils:log(debug, crowbar, step, "Node ~p checking for state ~p", [URI, State]),
+  R = eurl:get_http(URI),
+  {array, crowbar, "json", J, _, _, _} = bdd_restrat:get_object(R),
+  bdd_utils:log(trace, crowbar, step, "Node ~p returned ~p", [Node, J]),  
+  [{_ID,[{"name",Node},{"state",_},{"status",Status},_]}] = J,
+  bdd_utils:log(debug, crowbar, step, "Node ~p returned ~p", [Node, Status]),  
+  Status =:= State;
+
 % ============================  CLEANUP =============================================
+
+step(_, {_Any, {_Scenario, _N}, ["process", PS, "returns", Test]}) ->
+  case worker() of
+    true -> true;
+    _ -> bdd_clirat:step([], {_Any, {_Scenario, _N}, ["process", PS,"returns", Test]}), false
+  end;
 
 step(_, {_, {_Scenario, _N}, ["there are no pending Crowbar runs for",node,Node]}) -> 
   timer:sleep(250),   % we want a little pause to allow for settling
