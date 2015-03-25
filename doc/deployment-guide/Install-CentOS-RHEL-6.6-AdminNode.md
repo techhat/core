@@ -135,14 +135,14 @@ After logging in as root, run the following command (as an example) to
 install hardware support off of the latest master build:
 
 ```
-wget --no-check-certificate -O - https://raw.githubusercontent.com/opencrowbar/core/develop/tools/crowbar-install.sh | source /dev/stdin
+wget --no-check-certificate -O - https://raw.githubusercontent.com/opencrowbar/core/master/tools/crowbar-install.sh | source /dev/stdin
 ```
 
 or if you don't want hardware support (bios, RAID, and IPMI) and the
 develop builds, run the following command:
 
 ```
-wget --no-check-certificate -O - https://raw.githubusercontent.com/opencrowbar/core/develop/tools/crowbar-install.sh | source /dev/stdin --develop --without-hardware
+wget --no-check-certificate -O - https://raw.githubusercontent.com/opencrowbar/core/master/tools/crowbar-install.sh | source /dev/stdin --develop --without-hardware
 ```
 
 This will take a little bit of time.  Once complete, you will need to
