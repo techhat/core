@@ -36,6 +36,8 @@ en:
     description: "Description"
     deployment: "Deployment"
     router: "Router"
+    address: "Address"
+    pref: "Preference"
     vlan: "VLAN"
     bridge: "Bridge"
     team: "Team"
@@ -52,8 +54,9 @@ en:
       network-public: "Public Network"
       network-private: "Private Network"
       network-storage: "Storage Network"
-      network-bmc: "Managment Network"
+      network-bmc: "BMC Network"
       network-pilot: "Pilot Network"
+      network-lldpd: "LLDPD Network Service"
   networks:
     index:
       title: "Installed Networks"
@@ -61,6 +64,7 @@ en:
       <<: *network_common
     show:
       <<: *network_common
+      role_missing: "WARNING: Missing Network Role Mapping!"
     map:
       title: "Network-Node Map"
       node: "Node"

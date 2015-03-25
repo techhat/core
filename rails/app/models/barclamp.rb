@@ -55,17 +55,18 @@ class Barclamp < ActiveRecord::Base
 
       Rails.logger.info "Importing Barclamp #{bc_name} from #{source_path}"
 
-      # verson tracking
-      gitcommit = "unknown"
-      gitdate = "unknown"
+      # verson tracking (use Git if we don't get it from the RPM)
+      gitinfo = %x[cd '#{source_path}' && git log -n 1].split("\n") rescue ['unknown']*3
+      gitcommit = gitinfo[0] || "unknown" rescue "unknown"
+      gitdate = gitinfo[2] || "unknown" rescue "unknown"
       if bc['git']
-        gitcommit = bc['git']['commit'] || 'unknown'
-        gitdate = bc['git']['date'] || 'unknown'
+        gitcommit = bc['git']['commit'] || gitcommit
+        gitdate = bc['git']['date'] || gitdate
       end
-      version = bc["version"] || '2.0'
-      build_version = bc["build_version"] || '2.0'
+      version = bc["version"] || '0.0'
+      build_version = bc["build_version"] || '0.0'
 
-      source_url = bc["source_url"] || "http://github/opencrowbar/unknown"
+      source_url = bc["source_url"]
       barclamp.update_attributes!(:description   => bc['description'] || bc_name.humanize,
                                   :version       => version,
                                   :build_version => build_version,
@@ -95,7 +96,7 @@ class Barclamp < ActiveRecord::Base
         jig_active = if (Rails.env == "production")
                        jig_name != "test"
                      else
-                       ["noop","test"].include? jig_name
+                       ["noop","test","role-provided"].include? jig_name
                      end
         jig = jig_type.constantize.find_or_create_by!(:name => jig_name)
         jig.update_attributes!(:order => 100,
@@ -176,7 +177,9 @@ class Barclamp < ActiveRecord::Base
                              :discovery=>flags.include?('discovery'),
                              :abstract=>flags.include?('abstract'),
                              :destructive=>flags.include?('destructive'),
-                             :cluster=>flags.include?('cluster'))
+                             :service=>flags.include?('service'),
+                             :cluster=>flags.include?('cluster'),
+                             :powersave=>flags.include?('powersave'))
         RoleRequire.where(:role_id=>r.id).delete_all
         RoleRequireAttrib.where(:role_id => r.id).delete_all
         prerequisites.each do |req|

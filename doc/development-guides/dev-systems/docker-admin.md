@@ -69,12 +69,6 @@ as their init system, perform the following steps:
   After making the above changes. reboot or restart the Docker service (`sudo service docker restart`) for them to
   take effect.
 
-Time saving tips
-
-  * preload the with `docker pull opencrowbar/centos`
-    * while you wait, you can setup your [git remotes](../contributing.md) in another session
-  * test docker, use `docker run -i -t centos /bin/bash`
-
 ### The docker-admin command and its environment
 
 The `docker-admin` command (located in the `tools` directory in the
@@ -113,8 +107,8 @@ able to install operating systems on slave nodes.  By default, the
 (partial list below) from the ISO images:
 
  * `ubuntu-14.04`: `ubuntu-14.04.1-server-amd64.iso`
- * `centos-6.5`: `CentOS-6.5-x86_64-bin-DVD1.iso`
- * `centos-7.0`: `CentOS-7.0-1406-x86_64-DVD.iso`
+ * `centos-6.6`: `CentOS-6.6-x86_64-bin-DVD1.iso`
+ * `centos-7.0.1406`: `CentOS-7.0-1406-x86_64-DVD.iso`
 
 > This list is subject to change!  For the latest list, consult [Provisioner Base Images](https://github.com/opencrowbar/core/blob/master/chef/roles/provisioner-base-images/role-template.json) template file.
 
@@ -156,7 +150,7 @@ This will perform the following actions:
   * Update the `provisioner-server` role template to use the passed-in
   http proxy, if any.
   * Update the `provisioner-os-install` role template to default to
-  `centos-6.5`.
+  `centos-7.0`.
   * Create the admin node record.
   * Extract the addresses that were allocated to the admin node, and
   bind them to eth0.

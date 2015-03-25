@@ -51,7 +51,7 @@ json(Name, Description, Order) ->
 make_admin() ->
   Test = eurl:get_http(eurl:path([g(path),"admin"])),
   if Test#http.code == 404 ->
-      URI = eurl:path(["utils","bootstrap"]),
+      URI = eurl:path(["support","bootstrap"]),
       R = eurl:put_post(URI, [], post),
       bdd_utils:log(debug, network, make_admin, "Code: ~p, URL: ~p", [R#http.code, R#http.url]);
     true -> 
@@ -66,13 +66,13 @@ step(_Global, {step_given, {_Scenario, _N}, ["I add an Interface",Interface,"wit
 step(_Given, {step_when, {Scenario, _N}, ["I use the Network API to create",Network,"with range",Range,"from",First,"to",Last]}) -> 
   step(_Given, {step_given, {Scenario, _N}, ["I use the Network API to create",Network,"with range",Range,"from",First,"to",Last]});
 step(_Global, {step_given, {Scenario, _N}, ["I use the Network API to create",Network,"with range",Range,"from",First,"to",Last]}) -> 
- JSON = crowbar:json([{name, Network}, {description, g(description)}, {order, g(order)}, {conduit, "1g1"}, {deployment, "system"},
+ JSON = crowbar:json([{name, Network}, {description, g(description)}, {order, g(order)}, {conduit, "1g0"}, {deployment, "system"},
       {ranges, [{0, [{name, Range}, {first, First}, {last, Last}] }] } ]),
  bdd_utils:log(debug, network, step, "creating network ~p on range ~p [~p to ~p] with JSON ~p", [Network, Range, First, Last, JSON]),
  bdd_restrat:create(g(path), JSON, network, Scenario);
 
 step(_Global, {step_when, {Scenario, _N}, ["I use the Network API to create",Network,"with v6prefix of",V6Prefix]}) -> 
- JSON = crowbar:json([{name, Network}, {description, g(description)}, {order, g(order)}, {conduit, "1g1"}, {deployment, "system"},
+ JSON = crowbar:json([{name, Network}, {description, g(description)}, {order, g(order)}, {conduit, "1g0"}, {deployment, "system"},
       {v6prefix, V6Prefix} ]),
  bdd_utils:log(debug, network, step, "creating network ~p with v6 ~p with JSON ~p", [Network, V6Prefix, JSON]),
  bdd_restrat:create(g(path), JSON, network, Scenario);

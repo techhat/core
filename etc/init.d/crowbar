@@ -15,7 +15,14 @@
 
 PATH="/bin:/usr/bin:/sbin:/usr/sbin:/usr/local/bin:/usr/local/sbin"
 GEMFILE_LOCK=/opt/opencrowbar/core/rails/Gemfile.lock
-[[ $RAILS_ENV ]] || RAILS_ENV=production
+
+# if we started in development, make sure we're running development
+if [[ -f /tmp/development.txt ]]; then
+    RAILS_ENV=development
+else
+    [[ $RAILS_ENV ]] || RAILS_ENV=production
+fi
+
 export RAILS_ENV
 if [[ -f /etc/redhat-release || -f /etc/centos-release ]]; then
     OS=redhat
@@ -52,16 +59,19 @@ start(){
     as_crowbar bundle exec puma -d -C $PUMA_CFG
     echo "Starting delayed_job NodeRoleRunner queue (10 workers)"
     as_crowbar bundle exec script/delayed_job --queue=NodeRoleRunner -n 10 start
+    as_crowbar bundle exec script/dj_reaper start
 }
 
 stop() {
     as_crowbar bundle exec pumactl -F $PUMA_CFG stop
     as_crowbar bundle exec script/delayed_job stop
+    as_crowbar bundle exec script/dj_reaper stop
 }
 
 restart() {
     as_crowbar bundle exec pumactl -F $PUMA_CFG restart
     as_crowbar bundle exec script/delayed_job restart
+    as_crowbar bundle exec script/dj_reaper restart
 }
 
 status() {

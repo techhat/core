@@ -23,10 +23,7 @@ roles:
       - implicit
     requires:
       - network-server
-      - dns-database
-      - provisioner-dhcp-database
-      - provisioner-repos
-      - provisioner-docker-setup
+      - network-lldpd
     conflicts:
       - crowbar-managed-node
     provides:
@@ -37,17 +34,20 @@ roles:
     flags:
       - milestone
       - implicit
+      - powersave
     requires:
       - deployer-client
       - dns-client
       - logging-client
       - ntp-client
+      - network-lldpd
   - name: crowbar-hardware-configured
-    description: "Crowbar Harware Configured Checkpoint"
+    description: "Crowbar Hardware Configured Checkpoint"
     jig: noop
     flags:
       - implicit
       - milestone
+      - powersave
     requires:
       - crowbar-managed-node
   - name: crowbar-installed-node
@@ -56,6 +56,7 @@ roles:
     flags:
       - milestone
       - implicit
+      - powersave
     requires:
       - crowbar-hardware-configured
       - provisioner-os-install
@@ -127,6 +128,12 @@ attribs:
   - name: 'number_of_drives'
     description: 'RAID set'
     map: 'ohai/block_device'
+  - name: stay_on
+    map: 'crowbar/stay_on'
+    description: 'Leave the node powered on when there is nothing to do'
+    schema:
+      type: bool
+      required: false
   # Node specific hints.
   - name: 'hint-admin-macs'
     description: 'Hint for Admin MAC addresses'

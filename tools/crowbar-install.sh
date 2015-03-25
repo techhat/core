@@ -23,19 +23,38 @@ service iptables stop
 setenforce 0
 sed -i "s/SELINUX=.*/SELINUX=permissive/g" /etc/selinux/config
 
-# Setup OCB repo
+# Get release requested
+if [[ $1 = '--develop' ]]; then
+  shift
+  RELEASE="develop"
+  RELPATH="develop"
+elif [[ $1 = '--master' ]]; then
+  shift
+  RELEASE="master"
+  RELPATH="el6"
+elif [[ $1 = '--release' ]]; then
+  shift
+  RELEASE="$1"
+  RELPATH="release/$1"
+  shift
+else
+  RELEASE="master"
+  RELPATH="el6"
+fi
+
+# Setup repo
 cd /etc/yum.repos.d
-cat > ocb.repo <<EOF
-[ocb]
-name=repo for opencrowbar rpms
-baseurl=http://opencrowbar.s3-website-us-east-1.amazonaws.com/el6
+# Setup OCB repo
+cat > ocb-$RELEASE-install.repo <<EOF
+[ocb-$RELEASE]
+name=$RELEASE repo for opencrowbar rpms
+baseurl=http://opencrowbar.s3-website-us-east-1.amazonaws.com/$RELPATH
 enabled=1
 gpgcheck=0
 type=none
 autorefresh=1
 keeppackages=1
 EOF
-
 cd -
 
 # Clean up repos
@@ -43,19 +62,29 @@ yum clean all
 yum makecache
 
 # Install code
+WITH_HARDWARE="NO"
 if [[ $1 = '--without-hardware' ]]; then
+    shift
     yum install -y opencrowbar-core
 else
     yum install -y opencrowbar-hardware
+    WITH_HARDWARE="YES"
 fi
 
 # Get the default installation OS.
 mkdir -p /tftpboot/isos
 cd /tftpboot/isos
-wget http://mirrors.kernel.org/centos/7/isos/x86_64/CentOS-7.0-1406-x86_64-DVD.iso
+
+WITH_DOWNLOAD="NO"
+if [[ $1 = '--download-os' ]]; then
+  shift
+  WITH_DOWNLOAD="YES"
+  wget http://mirrors.kernel.org/centos/7/isos/x86_64/CentOS-7.0-1406-x86_64-DVD.iso
+fi
+
 cd -
 
-if [[ $1 != '--without-hardware' ]]; then
+if [[ $WITH_HARDWARE = 'YES' ]]; then
     mkdir -p /tftpboot/files/raid
 
     echo "Remember to populate /tftpboot/files/raid"
@@ -65,5 +94,13 @@ if [[ $1 != '--without-hardware' ]]; then
     echo "  http://www.lsi.com/downloads/Public/Host%20Bus%20Adapters/Host%20Bus%20Adapters%20Common%20Files/SAS_SATA_6G_P19/SAS2IRCU_P19.zip"
     echo "  http://www.lsi.com/downloads/Public/RAID%20Controllers/RAID%20Controllers%20Common%20Files/8.07.14_MegaCLI.zip"
     echo ""
+fi
+
+if [[ $WITH_DOWNLOAD = 'NO' ]]; then
+  echo "Remeber to populate /tftpboot/isos"
+  echo "You will need to place a supported ISO image or images into this directory"
+  echo "before running production.sh"
+  echo "More details cab be found here:"
+  echo "See: https://github.com/opencrowbar/core/tree/master/doc/deployment-guide/adding-operating-systems.md"
 fi
 

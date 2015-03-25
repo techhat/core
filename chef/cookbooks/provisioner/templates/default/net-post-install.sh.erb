@@ -83,7 +83,21 @@ elif [[ -f /etc/crowbar.install.key ]]; then
     export CROWBAR_KEY="$(cat /etc/crowbar.install.key)"
 fi
 
-HOSTNAME=$(hostname -f)
+hostname_re='crowbar\.fqdn=([^ ]+)'
+if [[ $(cat /proc/cmdline) =~ $hostname_re ]]; then
+   HOSTNAME=${BASH_REMATCH[1]}
+   if [ -f /etc/sysconfig/network ] ; then
+      sed -i -e "s/HOSTNAME=.*/HOSTNAME=${HOSTNAME}/" /etc/sysconfig/network
+    fi
+    echo "${HOSTNAME#*.}" >/etc/domainname
+else
+    echo "Cannot set hostname, we fail."
+    sleep 999
+    reboot -f
+fi
+echo "$HOSTNAME" >/etc/hostname
+hostname "$HOSTNAME"
+
 
 export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true
 export LC_ALL=C LANGUAGE=C LANG=C
@@ -95,6 +109,9 @@ echo "PermitRootLogin without-password" >> /etc/ssh/sshd_config
 # Allow client to pass http proxy environment variables
 echo "AcceptEnv http_proxy https_proxy no_proxy" >> /etc/ssh/sshd_config
 
+<% if @install_name =~ /^debian-/ -%>
+update-rc.d crowbar_join.sh defaults
+<% end -%>
 
 curl -u "$CROWBAR_KEY" --digest -L -X PUT -d "bootenv=local" \
     "http://<%=@admin_ip%>:3000/api/v2/nodes/$HOSTNAME"
@@ -117,8 +134,10 @@ EOF
 mount /proc /target/proc
 chmod +x /target/etc/init.d/crowbar_join.sh
 chmod +x /target/update_system2.sh
+<% if @install_name !~ /^debian-/ -%>
 chroot /target ln -s /etc/init.d/crowbar_join.sh /etc/rc3.d/S80crowbar
 chroot /target ln -s /etc/init.d/crowbar_join.sh /etc/rc5.d/S80crowbar
 chroot /target ln -s /etc/init.d/crowbar_join.sh /etc/rc2.d/S80crowbar
+<% end -%>
 chroot /target /update_system2.sh
 sync

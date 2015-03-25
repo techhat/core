@@ -31,23 +31,24 @@ g(Item) ->
     deployment -> "system";
     _ -> crowbar:g(Item)
   end.
-  
+
 % Common Routine
 % Makes sure that the JSON conforms to expectations (only tests deltas)
 validate(JSON) when is_record(JSON, obj) ->
   J = JSON#obj.data,
   R =[JSON#obj.type == "node",
-      bdd_utils:is_a(J, length, 17),
-      bdd_utils:is_a(J, boolean, alive), 
-      bdd_utils:is_a(J, boolean, available), 
-      bdd_utils:is_a(J, boolean, allocated), 
-      bdd_utils:is_a(J, boolean, admin), 
-      bdd_utils:is_a(J, string, bootenv), 
-      bdd_utils:is_a(J, string, discovery), 
-      bdd_utils:is_a(J, string, hint), 
-      bdd_utils:is_a(J, dbid, deployment_id), 
+      bdd_utils:is_a(J, length, 18),
+      bdd_utils:is_a(J, boolean, alive),
+      bdd_utils:is_a(J, boolean, system),
+      bdd_utils:is_a(J, boolean, available),
+      bdd_utils:is_a(J, boolean, allocated),
+      bdd_utils:is_a(J, boolean, admin),
+      bdd_utils:is_a(J, string, bootenv),
+      bdd_utils:is_a(J, string, discovery),
+      bdd_utils:is_a(J, string, hint),
+      bdd_utils:is_a(J, dbid, deployment_id),
       bdd_utils:is_a(J, dbid, target_role_id),
-      bdd_utils:is_a(J, string, alias), 
+      bdd_utils:is_a(J, string, alias),
       bdd_utils:is_a(J, integer, order),
       crowbar_rest:validate(J)],
   bdd_utils:assert(R).
@@ -69,12 +70,12 @@ create_node(Name, Params, Atom) ->
     "-1" -> 
           P = lists:append([{name, Name}, {alive, true}, {bootenv, node:g(bootenv)}], Params),
           JSON = crowbar:json(P),
-          bdd_utils:log(debug, node, create_node, "Creating Node ~p on ~p with ~p", [Name, Path, JSON]),
+          bdd_utils:log(trace, node, create_node, "Creating Node ~p on ~p with ~p", [Name, Path, JSON]),
           [_R, O] = bdd_crud:create(Path, JSON, Atom),
-          bdd_utils:log(info, node, create_node, "Node ~p created (id ~p)", [Name, O#obj.id]),
+          bdd_utils:log(debug, node, create_node, "Node ~p created (id ~p)", [Name, O#obj.id]),
           O;
     _  -> bdd_utils:config_set(Atom, Obj),
-          bdd_utils:log(info, node, create_node, "Node ~p already exists (id ~p)", [Name, Obj#obj.id]),
+          bdd_utils:log(debug, node, create_node, "Node ~p already exists (id ~p)", [Name, Obj#obj.id]),
           Obj
   end.
 
@@ -85,7 +86,7 @@ add_node(Name, Role, Params, Atom) ->
   bind(O#obj.id, Role),
   % add os choices for admin node
   case Role of
-    "crowbar-admin-node" -> node_role:available_os(O#obj.id, ["ubuntu-12.04","centos-6.5"]);
+    "crowbar-admin-node" -> node_role:available_os(O#obj.id, ["ubuntu-12.04","centos-6.6"]);
     _ -> noop
   end,
   % complete deploy
@@ -121,11 +122,14 @@ step(_Given, {step_when, {_Scenario, _N}, ["REST sets the",node,Node,Field,"stat
   JSON = crowbar:json([{Field, Value}]),
   bdd_crud:update(URI, JSON);
 
+step(_Global, {step_given, {ScenarioID, _N}, ["REST creates and commits the",node,Name]}) ->
+  add_node(Name, [], ScenarioID);
+
 step(_Global, {step_setup, _N, _}) -> 
   % create node(s) for tests
   Node = json(g(name), g(description), 100),
   bdd_crud:create(g(path), Node, g(atom)),
-  true = bdd_clirat:step([], {foo, {0,0}, ["process", "delayed","returns", "delayed_job.([0..9])"]});
+  crowbar:step([], {foo, {0,0}, ["process", "delayed","returns", "delayed_job.([0..9])"]});
 
 step(_Global, {step_teardown, _N, _}) -> 
   % find the node from setup and remove it

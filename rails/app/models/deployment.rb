@@ -13,6 +13,8 @@
 # limitations under the License.
 #
 
+require 'digest/md5'
+
 class Deployment < ActiveRecord::Base
 
   ERROR = -1
@@ -27,6 +29,7 @@ class Deployment < ActiveRecord::Base
   }
 
   after_commit :run_if_any_runnable, on: :update
+  after_commit :add_phantom_node, on: :create
   before_destroy :release_nodes    # also prevent deleting if deployment is a system deployment
 
   has_many        :deployment_roles,  :dependent => :destroy
@@ -53,6 +56,10 @@ class Deployment < ActiveRecord::Base
   # is this a system deployment?
   def system?
     read_attribute("system")
+  end
+
+  def system_node
+    nodes.where(:system => true).first
   end
 
   def available_roles
@@ -102,6 +109,13 @@ class Deployment < ActiveRecord::Base
     node_roles.each { |nr| s[nr.id] = nr.status if nr.error?  }
   end
 
+  # returns a md5 sum of all of the node ids
+  def node_role_md5
+    return '' if !node_roles || node_roles.count == 0
+    data = node_roles.map(&:id)*'_'
+    return Digest::MD5.hexdigest(data)
+  end
+
   def commit
     Deployment.transaction do
       deployment_roles.all.each{|dr|dr.commit if dr.proposed?}
@@ -126,6 +140,20 @@ class Deployment < ActiveRecord::Base
   end
 
   private
+
+  def add_phantom_node
+    begin
+      Node.create!(name: "#{name}-phantom.internal.local",
+                   admin: false,
+                   system: true,
+                   alive: true,
+                   deployment_id: self.id,
+                   bootenv: "local")
+    rescue Exception => e
+      puts "failed to add node: #{e.message}"
+      Rails.logger.fatal("Failed to add node: #{e.message}")
+    end
+  end
 
   def run_if_any_runnable
     Rails.logger.debug("Deployment: after_commit hook called")

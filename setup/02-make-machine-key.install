@@ -3,6 +3,7 @@
 [[  -d /opt/opencrowbar/core ]] || \
     { echo "Not an admin node, not creating machine key"; exit 0; }
 
+[[ -f /etc/profile.d/crowbar-key.sh ]] && exit 0
 touch "/tmp/.crowbar_in_bootstrap"
 
 if [[ ! -e /etc/crowbar.install.key ]]; then
